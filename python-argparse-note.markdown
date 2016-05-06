@@ -20,4 +20,9 @@
 
 ####[moduel argparse](https://docs.python.org/3/library/argparse.html)
 
-- 
+- `nargs`关键字参数可以为一个选项指定多个值.
+ - 定义时指定`nargs=N`, 则命令行中的N个参数将被作为一个list, 即使当`nargs=1`也将返回list, 而不是默认的字符串
+ - `?` - 命令行中的一个参数将被作为选项的值, 或者未使用选项, 则将使用默认值
+ - `*` - 命令行中所有参数都以list的形式作为选项值
+ - `+` - 与`*`类似, 除此之外, 若一个参数都没有, 因抛出异常
+ - `argparse.REMAINDER` - 剩余的命令行参数全部以list的形式作为选项的值
