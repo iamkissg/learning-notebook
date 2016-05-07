@@ -77,7 +77,7 @@ html → <html><head>...</head><body>...</body></html>
  - `^` - 标识字符串的开始
  - `\` - 转义字符
  - `$` - 标识字符串的结尾
-- 在BeautifulSoup中使用regex, 提高效率, 如images = bsObj.findAll("img",{"src":re.compile("\.\.imggifts/img.*\.jpg")})
+- 在BeautifulSoup中使用regex, 提高效率, 如`images = bsObj.findAll("img",{"src":re.compile("\.\.imggifts/img.*\.jpg")})`
 - regex可以作为BeautifulSoup语句的任意一个参数
 - 对于标签对象, 可采用`.attrs`获取全部属性, 返回字典对象. `imgTag.attrs["src"]`就可以获取图片的资源位置
 - BeautifulSoup允许将特定函数类型作为`findAll`函数的参数, 唯一的限制条件是这些函数必须将一个***标签作为参数***且***返回结果是布尔类型***. BeautifulSoup用这个函数评估遇到的每个标签对象, 将评估结果为"True"的标签保留下来, 将其他标签剔除. 如`soup.findAll(lambda tag: len(tag.attrs) == 2)`将返回具有2个属性的标签
@@ -118,4 +118,47 @@ html → <html><head>...</head><body>...</body></html>
  2. 客户端重定向, 跳转到新url之前网页需要加载内容
 - python3版本的urllib库会自动处理重定向. 不过要注意,有时候要采集的页面的 URL 可能并不是当前所在页面的url
 - 爬虫的一些基本模式: 找出页面上的所有链接, 区分内外链, 跳转到新的页面
-- 
+
+
+###Chapter4 使用API
+
+- API的用处:为不同的应用提供了方便友好的接口。不同的开发者用不同的架构,甚至不同的语言编写软件都没问题——因为API设计的目的就是要成为一种通用语言,让不同的软件进行信息共享。
+- API 可以通过 HTTP 协议下载文件,和 URL 访问网站获取数据的协议一样,它几乎可以实现所有在网上干的事情。API 之所以叫 API 而不是叫网站的原因,其实是首先 API 请求使用非常严谨的语法,其次 API 用 JSON 或 XML 格式表示数据,而不是HTML 格式。
+- 通常api的验证方法都是用类似令牌(token)的方式调用, 每次api调用将令牌传递给服务器. token除了在url链接中传递, 还会通过请求头里的cookie将用户信息传递给服务器:
+
+```
+token = token
+webRequest = urllib.request.Request("http://xxx", headers={"token": token})
+```
+
+- api一个重要的特征是反馈格式友好的数据, xml或json. 目前json比xml更受欢迎, 因为json文件比完整的xml文件小, 另一个原因是网络技术的改变.
+- 使用get请求获取数据时, 用url路径描述获取的数据范围, 查询参数可以作为过滤器或附加请求使用.
+- 一些api使用文件路径形式指定api版本, 数据和其他属性:
+
+```text
+http://socialmediasite.com/api/v4/json/users/1234/posts?from=08012014&to=08312014
+```
+
+- 一个api通过请求参数的形式指定数据格式和api版本:
+
+```text
+http://socialmediasite.com/users/1234/posts?format=json&from=08012014&to=08312014
+```
+.
+- 一些api使用文件路径形式指定api版本, 数据和其他属性:
+
+```text
+http://socialmediasite.com/api/v4/json/users/1234/posts?from=08012014&to=08312014
+```
+
+- 一个api通过请求参数的形式指定数据格式和api版本:
+
+```text
+```
+
+- `response.read()` -> bytes
+- python将json转换成字典, json数组转换成列表, json字符串转换成pyton字符串
+- 如果你用API作为唯一的数据源,那么你最多就是复制别人数据库里的数据,不过都是些已经公布过的“黄花菜”。真正有意思的事情,是把多个数据源组合成新的形式,或者把 API 作为一种工具,从全新的视角对采集到的数据进行解释
+- 虽然列表迭代速度更快, 但集合查找速度更快(确定一个对象是否在集合中).
+- python的集合就是值为None的字典, 用到是hash表结构, 查询速度为O(1)
+-   
