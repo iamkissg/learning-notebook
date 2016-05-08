@@ -139,21 +139,10 @@ webRequest = urllib.request.Request("http://xxx", headers={"token": token})
 http://socialmediasite.com/api/v4/json/users/1234/posts?from=08012014&to=08312014
 ```
 
-- 一个api通过请求参数的形式指定数据格式和api版本:
+- 一些api通过请求参数的形式指定数据格式和api版本:
 
 ```text
 http://socialmediasite.com/users/1234/posts?format=json&from=08012014&to=08312014
-```
-.
-- 一些api使用文件路径形式指定api版本, 数据和其他属性:
-
-```text
-http://socialmediasite.com/api/v4/json/users/1234/posts?from=08012014&to=08312014
-```
-
-- 一个api通过请求参数的形式指定数据格式和api版本:
-
-```text
 ```
 
 - `response.read()` -> bytes
@@ -161,4 +150,82 @@ http://socialmediasite.com/api/v4/json/users/1234/posts?from=08012014&to=0831201
 - 如果你用API作为唯一的数据源,那么你最多就是复制别人数据库里的数据,不过都是些已经公布过的“黄花菜”。真正有意思的事情,是把多个数据源组合成新的形式,或者把 API 作为一种工具,从全新的视角对采集到的数据进行解释
 - 虽然列表迭代速度更快, 但集合查找速度更快(确定一个对象是否在集合中).
 - python的集合就是值为None的字典, 用到是hash表结构, 查询速度为O(1)
--   
+- 多种技术的融合, 多种数据的融合, 将得到更有用的信息
+
+###Chapter5 存储数据
+
+- 大数据存储与数据交互能力, 在新式的程序开发中已经是重中之重了.
+- 存储媒体文件的2种主要方式: 只获取url链接, 或直接将源文件下载下来
+- 直接引用url链接的优点:
+ - 爬虫运行得更快,耗费的流量更少,因为只要链接,不需要下载文件。
+ - 可以节省很多存储空间,因为只需要存储 URL 链接就可以。
+ - 存储 URL 的代码更容易写,也不需要实现文件下载代码。
+ - 不下载文件能够降低目标主机服务器的负载。
+- 直接引用url链接的缺点:
+ - 这些内嵌在网站或应用中的外站 URL 链接被称为盗链(hotlinking), 每个网站都会实施防盗链措施。
+ - 因为链接文件在别人的服务器上,所以应用就要跟着别人的节奏运行了。
+ - 盗链是很容易改变的。如果盗链图片放在博客上,要是被对方服务器发现,很可能被恶搞。如果 URL 链接存起来准备以后再用,可能用的时候链接已经失效了,或者是变成了完全无关的内容。
+- python3的urllib.request.`urlretrieve`可以根据文件的url下载文件:
+
+```python
+from urllib.request import urlretrieve
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+html = urlopen("http://www.pythonscraping.com")
+bsObj = BeautifulSoup(html)
+imageLocation = bsObj.find("a", {"id": "logo"}).find("img")["src"]
+urlretrieve (imageLocation, "logo.jpg")
+```
+
+- csv(comma-separated values, 逗号分隔值)是存储表格数据的常用文件格式
+- 网络数据采集的一个常用功能就是获取html表格并写入csv
+- 除了用户定义的变量名,mysql是不区分大小写的, 习惯上mysql关键字用大写表示
+- 连接与游标(connection/cursor)是数据库编程的2种模式:
+ - 连接模式除了要连接数据库之外, 还要发送数据库信息, 处理回滚操作, 创建游标对象等
+ - 一个连接可以创建多个游标, 一个游标跟踪一种状态信息, 比如数据库的使用状态. 游标还会包含最后一次查询执行的结果. 通过调用游标函数, 如`fetchall`获取查询结果
+ - 游标与连接使用完毕之后,务必要关闭, 否则会导致连接泄漏, 会一直消耗数据库资源
+- 使用`try ... finally`语句保证数据库连接与游标的关闭
+- 让数据库更高效的几种方法:
+ 1. 给每张表都增加id字段. 通常数据库很难智能地选择主键
+ 2. 用智能索引, `CREATE INDEX definition ON dictionary (id, definition(16));`
+ 3. 选择合适的范式
+- 发送Email, 通过爬虫或api获取信息, 设置条件自动发送Email! 那些订阅邮件, 肯定就是这么来的!
+
+###Chapter6 读取文档
+
+- 互联网的最基本特征: 作为不同类型文件的传输媒体
+- 互联网不是一个html页面的集合, 它是一个信息的集合, 而html文件只是展示信息的一个框架
+- 从最底层的角度看, 所有文档都是01的编码, 而任意类型的文件的唯一区别就在于,它们的01在面向用户的转换方式不同
+- `utf-8`的全称: Universal Character Set - Transformation Format 8 bit
+- utf-8的每个字符开头有一个标记,表示该字符用几个字节表示.一个字符最多可以是4字节, 但字节信息里还包括一部分设置信息, 因此全部32位不会都用, 最多使用21位
+- utf8利用ascii的填充位让所有以"0"开头的字节表示该字符占用1个字节. 因此, 在英文字符在ascii和uft8两个编码方式下表示一样
+- python默认将文本读成ascii编码格式
+- utf8不能处理iso编码格式. 因此做数据采集工作时,尤其对国际网咱, 最好先看看meta标签内容, 用网站推荐的编码方式读取页面内容
+- 几种读取在线文件的方法:
+ 1. 下载读取
+ 2. 从网上直接将文件读成一个字符串, 然后将其转换成一个StringIO对象, 使其具有文件的属性:
+
+```python
+dataFile = io.StringIO(data)
+```
+
+- `csv.reader`的返回对象是可迭代的, 而且由list对象构成.
+- `csv.DictReader`将csv文件的每一行转换成python字典返回, 并将字段列表(标题栏)保存在dictReader.fieldnames里
+- 后面的关于docx的内容略过了.
+
+##Part2 高阶数据采集
+
+- 网站的真实故事其实都隐藏在js, 登录表单和网站反爬取措施的背后
+
+###Chapter7 数据清洗
+
+- 用regex移除不想要的字符, 如换行符(\n). 剔除字符的过程, 合理的先后顺序能省很多力
+- 用***先以utf8格式编码,再以ascii方法解码***的方式,可以一定程度上剔除unicode字符
+- 数据标准化要确保清洗后的数据在语言学或逻辑上是等价的
+- python的`OrderedDict`,能解决字典无序排列的问题
+- 数据标准化时,根据投入计算能力的多少,还可以再考虑大小写(python与Python),单词等价(1st与first),连字符的使用(co-ordinated与coordinated),拼写错误,语病等因素
+- 对连字符的一个处理是,将其去掉或转换成其他字符,比如空格
+
+###Chapter8 自然语言处理
+
+- 
