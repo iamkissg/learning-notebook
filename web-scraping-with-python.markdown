@@ -211,7 +211,21 @@ dataFile = io.StringIO(data)
 
 - `csv.reader`的返回对象是可迭代的, 而且由list对象构成.
 - `csv.DictReader`将csv文件的每一行转换成python字典返回, 并将字段列表(标题栏)保存在dictReader.fieldnames里
-- 后面的关于docx的内容略过了.
+- pdf的文字提取
+- .docx的文字提取：
+ 1. 从文件读取xml, 将文档读成一个二进制对象(BytesIO), 再用zipfile解压(所有.docx文件为了节省空间都进行过压缩), 再读取解压文件, 就变成了xml
+
+```python
+from zipfile import ZipFile
+from urllib.request import urlopen
+from io import BytesIO
+
+wordFile = urlopen("http://pythonscraping.com/pages/AWordDocument.docx").read()
+wordFile = BytesIO(wordFile)
+document = ZipFile(wordFile)
+xml_content = document.read("word/document.xml")
+print(xml_content.decode("utf-8"))
+```
 
 ##Part2 高阶数据采集
 
@@ -228,4 +242,14 @@ dataFile = io.StringIO(data)
 
 ###Chapter8 自然语言处理
 
-- 
+- n-gram模型可用于词频分析, 很厉害!
+- `马尔可夫文字生成器(markov text generator)` - 基于一种常用于分析大量随机事件的马尔可夫模型. 随机事件的特点是一个离散事件发生之后, 另一个离散事件将在前一个事件的条件下以一定概率发生
+- 在马尔可夫模型描述的天气系统中,如果今天是晴天,那么明天有70%的可能是晴天,20%的可能多云,10% 的可能下雨。如果今天是下雨天,那么明天有 50% 的可能也下雨,25% 的可能是晴天,25% 的可能是多云
+- 马尔可夫模型需要注意的点:
+ - 任何一个节点引出的所有可能的总和必须等于 100%。无论是多么复杂的系统,必然会在下一步发生若干事件中的一个事件。
+ - 只有当前节点的状态会影响下一个状态。
+ - 有些节点可能比其他节点较难到达
+- google的pagerank算法也是基于马尔可夫模型的, 将网站看作节点, 入站/出站链接作为节点的连线. 连接某个节点的可能性(linklihood)表示一个网站的相对关注度
+- 马尔可夫文字生成器的工作原理: 对文献中的每一个单词进行有效处理, 再建立一个二维字典, 用于统计二元词组的词频. 每次以当前单词所在节点为查询表, 选择下一个节点. 随机生成一个权重, 用词频减权重, 一旦权重减为非正数, 确定该单词为下一单词. 词频高的单词使权重减小得更厉害, 因此更容易获得
+- 在寻找有向图的最短路径问题中, 效果最好且最常用的方法是`广度优先搜索(breadth-first search, bfs)`
+
