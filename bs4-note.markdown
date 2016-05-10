@@ -77,11 +77,49 @@ tag.string.replace_with("No longer bold")
  - 向上导航
   1. `.parent`获得元素的父亲. 顶级标签<html>的父亲是`BeautifulSoup`对象, `BeautifulSoup`的父亲是None
   2. `.parents`获得祖辈生成器
-  3. 
  - 侧向导航
   1. `.next_sibling`或`.previous_sibling`获得后一个或前一个兄弟. 若不存在, 将得到None. 兄弟必须是同一个父亲. (在html文档中, 标签可能是以换行符分隔开的, 换行符实际被认为是一个字符串, 因此其兄弟是"\n")
   2. `.next_siblings`或`.previous_siblings`获得兄弟的迭代器
  - 前后导航
-  1. 
-
-
+  1. `.next_element`与`.previous_element`指向下一个或前一个被解析的对象, 可能是兄弟, 可能是父子
+  2. `.next_elements`与`.previous_elements`获得往后或往前的对象生成器
+- 搜索树, 最长用的方法:`find()`与`findAll()`
+ - 可以传入`find`或`findAll`作为过滤器的可以是:
+  1. 字符串
+  2. regex
+  3. list
+  4. `True` - 将匹配它能匹配的一切
+  5. 函数 - 必须以一个文档元素作为唯一参数, 并返回布尔值
+ - `findAll(name, attrs, recursive, string, limit, **kw)` - 浏览一个标签的所有后代, 并获取匹配过滤器的所有后代
+  1. `name` - 标签名, 可以是字符串, regex, list, 函数, `True`
+  2. `**kw` - 除了`name`, `attrs`等位置参数, 其他使用关键字参数传入的参数都将被视作标签的属性. 参数值可以是str, regex, list, func, True
+  3. `class`是python关键字, 当要以css的class作为检索时, 要使用`class_`, 其值可以是str, regex, func, True
+  4. 对于具有多个值的属性, 匹配任意一个即可匹配到它;
+  5. `string` - 用于检索字符串, 可与其他参数联合使用找到需要的标签. 将在所有标签的`.string`查询参数指定的`string`
+  6. `limit` - `findAll`默认返回所有标签或字符串, 可用`limit`参数限制返回结果的数量, 将在匹配到相应数量的结果之后停止搜索
+  7. `recursive` - 默认搜索所有后代, 即`recursive`的默认值是`True`, 可设为False, 从而只对标签的直接后代进行搜索
+  8. 可以通过字典的方式指定标签的属性
+ - `find(name, attrs, recursive, string, **kw)`
+  1. 无论如何, `findAll`都将遍历整个文档, 但当文档中只存在一个特定的标签, 遍历将浪费很多时间
+  2. `find`与`findAll(limit=1)`类似, 但前者直接返回搜索结果, 后者返回list, 虽然这个list只有一个值
+  3. `findAll`匹配不到时, 返回`空list`, `find`则返回None
+ - `find_parents`与`find_parent`
+  1. `find`与`findAll`都是向下搜索的, 而`find_parent`与`find_parents`则是向上搜索
+ - `find_next_siblings`与`find_next_sibling`使用`.next_siblings`迭代剩余的兄弟节点
+ - `find_previous_siblings`与`find_previous_sibling`使用`.previous_siblings`迭代之前的兄弟节点
+ - `find_all_next()`与`find_next()`使用`.next_elements`进行迭代
+ - `find_all_previous()`与`find_previous()`使用`.previous_elements`进行迭代
+- CSS 选择器
+ - 使用标签对象或`BeautifulSoup`对象的的`.select()`方法, 达到css选择器的效果(好吧, 我基本不会)
+- 更新树
+ - 可通过`tag.name`或`tag["xxx"]`的方式轻松地修改标签名与属性
+ - 通过`tag.string`可修改标签的内容, 但如果标签包含其他标签, 这些内容全都会被替换掉
+ - `tag.append()` - 追加内容, 可以是str, NaviagleString, Comment, 或`new_tag`对象
+ - `tag.insert()` - 与append类似, 除了插入位置可自定义
+ - `insert_before`与`insert_after` - 在当前标签之前或之后插入str或标签
+ - `clear` - 清除标签的内容
+ - `.extract`将指定标签或str从树中解压出来, 返回并删除, 有点像pop
+ - `.decompose`从树中删除标签或str, 完全地毁尸灭迹
+ - `replace_with`用新的tag或str替换树中原来的tag或str
+ - `.wrap`将元素打包进指定的标签
+ - `.unwrap`将指定元素从速从标签中移除
