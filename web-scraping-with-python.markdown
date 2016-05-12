@@ -242,7 +242,12 @@ print(xml_content.decode("utf-8"))
 
 ###Chapter8 自然语言处理
 
+####概括数据
+
 - n-gram模型可用于词频分析, 很厉害!
+
+####马尔可夫模型
+
 - `马尔可夫文字生成器(markov text generator)` - 基于一种常用于分析大量随机事件的马尔可夫模型. 随机事件的特点是一个离散事件发生之后, 另一个离散事件将在前一个事件的条件下以一定概率发生
 - 在马尔可夫模型描述的天气系统中,如果今天是晴天,那么明天有70%的可能是晴天,20%的可能多云,10% 的可能下雨。如果今天是下雨天,那么明天有 50% 的可能也下雨,25% 的可能是晴天,25% 的可能是多云
 - 马尔可夫模型需要注意的点:
@@ -253,3 +258,148 @@ print(xml_content.decode("utf-8"))
 - 马尔可夫文字生成器的工作原理: 对文献中的每一个单词进行有效处理, 再建立一个二维字典, 用于统计二元词组的词频. 每次以当前单词所在节点为查询表, 选择下一个节点. 随机生成一个权重, 用词频减权重, 一旦权重减为非正数, 确定该单词为下一单词. 词频高的单词使权重减小得更厉害, 因此更容易获得
 - 在寻找有向图的最短路径问题中, 效果最好且最常用的方法是`广度优先搜索(breadth-first search, bfs)`
 
+####自然语言处理
+
+- 哪些单词使用得最频繁?哪些单词用得最少?一个单词后面跟着哪几个单词?这些单词是如何组合在一起的?
+- 用nltk做统计分析一般从`Text`对象开始`, 文本对象可以像普通的python list那样操作, 好像它们就是一个包含文本里所有单词的list一样.
+
+###Chapter9 穿越网页表单与登录窗口进行采集
+
+- 利用post方法, 将信息推送到服务器进行存储与分析
+- 页面表单基本上可以看成一种用户提交post请求的方式, 且这种请求方式是服务器能够理解和使用的
+
+####Requests库
+
+- `Requests`库是一个擅长处理复杂的http请求, cookie, header等内容的第三方库
+
+####提交一个基本表单
+
+- 大多数网页表单都是由一些 HTML 字段、一个提交按钮、一个在表单处理完之后跳转的“执行结果”(表单属性 action 的值)页面构成。
+- 字段的名称决定了表单被确认后要被传送到服务器上的变量名称
+- 表单的真实行为发生在`action`指定的页面
+- HTML 表单的目的,只是帮助网站的访问者发送格式合理的请求,向服务器请求没有出现的页面
+- 大多数情况下, 提交表单只需要注意:
+ 1. 提交数据的字段名称
+ 2. 表单的`action`属性, 即表单提交后网站会显示的页面
+
+####单选按钮, 复选框和其他输入
+
+- 无论表单的字段看起来多么复杂,仍然只有两件事是需要关注的:`字段名称`和`值`。字段名称可以通过查看源代码寻找 `name` 属性轻易获得
+- `字段`的值有时会比较复杂. 如果不确定一个输入字段指定数据格式, 可**跟踪浏览器正在通过网站发出或接受的get和post请求的内容**.
+- 跟踪get请求效果最好也最直接的手段是看网站的url链接, `?xxx=xxx&xxx=...`
+- 复杂的`post`表单, 可查看浏览器向服务器传递的参数, 用chrome的`F12`
+
+####提交文件和图像
+
+- 用`requests`处理文件上传的方式与提交普通表单类似:
+
+```python
+import requests
+file = {"image": open("filename", "rb")}
+response = requests.post("http://...", data = file)
+```
+
+####处理登录和cookie
+
+- 大多数新式的网站都用 `cookie` 跟踪用户是否已登录的状态信息。一旦网站验证了登录权证,它就会将它们保存在浏览器的 cookie 中,里面通常包含一个服务器生成的`令牌`、`登录有效时限`和`状态跟踪信息`。网站会把这个 cookie 当作信息验证的证据,在你浏览网站的每个页面时出示给服务器。
+- `obj.cookies.method`从响应中获取`cookie`, 再通过`cookies`参数将`cookie`发送给服务器
+- 使用`session`对象, 可以`持续`跟踪会话信息, 比如cookie, header, 甚至运行http协议的信息.
+- 使`session`的方法就是, 创建`Session`对象, 再用`Session`对象发送请求
+- 写爬虫时, 应持续关注cookie的状态, 掌握它们在可控范围内非常重要. 这样可以避免痛苦地调试和追寻网站行为异常,节省很多时间。
+- 在cookie发明之前, 处理网站登录常用的方法是用`http基本接入认证(http basic access authentication)`, requests库的`auth`模块专门用来处理http认证:
+
+```python
+import requests
+from requests.auth import AuthBase
+from requests.auth import HTTPBasicAuth
+auth = HTTPBasicAuth('ryan', 'password')
+r = requests.post(url="http://pythonscraping.com/pages/auth/login.php", auth=auth)  # HTTPBasicAuth对象作为auth参数传递到请求
+```
+
+####其他表单问题
+
+- 表单是网络恶意机器人(malicious bots)酷爱的网站切入点。
+- 新式的网站经常在HTML 中使用很多安全措施,让表单不能被快速穿越
+
+###Chapter10 采集 JavaScript
+
+- JavaScript 是网络上最常用也是支持者最多的`客户端脚本语言`。它可以收集用户的跟踪数据,不需要重载页面直接提交表单,在页面嵌入多媒体文件,甚至运行网页游戏
+
+#### JavaScript 简介
+
+- JavaScript 是一种弱类型语言, 所有变量都用`var`关键字进行定义, 可以将函数作为变量使用
+- 常用的 JavaScript 库
+ 1. `jQuery`:
+  - 一个网站使用`jQuery`的特征是源代码里包含了`jQuery`入口.
+  - jQuery 可以动态地创建 HTML 内容,只有在 JavaScript 代码执行之后才会显示。如果用传统的方法采集页面内容,就只能获得 JavaScript 代码执行之前页面上的内容
+  - 这些页面还可能包含动画、用户交互内容和嵌入式媒体,这些内容对网络数据采集都是挑战。
+ 2. Google Analytics
+  - 如果网站使用了Google Analytics,在页面底部会有类似`<!-- Google Analytics -->`的 JavaScript 代码
+  - 如果一个网站使用了 Google Analytics 或其他类似的网络分析系统,而不想让网站知道在采集数据,就要确保把那些分析工具的 cookie 或者所有 cookie 都关掉。
+ 3. Google Map
+  - 在 Google 地图上,显示一个位置最常用的方法就是用标记
+
+```JavaScript
+var marker = new google.maps.Marker({
+    position: new google.maps.LatLng(-25.363882,131.044922),
+    map: map,
+    title: 'Some marker text'
+});
+```
+
+  - 取出google.maps.LatLng()里的坐标, 生成一组经纬度坐标值, 再通过google的`地理坐标反向查询`api(https://developers.google.com/maps/documentation/javascript/examples/geocoding-reverse), 就可以将经纬度坐标组解析成格式规范的地址, 可存储或分析
+
+####ajax和动态html
+
+- 提交表单之后,或从服务器获取信息之后,网站的页面不需要重新刷新,那么访问的网站就在用 Ajax 技术。
+- `Ajax(Asynchronous JavaScript and XML)` 其实并不是一门语言,而是用来完成网络任务的一系列技术, 网站不需要使用单独的页面请求就可以和网络服务器进行交互
+- 动态 HTML(dynamic HTML,`DHTML`)也是一系列用于解决网络问题的技术集合。DHTML 是用`客户端语言`改变页面的 HTML 元素(HTML、CSS,或者二者皆被改变). 是否使用了DHTML, 关键要看有没有用 JavaScript 控制 HTML 和 CSS 元素
+- 有时,***网页用一个加载页面把你引到另一个页面上,但是网页的 URL 链接在这个过程中一直没有变化。***
+- 当用爬虫采集的网页内容与浏览器上显示的不同时, 是因为爬虫不能执行 JavaScript 代码, 而浏览器可以正确地执行 JavaScript .
+- 用python爬取使用了`ajax`或`dhtml`的页面的2种办法:
+ 1. 直接从 JavaScript 代码里采集内容
+ 2. 用第三方库运行 JavaScript , 直接采集在浏览器中看到的页面
+
+####Selenium
+
+- `Selenium`是一个网络数据采集工具, 其最初是为`网站自动化测试`而开发的, 近几年,它还被广泛用于获取精确的网站快照.
+- `Selenium`可以直接运行在浏览器上, 它可以让浏览器自动加载页面, 获取需要的数据, 甚至页面截屏, 或者判断网站上某些动作是否发生
+- `Selenium`需要与第三方浏览器结合使用.
+- `PhantomJS`可以将网站加载到内存并执行页面上的 JavaScript, 但它不会向用户展示网页的图形界面.
+- 把 `Selenium` 和 `PhantomJS` 结合在一起,就可以运行一个非常强大的网络爬虫了,可以处理 `cookie`、`JavaScrip`、`header`,以及任何需要做的事情
+- python的`Selenium`库是一个在`WebDriver`上调用的api, `webdriver`有点像加载网站的浏览器, 可以像`BeautifulSoup`对象一样用来查找页面元素, 与页面上的元素进行交互, 以及执行其他动作来运行爬虫
+- webdriver的page_source函数返回页面的源代码字符串. 若不想要`Selenium`选择器, 则可以用返回的源代码创建`BeautifulSoup`对象.
+- 页面的加载时间是不确定的, 具体依赖于服务器某一毫秒的负载情况, 以及不断变化的网速
+- 解决`页面加载时间不确定`的有效方法是, 让`Selenium`不断检查某个元素是否存在, 以确定页面是否完全加载, 如果页面加载成功, 就执行后续程序.
+- `WebDriverWait`与`expected_conditions`组合构成了`Selenium`的隐式等待(implicit wait).
+- `隐式等待`与`显式等待`的不同之处在于,隐式等待是等 DOM 中某个状态发生后再继续运行代码(没有明确的等待时间,但是有最大等待时限,只要在时限内就可以),而显式等待明确设置了等待时间。在隐式等待中,DOM 触发的状态用expected_conditions 定义
+- `Selenium`中元素被触发的期望条件有许多种, 包括
+ - 弹出一个提示框
+ - 一个元素被选中(比如文本框)
+ - 页面的标题改变了,或者某个文字显示在页面上或者某个元素里
+ - 一个元素在 DOM 中变成可见的,或者一个元素从 DOM 中消失了
+- 大多数期望的条件在使用前需要指定等待的目标元素, 元素用`定位器`指定.
+- `定位器`是一种抽象的查询语言,用 `By` 对象表示,可以用于不同的场合,包括创建选择器(driver.find_element(By.ID, "content"))
+- 如果可以不用定位器, 就不用, 毕竟可以少导入一个模块
+- `Xpath(XML Path)`是在xml文档中导航和选择元素的查询语言. `BeautifulSoup`不支持`Xpath`. 使用方法通常和css选择器一样.
+- `Xpath`语法中四个重要概念:
+ 1. 根节点与非根节点
+  - /div 选择 div 节点,只有当它是文档的根节点时
+  - //div 选择文档中所有的 div 节点(包括非根节点)
+ 2. 通过属性选择节点
+  - //@href 选择带 href 属性的所有节点
+  - //a[@href='http://google.com'] 选择页面中所有指向 Google 网站的链接
+ 3. 通过位置选择节点
+  - //a[3] 选择文档中的第三个链接
+  - //table[last()] 选择文档中的最后一个表
+  - //a[position() < 3] 选择文档中的前三个链接
+ 4. *(星号)匹配任意字符或节点, 可以在不同条件下使用
+  - //table/tr/* 选择所有表格行 tr 标签的所有的子节点(这很适合选择 th 和 td 标签)
+  - //div[@*] 选择带任意属性的所有 div 标签
+- 微软的Xpath语法页面[https://msdn.microsoft.com/en-us/enus/library/ms256471](https://msdn.microsoft.com/en-us/enus/library/ms256471)
+
+####处理重定向
+
+- `客户端重定向`是在服务器将页面内容发送到浏览器之**前**,由浏览器执行 JavaScript 完成的页面跳转,而不是服务器完成的跳转
+- `服务器重定向`可通过python的urllib库解决?
+- 利用`Selenium`执行 JavaScript 代码, 解决客户端重定向问题. 关键点在于何时停止页面监控. 一种方法是: 从页面开始加载时就“监视”DOM 中的一个元素,然后重复调用这个元素直到Selenium抛出一`个StaleElementReferenceException`异常;也就是说,元素不在页面的 DOM 里了,说明这时网站已经跳转(示例代码并没有这个效果呀- -)
