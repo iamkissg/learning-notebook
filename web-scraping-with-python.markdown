@@ -540,6 +540,49 @@ var marker = new google.maps.Marker({
  3. 将所有以`test_`开头的函数当作单元测试运行, 忽略不带`test_`的函数
 - `setUpClass`函数只在类的初始化阶段运行一次, `setUp`函数在每个测试启动时都运行.
 
+####Selenium单元测试
+
+- `Selenium`是一个可以解决网站上各种复杂问题的优秀测试框架, 初衷就是用来做网站测试
+- `Selenium`可以在浏览器上做任何事情, 包括输入, 点击等, 这样就可以找出异常表单, JavaScript 代码错误, html排版错误, 以及其他用户使用过程中可能出现的问题
+- `Selenium`测试的关键是`element`. 可以对任何给定元素做许多操作, 如:
+ 1. myElement.click()
+ 2. myElement.click_and_hold()
+ 3. myElement.release()
+ 4. myElement.double_click()
+ 5. myElement.send_keys_to_element("content to enter"()
+- 为了一次性完成一个元素的多个操作, 可以用`行为连(action chain)`储存多个操作, 然后在程序中执行多次
+- `.drag_and_drop`实现拖拽, 可用于一部分登录验证
+- `driver.get_screenshot_as_file("xxx")`截屏
+
+####Python单元测试与Selenium单元测试的选择
+
+- Python 的单元测试语法严谨冗长,更适合为大多数大型项目写测试
+- Selenium 的测试方式灵活且功能强大, 可以成为一些网站功能测试的首选
+- 用Selenium可以轻易获取网站的信息, 而单元测试可以评估信息是否满足测试条件, 二者组合是最佳搭档
+- 任何网站上能看到的内容都可以通过Python的单元测试和Selenium组合来测试
+
+###Chapter14 远程采集
+
+- 当你停止在自己的笔记本上运行python爬虫, 生活会变得更加轻松
+
+####为什么要用远程服务器
+
+- 建立爬虫的第一原则是: `所有信息都可以伪造`. 可以用非本人的邮箱发送邮件, `通过命令自动化鼠标行为`
+- 阻止网站被采集的注意力主要集中在识别人类与机器人的行为差异上面
+
+
+####Tor代理服务器
+
+- `洋葱路由(The Onion Router)`网络,是一种`IP地址匿名`手段。通过不同服务器构成多个层(就像洋葱)把客户端包在最里面。数据进入网络之前会被加密,因此任何服务器都不能偷取通信数据
+- 虽然 Tor 网络可以让你访问网站时显示的 IP 地址是一个不能跟踪到你的 IP 地址,但是你在网站上留给服务器的任何信息都会暴露你的身份。
+- 登录 Tor 网络不是一个自动的匿名措施,也不能让你进入互联网上任何区域。虽然它是一个实用的工具,但是用它的时候一定要谨慎、清醒,并且遵守道德规范
+- 当你用 Tor 的时候网速会变慢。这是因为代理有可能要先在全世界网络上转几次才到目的地!
+- `tor`服务必须运行在`9150`端口上
+- `PySocks`是一个代理服务器通信模块, 可与`tor`配合使用
+- 在`tor`中使用`selenium`和`phantomjs`, 不需要`pysocks`, 只要保证tor在运行, 然后增加`service_args`参数设置代理端口, 让`selenium`通过端口`9150`连接网站就可以了
+
+> 互联网其实就是一个用户界面不太友好的超级API
+
 ##The Zen of Python
 > Beautiful is better than ugly.
 Explicit is better than implicit.
