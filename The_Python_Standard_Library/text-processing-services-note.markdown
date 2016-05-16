@@ -71,7 +71,7 @@ a = re.compile(r"""\d +  # the integral part
 - re.search(pattern, string, flags=0) - 扫描字符串, 将所有子串都尝试与regex进行匹配,匹配到则立即返回一个`match object`, 匹配不到则返回`None`
 - re.match(pattern, string, flags=0) - 只从字符串的开始与regex进行匹配, 成功则返回`match object`, 否则返回`None`
 - re.fullmatch(pattern, string, flags=0) - 只有在字符串完全匹配regex, 才返回`match object`
-- re.split(pattern, string, maxsplit=0, flags=0) - 用regex匹配到的子串分割字符串. 若`pattern`中使用了分组(group), 则得到的全部分组也将作为返回列表的一部分被返回. If maxsplit is nonzero, at most maxsplit splits occur, and the remainder of the string is returned as the final element of the list.(不懂诶)
+- re.split(pattern, string, maxsplit=0, flags=0) - 用regex匹配到的子串分割字符串. 若`pattern`中使用了分组(group), 则得到的全部分组也将作为返回列表的一部分被返回. `maxsplit`参数用于指定最大分割次数, 若前面的分割已经达到了`maxsplit`的值, 字符串剩余部分将被最后一个元素
 
 ```python
 > re.split('\W+', 'Words, words, words.')
@@ -91,7 +91,7 @@ a = re.compile(r"""\d +  # the integral part
 ```python
 >>> def dashrepl(matchobj):
 ...     if matchobj.group(0) == '-' : return ' '
-...     else: 'return'
+...     else: return '-'
 >>> re.sub('-{1,2}', dashrepl, 'pro----gram-files')
 pro--gram files'
 ```
@@ -133,11 +133,111 @@ pro--gram files'
 
 - match.groups(default=None) - 返回包含所有分组的tuple. default用于在没有匹配到选项时, 作为返回值, 默认是`None`
 - match.groupdict(default=None) - 返回命名分组的字典, key即为分组名称. default用法同上
-- match.start([group]) & match.end([group]) - 返回
-- match.span([group]) -
+- match.start([group]) & match.end([group]) - 返回`group`匹配到的子串的首(尾)字符在整个`match.string`中的索引. `group`默认是0, 即整个字符串. 若分组存在, 但并没有匹配到任何字符串, 将返回-1.
+- match.span([group]) - 返回一个二元元组`(m.start(group), m.end(group))`, 即分组的子串的在整个`match.string`中索引的起止.
 - match.pos - 即用于regex对象的`search`, `match`方法的pos
 - match.endpos - 同上
 - match.lastindex - 最后一个分组的索引
 - match.lastgroup - 最后一个分组的名称, 若未指定名称, 则为None
 - match.re - 得到该`match`对象使用的regex
 - match.string - 得到该`match`对象的string
+
+###6.2.5 Examples
+
+- `.*(.).*\1` - 检查字符串中出现的一对字符(重复1次)
+- 模拟`C`语言的`scanf`函数:
+
+```text
+scanf   regex
+%c      .
+%5c     .{5}
+%d      [-+]?\d+
+%e,     %E, %f, %g  [-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?
+%i      [-+]?(0[xX][\dA-Fa-f]+|0[0-7]*|\d+)
+%o      [-+]?[0-7]+
+%s      \S+
+%u      \d+
+%x, %X  [-+]?(0[xX])?[\dA-Fa-f]+
+```
+
+- 因此对于`/usr/sbin/sendmail - 0 errors, 4 warnings`的解析可以是:\\
+`%s - %d errors, %d warnings` - > `(\S+) - (\d+) errors, (\d+) warnings`
+- search vs match
+ - match只检查字符串的头
+ - search扫描整个字符串
+ - 在regex中使用`^`, 限制search从头匹配
+ - 多行模式下, `match`只能匹配字符串的开始, 对`search`使用`^`能匹配每一行的开始
+- `sub`函数的`repl`可以是一个函数, 但这个函数只能接收`match`对象作为唯一参数, 并返回替换后的string
+
+```python
+>>> def repl(m):
+...     inner_word = list(m.group(2))
+...     random.shuffle(inner_word)
+...     return m.group(1) + "".join(inner_word) + m.group(3)
+>>> text = "Professor Abdolmalek, please report your absences promptly."
+>>> re.sub(r"(\w)(\w+)(\w)", repl, text)
+'Poefsrosr Aealmlobdk, pslaee reorpt your abnseces plmrptoy.'
+>>> re.sub(r"(\w)(\w+)(\w)", repl, text)
+'Pofsroser Aodlambelk, plasee reoprt yuor asnebces potlmrpy.'
+```
+
+```python
+>>> def dashrepl(matchobj):
+...     if matchobj.group(0) == '-': return ' '
+...     else: return '-'
+>>> re.sub('-{1,2}', dashrepl, 'pro----gram-files')
+'pro--gram files'
+```
+
+- 与`search`不同, `findall`匹配给定字符串中所有regex, 并返回一个list
+- 与`findall`不同, `finditer`返回一个`match`对象的迭代器, 由于每个元素都是一个`match`对象, 因此包含的信息会比简单的string更多
+- `raw string`能是regex更清晰, 不用太多的`\`转义
+- 自制分词器:
+
+```python
+import collections
+import re
+
+Token = collections.namedtuple('Token', ['typ', 'value', 'line', 'column'])
+
+def tokenize(code):
+    keywords = {'IF', 'THEN', 'ENDIF', 'FOR', 'NEXT', 'GOSUB', 'RETURN'}
+    token_specification = [
+        ('NUMBER',  r'\d+(\.\d*)?'),  # Integer or decimal number
+        ('ASSIGN',  r':='),           # Assignment operator
+        ('END',     r';'),            # Statement terminator
+        ('ID',      r'[A-Za-z]+'),    # Identifiers
+        ('OP',      r'[+\-*/]'),      # Arithmetic operators
+        ('NEWLINE', r'\n'),           # Line endings
+        ('SKIP',    r'[ \t]+'),       # Skip over spaces and tabs
+        ('MISMATCH',r'.'),            # Any other character
+    ]
+    tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
+    line_num = 1
+    line_start = 0
+    for mo in re.finditer(tok_regex, code):
+        kind = mo.lastgroup
+        value = mo.group(kind)
+        if kind == 'NEWLINE':
+            line_start = mo.end()
+            line_num += 1
+        elif kind == 'SKIP':
+            pass
+        elif kind == 'MISMATCH':
+            raise RuntimeError('%r unexpected on line %d' % (value, line_num))
+        else:
+            if kind == 'ID' and value in keywords:
+                kind = value
+            column = mo.start() - line_start
+            yield Token(kind, value, line_num, column)
+
+statements = '''
+    IF quantity THEN
+        total := total + price * quantity;
+        tax := price * 0.05;
+    ENDIF;
+'''
+
+for token in tokenize(statements):
+    print(token)
+```
