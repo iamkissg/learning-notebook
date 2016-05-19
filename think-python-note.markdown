@@ -107,4 +107,44 @@ if abs(y - x) < epsilon:
 ## Chapter 9 文字游戏
 
 - `readline` - 从文件对象中读取字符直到新行, 并并将结果作为字符串返回
-- 
+- 搜索优化的过程：
+
+```python
+def has_no_e(word):
+    if 'e' in word:
+        return False
+    return True
+```
+
+```python
+def avoids(word, forbidden):
+    for letter in word:
+        if letter in forbidden:
+            return False
+    return True
+```
+
+```python
+def uses_only(word, available):
+    for letter in word:
+        if letter not in available:
+            return False
+    return True
+```
+
+```python
+def uses_all(word, required):
+   for letter in required:
+       if letter not in word:
+           return False
+    return True
+```
+
+```python
+def uses_all(word, required):
+    return uses_only(required ,word)
+```
+
+- 如上代码所示, `has_not_e`只能判断字母`e`在不在单词里, 而`avoids`则可以判断任意禁用字符是否在单词里出现, 更优. `uses_only`与`uses_all`则相反, 它们是判断单词是否全由指定字符集中的字符构成, 不过判断方式有所不同. 实现`uses_all`或`uses_only`其中一个, 另一个可以简单写出, 如最后一个函数所示
+- 测试能帮助你找到错误， 但是生成好的测试用例并不容易， 并且即便你做到了，你仍然不能保证你的程序是正确的
+- 程序测试能用于展示错误的存在，但是无法证明不存在错误！ -- Edsger W. Dijkstra
