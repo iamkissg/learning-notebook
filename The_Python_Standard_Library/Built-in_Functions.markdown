@@ -165,3 +165,48 @@ with open('mydata.txt') as fp:
     for line in iter(fp.readline, ''):
             process_line(line)
 ```
+
+- `len(s)2` - 返回对象的长度, 即元素的数目.\\
+原来, `sequence` != `collection`\\
+`sequence`包括`string`, `bytes`, `tuple`, `list`, `range`等
+`collection`包括`dict`, `set`, `frozen set`等
+- `class list([iterable])` - list是一个可变序列类型
+- `locals()` - 与`globals()`功能类似, 返回的作用域不同
+- `map(function, iterable, ...)` - 对`iterable`的每个元素都运用`funtion`, 返回一个迭代器. 若给定了多个`iterable`, 相应的, `funtion`需要能接受这些iterable. 另外, 当最短的`iterable`迭代结束时, 整个map的过程也就结束了
+- `max(iterable, *[, key, default])`\\`max(arg1, arg2, *args[, key])` - 当只有一个参数时, 这个参数必须是`iterable`, 将返回值最大的元素. 当以第二种形式调用时, 返回这些参数中值最大的. `key`关键字参数用于指定排序函数, `default`关键字参数用于指定默认返回值. 存在多个最大元素时, 返回第一个.
+- `memoryview(obj)` -  返回给定对象的`memory view`对象(不懂)
+- `min(iterable, *[, key, default])`\\`min(arg1, arg2, *args[, key])` - 与`max`相反
+- `next(iterator[, default])` - 通过调用迭代器的`__next__()`方法, 返回下一个元素. `default`的用法还是作为默认值, 可避免抛出`StopIteration`
+- `class object` - 返回一个"无面"对象. 它具有所有类的公有方法. 该函数不接受任何参数. `object`没有`__dict__`, 因此不能动态地添加属性
+- `oct(x)` - 将给定的整数转为八进制, 并返回字符串表示. 若`x`不是`int`对像, 它必须有`__index__()`方法
+- `open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)` - 打开文件, 并返回相应的`file`对象. 可选的模式有:
+
+```text
+'r' open for reading (default)
+'w' open for writing, truncating the file first
+'x' open for exclusive creation, failing if the file already exists
+'a' open for writing, appending to the end of the file if it exists
+'b' binary mode
+'t' text mode (default)
+'+' open a disk file for updating (reading and writing)
+'U' universal newlines mode (deprecated)
+```
+
+- 模式可选择性组合.\\
+python区分二进制和文本io对象, 当文件以二进制模式打开时, 文件内容就以`bytes`对象形式返回, 不作任何解码. 以文本模式打开时, 文件内容将以`str`形式返回, 编码形式用`encoding`指定, 或使用`platform-dependent`编码格式.\\
+`buffering`用于设置缓冲策略. 0表示关闭缓冲(只在二进制模式下有效), 1表示行缓冲(只在文本模式下有效), >1用于设置缓冲块大小. 使用默认值(-1)时, 二进制文件将以合适大小的缓冲块; ""交互式文本文件使用行缓冲, 其他文本文件的缓冲策略同二进制文件\\
+`errors`字符串, 用于指示如何处理编解码错误. 可选的字符串如下:
+
+```text
+'strict' to raise a ValueError exception if there is an encoding error. The default value of None has the same effect.
+'ignore' ignores errors. Note that ignoring encoding errors can lead to data loss.
+'replace' causes a replacement marker (such as '?') to be inserted where there is malformed data.
+'surrogateescape' will represent any incorrect bytes as code points in the Unicode Private Use Area ranging from U+DC80 to U+DCFF. These private code points will then be turned back into the same bytes when the surrogateescape error handler is used when writing data. This is useful for processing files in an unknown encoding.
+'xmlcharrefreplace' is only supported when writing to a file. Characters not supported by the encoding are replaced with the appropriate XML character reference &#nnn;.
+'backslashreplace' replaces malformed data by Python’s backslashed escape sequences.
+'namereplace' (also only supported when writing) replaces unsupported characters with \N{...} escape sequences
+```
+
+- `newline`用于控制换行符, 可选`None`, `''`, `'\n'`, `'\r'`, `'\r\n'`\\
+读取时, 若`newline`设置为`None`, 所有换行符都将被转为`'\n'`; 若为`''`, 则换行符不转换. 若为其他任意项, 则只有遇到给定的换行符, 才算一行的终结\\
+写回时, 若`newline`为`None`, 则`'\n'`将被转换为系统默认的换行符; 若为`''`或`'\n'`, 不进行转换; 若为其他任意项, `'\n'`将被转为该指定的换行符
