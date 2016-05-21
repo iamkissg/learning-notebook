@@ -194,8 +194,8 @@ with open('mydata.txt') as fp:
 
 - 模式可选择性组合.\\
 python区分二进制和文本io对象, 当文件以二进制模式打开时, 文件内容就以`bytes`对象形式返回, 不作任何解码. 以文本模式打开时, 文件内容将以`str`形式返回, 编码形式用`encoding`指定, 或使用`platform-dependent`编码格式.\\
-`buffering`用于设置缓冲策略. 0表示关闭缓冲(只在二进制模式下有效), 1表示行缓冲(只在文本模式下有效), >1用于设置缓冲块大小. 使用默认值(-1)时, 二进制文件将以合适大小的缓冲块; ""交互式文本文件使用行缓冲, 其他文本文件的缓冲策略同二进制文件\\
-`errors`字符串, 用于指示如何处理编解码错误. 可选的字符串如下:
+- `buffering`用于设置缓冲策略. 0表示关闭缓冲(只在二进制模式下有效), 1表示行缓冲(只在文本模式下有效), >1用于设置缓冲块大小. 使用默认值(-1)时, 二进制文件将以合适大小的缓冲块; ""交互式文本文件使用行缓冲, 其他文本文件的缓冲策略同二进制文件
+- `errors`字符串, 用于指示如何处理编解码错误. 可选的字符串如下:
 
 ```text
 'strict' to raise a ValueError exception if there is an encoding error. The default value of None has the same effect.
@@ -210,3 +210,97 @@ python区分二进制和文本io对象, 当文件以二进制模式打开时, �
 - `newline`用于控制换行符, 可选`None`, `''`, `'\n'`, `'\r'`, `'\r\n'`\\
 读取时, 若`newline`设置为`None`, 所有换行符都将被转为`'\n'`; 若为`''`, 则换行符不转换. 若为其他任意项, 则只有遇到给定的换行符, 才算一行的终结\\
 写回时, 若`newline`为`None`, 则`'\n'`将被转换为系统默认的换行符; 若为`''`或`'\n'`, 不进行转换; 若为其他任意项, `'\n'`将被转为该指定的换行符
+- 若使用`文件描述符`而不是`文件名`来打开文件, 并指定`closefd`为`False`, 那么底层的文件描述符将保持打开的状态直到文件被关闭. 以文件名方式打开文件, 则`closefd`必须是`True`
+- `opener`参数可通过传入一个可调用的`opener`来使用. 当通过(file, flags)的方式调用`opener`时, 将得到文件对象底层的文件描述符. `opener`必须返回一个打开的文件描述符
+- 文件对象的类型, 由`open`函数的模式决定. 当选择`w`, `r`, `wt`, `rt`时, 返回`io.TextIOBase`的子类对象; 带缓冲的二进制模式, 返回`io.BufferedIOBase`.其他, 遇到再说吧- -
+- `ord(c)` - 返回单个unicode字符对应的编码号, 与`chr`相对
+- `pow(x, y[, z])` - 返回x^y的结果, `z`表示模, 即`pow(x, y) % z`, 当相对更高效. 当指定`z`参数时, `x`, `y` 必须是整型数, 并且`y`必须是非负数
+- `print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)` - 将对象打印到文本流`file`, 以`seq`作为分割, `end`作为结束. `file`, `seq`, `end`必须以关键字参数使用.\\
+所有非关键字参数将被转为字符串, 以`seq`作为分隔, `end`作为结束符, 它们必须是字符串.\\
+`file`必须是带`write(string)`方法的对象, 默认是`sys.stdout`. 由于打印的内容会被转为文本字符串, 因此`print()`不能用于二进制模式的文本对象.
+- `class property(fget=None, fset=None, fdel=None, doc=None)` - 返回`property`属性, `fget`是获取属性值的函数, `fset`设置函数值的函数, `fdel`是删除属性值的函数, `doc`则为该属性创建了`docstring`:
+
+```python
+class C:
+    def __init__(self):
+        self._x = None
+    def getx(self):
+        return self._x
+    def setx(self, value):
+        self._x = value
+    def delx(self):
+        del self._x
+    x = property(getx, setx, delx, "I'm the 'x' property.")
+```
+
+- `property`常用作装饰器. 如:
+
+```python
+class Parrot:
+    def __init__(self):
+        self._voltage = 100000
+    @property
+    def voltage(self):
+        """Get the current voltage."""
+        return self._voltage
+```
+
+- 上述列子就创建了一个只读的私有属性, `@property`装饰器将方法转变为一个`getter`. 同样地, 还有`setter`, `deleter`装饰器:
+
+```python
+class C:
+    def __init__(self):
+        self._x = None
+    @property
+    def x(self):
+        ""I'm the 'x' property.""
+        return self._x
+    @x.setter
+    def x(self, value):
+        self._x = value
+    @x.deleter
+    def x(self):
+        del self._x
+```
+
+- `range(stop)`\\`range(start, stop[, step])` - 返回一个不可变序列
+- `repr(object)` - 以字符串的形式返回对象的可打印部分:
+
+```python
+>>> a = [1, 2, 3, 4, 5]
+>>> repr(a)
+'[1, 2, 3, 4, 5]'
+>>> re_x = re.compile(r'\\\\')
+>>> re_x
+re.compile('\\\\\\\\')
+>>> repr(re_x)
+"re.compile('\\\\\\\\\\\\\\\\')"
+```
+
+- `reversed(seq)` - 反转迭代器
+- `round(number[, ndigits])` - 取近似值. 若省略`ndigits`, 则取`number`最接近的整数. `ndigits`用于指定取到小数点后几位. 需要注意的是, 并非单纯地使用**四舍五入**舍入. `5`会被截断.
+- `class set([iterable])` - 返回集合对象
+- `setattr(object, name, value)` - 设置对象的属性值, 用法与`getattr`类似. `setattr(x, 'foobar', 123)`等价于`x.foobar = 123`
+- `class slice(stop)`\\`class slice(start, stop[, step])` - 返回一个切片对象.
+- `sorted(iterable[, key][, reverse])` - 返回一个排序好的`list`. 可选参数必须以关键字参数形式使用. `key`参数表示排序函数, `reverse`表示是否反转. `sorted`是稳定的(stable), 此处的稳定与冒泡排序的稳定是一个意思, 即元素的相对位置并不发生改变
+- `staticmethod(function)` - 返回一个静态方法. 一般用作装饰器. python的静态方法与java, c++的类似.
+- `class str(object='')`\\`class str(object=b'', encoding='utf-8', errors='strict')` - 返回字符串
+- `sum(iterable[, start])` - 数字求和. `start`指定起始位置.\\
+`''.join(sequence)` - 将字符串序列串联起来\\
+`math.fsum()` - 用于浮点数求和\\
+`itertools.chain` - 串联多个可迭代对象.
+- `super([type[, object-or-type]])` - 返回一个父类对象. 所以你看, 为什么`super`的第一个参数总是类名.\\
+第二个参数省略的话, 返回的父类对象是不绑定到当前对象的. 第二个参数可以是当前类的实例, 也可以是当前类的子类\\
+当一个类只有单一继承关系时, `super`将直接指向该父类, 而不比明确指出.
+当存在多继承关系时, 可实现`diamond diagrams`(钻石图?), 多个基类可以实现相同的方法.(不懂诶)\\
+`super`实现绑定之后, 可通过`点标记法`使用, 但不能隐性地通过`super()[name]`使用\\
+无参使用, 尽在类定义时有效
+- `tuple([iterable])` - 返回不可变的序列.
+- `class type(object)`\\`class type(name, bases, dict)` - 单一参数使用时, 返回对象的类型, 返回值与`obj.__class__`的返回一样\\
+3参数使用时, 则返回一个新的类对象, 是动态创建类的一种形式. `name`参数值将作为类名, 以及`__name__`的属性值, `bases`定义类该类的基类, 并作为`__bases__`属性, `dict`是一个命名空间, 其中就是类主体, 并作为`__dict__`属性值. 
+- `vars([object])` - 返回模块, 类, 实例, 或任意带`__dict__`属性的对象的`__dict__`属性值.\\
+模块与实例的`__dict__`是可更新的, 其他类型的对象对此可能有写的限制\\
+无参使用时, 用法与`locals()`相同
+- `zip(*iterables)` - 返回一个元组的迭代器, 第i个元组中的元组分别是各iterable的第i个元素. 当最短的迭代完时, 整个迭代就结束了. 当只有一个参数时, 返回一元元组的迭代器; 无参使用时, 返回空的迭代器.\\
+使用`itertools.zip_longest()`, 如果希望迭代至最长的迭代结束.
+- `__import__(name, globals=None, locals=None, fromlist=(), level=0)` - 包含在`import`语句中. 官方推荐不用, 那就不做记录了.
