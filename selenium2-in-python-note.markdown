@@ -82,6 +82,7 @@
 
 ##Chapter4 WebDriver API
 
+###4.1 定位元素
 - webdriver 属于 selenium 体系中设计出来操作浏览器的一套 api. 站在webdriver的角度, 它针对多种编程语言都实现了一遍这套 api, 所以支持多语言; 站在编程语言角度, 是用于实现 web 自动化的第三方库.
 - 查找元素的方法:
  1. 通过元素本身的属性, 如 id, name等
@@ -90,17 +91,152 @@
 - id 定位 - `find_element_by_id` - 在html中, id 具有唯一性
 - name 定位 - `find_element_by_name` - 不一定唯一
 - class 定位 - `find_element_by_class_name`
-- tag 定位 - `find_element_by_class_name` - html的本质就是通过tag来定义实现不同的功能, 每个元素本质上也是一个tag
+- tag 定位 - `find_element_by_tag_name` - html的本质就是通过tag来定义实现不同的功能, 每个元素本质上也是一个tag
 - link 定位 - `find_element_by_link_text` - 专门用来定位文本链接. 通过元素标签对之间的文本信息来定位元素
 - partial link 定位 - `find_element_by_partial_link_text` - 对link定位的补充. 对于长文本链接, 可取部分信息来定位, 只要能唯一地标识该链接即可
 - xpath 定位 - `find_element_by_xpath` - xpath 是 xml 中定位元素的语言.
  - 绝对路径定位 - 用标签名的层级关系来定位元素的绝对路径, 根路径为`/html`. 如果同层有多个相同标签名, 按从上往下的顺序指明, 从1开始, 如`div[2]`
  - 元素属性定位 - `find_element_by_xpath("//input[@id='stb']")`, `//`表示当前文档的某层, `input`表示定位元素的标签名, `[@id='stb']`表示元素的id属性值为stb. 更一般的形式为:\\
- `find_element_by_xpath("//tagName[@attrName=attrValue]")`\\
- 可使用通配符`*`
+`find_element_by_xpath("//tagName[@attrName=attrValue]")`\\
+可使用通配符`*`
  - 层级与属性结合 - 通过属性定位找到元素的父元素, 再通过层级关系定位到指定元素, 如\\
- `find_element_by_xpath("//span[@class='xxx']/input")
+`find_element_by_xpath("//span[@class='xxx']/input")
  - 使用逻辑运算符定位 - 如果一个属性不能唯一地区分一个元素, 可通过使用逻辑运算符连接多个属性来定位它, 如\\
- `find_element_by_xpath("//input[@id='kw' and @class='su']/span/input")
+`find_element_by_xpath("//input[@id='kw' and @class='su']/span/input")
 - css 定位 - `find_element_by_css_selector` - css 用于描述 html 或 xml 文档的表现形式. css使用选择器来为页面元素绑定属性, 这为元素定位提供了便利. css 可以选择控件的任意属性, 一般情况下比xpath定位要快.
+ - 通过css选择器的class属性定位: `find_element_by_css_selector(".bg_btn")`
+ - 通过css选择器的id属性定位: `find_element_by_css_selector("#su")`
+ - 通过css选择器的标签名定位: `find_element_by_css_selector("input")`
+ - 通过css选择器的父子关系定位: `find_element_by_css_selector("span>input")` - 将查找父标签下所有的子标签
+ - 通过css选择器的属性定位: `find_element_by_css_selector("[name='kw']")` - 属性值可加引号, 也可不加
+ - css选择器组合定位: `find_element_by_css_selector("form.fm>span>input.s_ipt") -
+ - css选择器常见语法:
 
+```text
+.class            .intro           class 选择器,选择 class="intro"的所有元素
+#id               #firstname       id 选择器,选择所有 id= " firstname " 所有元素
+*                 *                选择所有元素
+element           p                元素所有<p>元素
+element > element div > input      选择父元素为 <div> 元素的所有 <input> 元素
+element + element div + input      选择紧接在 <div> 元素之后的所有 <p> 元素。
+[attribute=value] [target=_blank]  选择 target="_blank" 的所有元素
+```
+
+- 用 By 定位元素, 此时统一使用`find_element`方法, 第一个参数定位`By.XXX`, 用于指定定位的类型, 第二个参数与上一样, 指定定位的具体方式. 底层的代码实现是一样的, 但`find_element_by_xxx`的表达更清晰.
+
+###4.2 控制浏览器
+
+- `set_window_size()` - 设置窗口大小
+- `maxmize_window()` - 浏览器窗口最大化
+- `back()` - 后退
+- `forward()` - 前进
+- `refresh()` - 刷新页面
+
+###4.3 简单元素操作
+
+- `clear()` - 清楚文本
+- `send_keys(*value)` - 模拟按键输入
+- `click()` - 单击
+- 文本输入框中可能有引导用户输入的提示信息, 因此在输入内容之前最好先调用`clear()`方法清楚内容.
+- `submit()` - 提交表单, 功能与单击按钮类似:
+
+```python
+In [11]: driver.find_element_by_id("query").send_keys("机器学习")
+
+In [12]: driver.find_element_by_id("query").submit()
+```
+
+- `size` - 返回元素中大小
+- `location` - 返回元素的座标
+- text` - 获取文本信息
+- `get_attribute(name)` - 获得属性值
+- `is_displayed()` - 判断是否可见
+
+###4.4 鼠标事件
+
+- `ActionChains`链中定义了一系列的鼠标操作, 该类的构造方法以`webdriver`为参数
+- 除了`click`, `send_keys`等已经封装进`WebElement`的方法, 其他的鼠标事件都是基于元素的, 即使用元素或元素的属性作为参数, 而不能简单地使用点标记法
+- `perform()` - 执行所有ActionChains中存储的行为
+- `context_click(elm)` - 右击
+- `double_click(elm)` - 双击
+- `drag_and_drop(source, target)` - 拖动
+- `move_to_element()` - 鼠标悬停
+
+###4.5 键盘事件
+
+- `Keys`提供了键盘上提供的几乎所有按键的方法. 多参数方式调用`send_keys`方法可输入组合键.
+
+###4.6 获得验证信息
+
+- 在编写功能测试用例时,一般会有预期结果,在执行用例的过程中将得到的实际结果与预期结果进行比较, 从而判断用户的通过与失败。
+- 自动化测试用例由机器执行, 在完成之后, 通过获取一些信息来验证成功或失败, 而不必人工地检测. 常用的验证信息包括`title`, `URL`, `text`.
+- `title` - 返回网页的标题
+- `current_url` - 返回当前页面的url
+
+###4.7 设置元素等待
+
+- 大多数web应用都使用`AJAX`技术, 当浏览器加载页面时, 并不同时加载所有的页面元素, 这为元素定位增加了难度.
+- `显式等待` - 等待某个条件成立时继续执行, 否则在达到最大时长时抛出超时异常
+
+```python
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+driver = webdriver.Firefox()
+driver.get("http://www.sogou.com")
+# presence_of_all_elements_located(object) - 返回WebElement, 一旦它被加载
+# until(method, message='') - 调用driver提供的方法, 直到返回值为True
+element = WebDriverWait(driver,5,0.5).until(
+              EC.presence_of_element_located((By.ID,"query")))  # 通过By定位
+element.send_keys("selenium")
+```
+
+- `WebDriverWait(driver, timeout, poll_frequency=0.5, ignored_exceptions=None)` - 等待方法, 一般与`until`或`until_not`连用
+- `until(method, message='')`
+- `until_not(method, message='')`
+- `expected_conditions`类提供的预期条件判断的方法:
+
+```text
+title_is                                   用于判断标题是否存在
+title_contains                             用于判断标题是否包含预期信息。
+presence_of_element_located                判断元素是否被加载DOM树里, 并不代表元素一定可见
+visibility_of_element_located              元素是否可见
+visibility_of                              同上, 用法略有不同
+presence_of_all_elements_located           判断一组元素的是否存在
+text_to_be_present_in_element              判断元素的text是否包含预期的字符串
+text_to_be_present_in_element_value        判断元素的value属性是否包含预期的字符串
+frame_to_be_available_and_switch_to_it     表单是否可用,若可用则切换到该表单。
+invisibility_of_element_located            判断元素是否隐藏
+element_to_be_clickable                    判断元素是否可见并可点击
+staleness_of                               等到一个元素不再是依附于 DOM。
+element_to_be_selected                     被选中的元素
+element_located_to_be_selected             期望找到元素并选中ta
+element_selection_state_to_be              判断某个元素的选中状态是否符合预期
+element_located_selection_state_to_be      期望找到一个元素并检查是否选择状态
+alert_is_present                           预期一个警告信息
+```
+
+- 也可以用`is_displayed()`来判断元素是否可见:
+
+```python
+from selenium import webdriver
+from time import sleep, ctime
+
+driver = webdriver.Firefox()
+driver.get("http://www.baidu.com")
+print(ctime())
+for i in range(10):
+    try:
+        el = driver.find_element_by_id("kw22")
+        if el.is_displayed():
+            break
+    except:
+        sleep(1)
+    else:
+        print("time out")
+    driver.close()
+    print(ctime())
+
+```
