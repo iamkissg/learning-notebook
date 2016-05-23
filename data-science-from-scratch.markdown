@@ -125,9 +125,19 @@ Out[37]: 2
  2. 交流数分
 - `plot.scatter(x, y, ...)` - 绘制散点图, x, y的长度要一样
 - `plot.axis("equal")` - 调整座标轴到合适区间
-- `plot.annotate(s, xy, xytext=None, xycoords='data', textcoords='data', arrowprops=None, **kwargs) - 为图上的数据点叫标记
+- `plot.annotate(s, xy, xytext=None, xycoords='data', textcoords='data', arrowprops=None, **kwargs)` - 为图上的数据点叫标记
 - `plot.plot(*args, **kw)` - 绘制线图
-- `plot.bar(left, height, width=0.8, bottom=None, hold=None, **kw) - 绘制条形图
+- `plot.bar(left, height, width=0.8, bottom=None, hold=None, **kw)` - 绘制条形图
 - `plot.xticks(*args, **kw)` - 为x轴添加标记
 
 ##Chapter4 线性代数
+
+- 抽象地说,向量是指可以加总(以生成新的向量),可以乘以标量(即数字),也可以生成新的向量的对象。
+- 具体来说, 向量是有限维空间的点. 将数值表示为向量是非常好的处理方式
+- 最简单的入门方法是将向量表示为`数字的列表`。一个包含三个数字的列表对应一个三维空间的向量.
+- 用列表表示向量有利于概念阐释, 但性能太差
+- 矩阵是一个二维的数据集合, 按照数学表达惯例, 通常用大写字母表示矩阵
+- 矩阵的重要性:
+ 1. 可以将每个向量看成矩阵的一行, 那么就可以用矩阵表示一个包含多维向量的数据集
+ 2. 可以用 n x k的矩阵表示一个线性函数, 这个函数将k维的向量映射到n维的向量上
+ 3. 可以用矩阵表示2维关系
