@@ -62,3 +62,37 @@ Out[5]: '头脑风暴'
 - `class urllib.request.CacheFTPHandler` - 打开ftp urls, 并为打开的ftp连接保存一个缓存, 以使延迟最小
 - `class urllib.request.UnknownHandler` - 处理未知urls
 - `class urllib.request.HTTPErrorProcessor` - 处理http错误响应
+
+### 21.6.1 Request objects
+
+- `Request.full_url` - 包含完整的url信息的属性, 带有`setter`, `getter`, `deleter`
+- `Request.type` - 协议
+- `Request.host` - 主机名(域名), 可能带有端口号
+- `Request.origin_req_host` - 不带端口号的域名
+- `Request.selector` - uri路径, 若`Request`对象使用了代理, `selector`属性是传入代理的完整url
+- `Request.data` - 请求的实体主体, 若没有使用将为`None`
+- `Request.unverifiable` - 布尔值, 指示请求是否是不可验证的
+- `Request.get_method()` - 返回http request method的类型的字符串. 默认http request method是`GET`
+- `Request.add_header(key, val)` - 添加请求头部字段
+- `Request.add_unredirected_header(key, header)` - 添加不会被加入重定向请求的头部字段
+- `Request.has_header(header)` - 检查请求是否含有头部字段
+- `Request.remove_header(header)` - 删除头部字段
+- `Request.get_full_url()` - 获取url, 返回值即为`Request.full_url`
+- `Request.set_proxy(host, type)` - 设置代理服务器
+- `Request.get_header(header_name, default=None)` - 返回头部字段的值
+- `Request.header_items()` - 返回头部字段信息, 二元元组的列表
+
+### 21.6.2 OpenerDirector objects
+
+- `OpenerDirector.add_handler(handler)` - 添加handler, 将搜索以下方法, 并加入到可能的链中:
+ - protocol_open() — signal that the handler knows how to open protocol URLs.
+ - http_error_type() — signal that the handler knows how to handle HTTP errors with HTTP error code type.
+ - protocol_error() — signal that the handler knows how to handle errors from (non-http) protocol.
+ - protocol_request() — signal that the handler knows how to pre-process protocol requests.
+ - protocol_response() — signal that the handler knows how to post-process protocol responses.
+- `OpenerDirector.open(url, data=None[, timeout])` - 打开url, 参数, 返回值, 异常都与`urlopen`一样. `urlopen`函数是简单地调用了全局`OpenDirector`的`open`方法. `timeout`只对`http`, `https`, `ftp`连接有效
+- `OpenerDirector.error(proto, *args)` - 处理给定协议的错误, 将会调用已注册的错误handler. http协议, 通过http响应编码指定错误handler.
+- `OpenerDirector`对象打开urls的三种情况:
+ 1. 调用每个带有如`protocol_request`的方法的handler的`protocol_type`预处理请求
+ 2. 调用带有如`protocol_open`方法的handlers去处理请求, 当某个handler返回了非空值或抛出了异常, 结束.  事实上, 先调用`default_open`方法, 若全部这些方法都返回`None`, 再调用`protocol_open`方法, 还是fanhui`None`, 调用`unknown_open`方法.
+ 3. 调用如`protocol_response`的方法`后处理(post-process)`响应
