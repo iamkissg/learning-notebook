@@ -96,3 +96,106 @@ Out[5]: '头脑风暴'
  1. 调用每个带有如`protocol_request`的方法的handler的`protocol_type`预处理请求
  2. 调用带有如`protocol_open`方法的handlers去处理请求, 当某个handler返回了非空值或抛出了异常, 结束.  事实上, 先调用`default_open`方法, 若全部这些方法都返回`None`, 再调用`protocol_open`方法, 还是fanhui`None`, 调用`unknown_open`方法.
  3. 调用如`protocol_response`的方法`后处理(post-process)`响应
+
+### 21.6.3 BaseHandler objects
+
+- `BaseHandler.add_parent(director)` - add a director as parent(就是`OpenerDirector`)
+- `BaseHandler.close()` - remove any parents
+- 定义了`protocol_request()`或`protocol_response()`方法的handlers被命名为`*Processor`, 所有其他的都被命名为`*Handler`
+- `BaseHandler.parent` -  有效的`OpenDirector`
+- `BaseHandler.default_open(req)` - 该方法并不在`BaseHandler`中定义, 但若其子类若希望捕获?(catch) urls, 需要定义该方法. 该方法由`OpenDirector`调用, 返回`file-like`对象或`None`, 或抛出异常
+- `BaseHandler.protocol_open(req)` - 该方法并不在`BaseHandler`中定义, 但若其子类若希望处理urls, 需要定义该方法. 同上, 由`OpenerDirector`调用
+- `BaseHandler.unknown_open(req)` - 同上
+- `BaseHandler.http_error_default(req, fp, code, msg, hdrs)` - 该方法并不在`BaseHandler`中定义, 但若其子类若希望捕获?(catch) 未处理的http errors, 需要定义该方法. 该方法应由`OpenerDirector`再出错时自动调用.\\
+`req`是一个`Request`对象, `fp`是一个带有http error主体的类文件对象, `code`是错误代码, `msg`是用户可见的错误原因, `hdrs`是消息的头部字段的字典
+- `BaseHandler.http_error_nnn(req, fp, code, msg, hdrs)` - 基本同上, `nnn`是错误编码. 若定义了该方法, 当nnn错误编码被返回时, 将被调用
+- `BaseHandler.protocol_request(req)` - 该方法并不在`BaseHandler`中定义, 但若其子类若希望预处理请求, 需要定义该方法. 由OpenerDirector调用, req和返回值都是Request对象
+- `BaseHandler.protocol_response(req, response)` - 该方法并不在`BaseHandler`中定义, 但若其子类若希望后处理响应, 需要定义该方法. `response`是与`urlopen`函数的返回值实现了同样接口的对象, 返回值同样如此.
+
+### 21.6.4 HTTPRedirectHandler objects
+
+- `HTTPRedirectHandler.redirect_request(req, fp, code, msg, hdrs, newurl)` - 对于重定向的响应, 返回Request或None. 当收到服务器的重定向响应, 由`http_error_30*()`方法自动调用.
+- `HTTPRedirectHandler.http_error_30*(req, fp, code, msg, hdrs)` - 重定向到新的url, 由OpenerDirector调用
+-
+### 21.6.5 HTTPCookieProcessor Objects
+
+- `HTTPCookieProcessor`的实例有属性`cookiejar`, 储存了cookies信息
+
+### 21.6.6 ProxyHandler Objects
+
+- `ProxyHandler.protocol_open(request)` - 修改请求, 设置代理, 再由后续的handler执行协议
+
+### 21.6.7 HTTPPasswordMgr Objects
+
+- 以下方法对`HTTPPasswordMgr`和`HTTPPasswordMgrWithDefaultRealm`对象是可用的
+ - `HTTPPasswordMgr.add_password(realm, uri, user, passwd)` - uri可以是单个uri或uri的序列, realm, user, passwd是字符串. 使用(user, passwd)作为验证的token.
+ - `HTTPPasswordMgr.find_user_password(realm, authuri)` - 寻找user和password
+ - 对于`HTTPPasswordMgrWithDefaultRealm`对象, 若给定的realm没有任何匹配的user/passwd, realm被置为None
+
+### 21.6.8 HTTPPasswordMgrWithPriorAuth Objects
+
+- 拓展了`HTTPPasswordMgrWithDefaultRealm`, 支持跟踪总是需要发送认证证书的uris
+- `HTTPPasswordMgrWithPriorAuth.add_password(realm, uri, user, passwd, is_authenticated=False)` - 基本同`HTTPPasswordMgr.add_password()`, `is_authenticated`用于设置对应的标识位, 若为真, realm将被忽略
+- `HTTPPasswordMgr.find_user_password(realm, authuri)` - 同前
+- `HTTPPasswordMgrWithPriorAuth.update_authenticated(self, uri, is_authenticated=False)` - 修改`is_authenticated`标志
+- `HTTPPasswordMgrWithPriorAuth.is_authenticated(self, authuri)` - 返回标志位当前状态
+
+### 21.6.9 AbstractBasicAuthHandler Objects
+
+- `AbstractBasicAuthHandler.http_error_auth_reqed(authreq, host, req, headers)` - 获取user/password, 处理认证请求(重新尝试). `authreq`是请求中关于`realm`的头部字段名, `host`指定了url和路径, `req`是之前失败的请求对象, `headers`是错误头部
+-
+
+### 21.6.10 HTTPBasicAuthHandler Objects
+
+- `HTTPBasicAuthHandler.http_error_401(req, fp, code, msg, hdrs)` - 用认证信息重新尝试请求
+
+### 21.6.11 ProxyBasicAuthHandler Objects
+
+- `ProxyBasicAuthHandler.http_error_407(req, fp, code, msg, hdrs)` - 同上
+
+### 21.6.12 AbstractDigestAuthHandler Objects
+
+- `AbstractDigestAuthHandler.http_error_auth_reqed(authreq, host, req, headers)` - 同上述`AbstractBasicAuthHandler`的方法
+
+### 21.6.13 HTTPDigestAuthHandler Objects
+
+- `HTTPDigestAuthHandler.http_error_401(req, fp, code, msg, hdrs)` - 同上
+
+### 21.6.14 ProxyDigestAuthHandler Objects
+
+- `ProxyDigestAuthHandler.http_error_407(req, fp, code, msg, hdrs)` - 同上
+
+### 21.6.15. HTTPHandler Objects
+
+- `HTTPHandler.http_open(req)` - 发送http请求
+
+### 21.6.16. HTTPSHandler Objects
+
+- `HTTPSHandler.https_open(req)` - 发送https请求
+
+### 21.6.17. FileHandler Objects
+
+- `FileHandler.file_open(req)` - 若五主机名或主机名是`localhost`, 打开本地文件
+
+### 21.6.18. DataHandler Objects
+
+- `DataHandler.data_open(req)` - 读取data url. 这类url将内容编码在url中了
+
+### 21.6.19. FTPHandler Objects
+
+- `FTPHandler.ftp_open(req)` - 打开ftp文件, 以空用户名和密码登录
+
+### 21.6.20. CacheFTPHandler Objects
+
+- `CacheFTPHandler`对象是增加了以下方法的`FTPHandler`:
+ - `CacheFTPHandler.setTimeout(t)` - 设置超时
+ - `CacheFTPHandler.setMaxConns(m)` - 设置最大连接数
+
+### 21.6.21. UnknownHandler Objects
+
+- `UnknownHandler.unknown_open()` - 抛出`URLError`异常
+
+### 21.6.22. HTTPErrorProcessor Objects
+
+- `HTTPErrorProcessor.http_response()` - 处理http错误响应. 若编码为200, 立即返回响应对象
+- `HTTPErrorProcessor.https_response()` - 同上
