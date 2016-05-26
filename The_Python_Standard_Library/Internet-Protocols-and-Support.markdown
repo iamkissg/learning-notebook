@@ -199,3 +199,63 @@ Out[5]: '头脑风暴'
 
 - `HTTPErrorProcessor.http_response()` - 处理http错误响应. 若编码为200, 立即返回响应对象
 - `HTTPErrorProcessor.https_response()` - 同上
+
+## 21.7
+
+## 21.8 urllib.parse
+
+- 该模块提供了将url字符串分解成各组件, 或将组件组装成url字符串, 或将相对url转换成绝对路径
+- 支持的应用层协议有: file, ftp, gopher, hdl, http, https, imap, mailto, mms, news, nntp, prospero, rsync, rtsp, rtspu, sftp, shttp, sip, sips, snews, svn, svn+ssh, telnet, wais.
+
+### 28.1 URL Parsing
+
+- url parsing 函数专注于url 字符串的分解与组装
+- `urllib.parse.urlparse(urlstring, scheme='', allow_fragments=True)` - 将url解析成6部分, 返回一个6元tuple. 既定分解方案是: `scheme://netloc/path parameters?query#fragment`:
+
+```python
+> o = urlparse('http://www.cwi.nl:80/%7Eguido/Python.html')
+> o
+ParseResult(scheme='http', netloc='www.cwi.nl:80', path='/%7Eguido/Python.html',
+            params='', query='', fragment='')
+```
+
+- `urlparse`recognizes a netloc only if it is properly introduced by ‘//’. Otherwise the input is presumed to be a relative URL and thus to start with a path component. 即只有域名前有`//`引导的url, 域名才会被正常解析, 否则整个路径将全被视为`path`:
+
+```python
+>>> urlparse('//www.cwi.nl:80/%7Eguido/Python.html')
+ParseResult(scheme='', netloc='www.cwi.nl:80', path='/%7Eguido/Python.html',
+           params='', query='', fragment='')
+>>> urlparse('www.cwi.nl/%7Eguido/Python.html')
+ParseResult(scheme='', netloc='', path='www.cwi.nl/%7Eguido/Python.html',
+            params='', query='', fragment='')
+```
+
+- 当url字符串中未指定`scheme`(方案)时, 可用`scheme`参数指定默认的scheme.
+- `allow_fragments`为假时, url字符串中的fragment标志符将不会被识别, 而是作为path的一部分:
+
+```python
+In [4]: a = urlparse("https://docs.python.org/3/library/urllib.parse.html#url-parsing", allow_fragments=True)
+
+In [5]: a
+Out[5]: ParseResult(scheme='https', netloc='docs.python.org', path='/3/library/urllib.parse.html', params='', query='', fragment='url-parsing')
+
+In [6]: a = urlparse("https://docs.python.org/3/library/urllib.parse.html#url-parsing", allow_fragments=False)
+
+In [7]: a
+Out[7]: ParseResult(scheme='https', netloc='docs.python.org', path='/3/library/urllib.parse.html#url-parsing', params='', query='', fragment='')
+```
+
+Attribute | Index | Value | Value if not present
+ :--:     | :---: | :--:  | :---:
+scheme   | 0 |  URL scheme specifier             | scheme parameter
+netloc   | 1 |  Network location part            | empty string
+path     | 2 |  Hierarchical path                | empty string
+params   | 3 | Parameters for last path element  | empty string
+query    | 4 |  Query component                  | empty string
+fragment | 5 |   Fragment identifier             | empty string
+username |   |     User name                     | None
+password |   |    Password                       | None
+hostname |   |    Host name (lower case)         | None
+port     |   | Port number as integer, if present| None
+
+- `urllib.parse.parse_qs(qs, keep_blank_values=False, strict_parsing=False, encoding='utf-8', errors='replace')` -
