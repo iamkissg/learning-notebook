@@ -200,6 +200,28 @@ Out[5]: '头脑风暴'
 - `HTTPErrorProcessor.http_response()` - 处理http错误响应. 若编码为200, 立即返回响应对象
 - `HTTPErrorProcessor.https_response()` - 同上
 
+### 21.6.24 Legacy interface
+
+- `urllib.request.urlretrieve(url, filename=None, reporthook=None, data=None)` - Copy a network object denoted by a URL to a local file.(这描述, 我服) 若`url`指向一个本地文件, 除非给定了文件名, 否则下载不会执行. 返回值是`(filename, headers)`的元组
+ - `filename`省略时, 下载的将是临时文件, 文件名自动生成
+ - `reporthook`若给定, 将在网络连接建立好之后以及每一快数据被读取之后, 调用一个`hook`函数, 它有3个参数: 目前已经转换的块数, 一块的字节大小, 文件的总的大小
+ - 若采用`http:`scheme, 可以给出`data`参数, 从而使用POST方法. 如上所述, data必须是`application/x-www-form-urlencoded`格式的二进制对象, 可用`urllib.parse.urlencode()`函数加工
+- `urllib.request.urlcleanup()` - 清理`urltrieve`方法残留的临时文件
+- 其他已过时的不再列出
+
+### 21.6 urllib.request Restrictions
+
+- 目前只支持http, ftp, 本地文件和data urls
+- `urlretrieve()`的缓存功能被取消了
+- `urlopen`和`urlretrieve`函数会造成任意长的延迟, 这意味着若不使用线程, 很难建立一个交互式的web客户端
+- `urlopen`和`urlretrieve`返回的数据都是服务器发回的原生数据, 可能是二进制数据(如图像), 纯文本, html等等, 可通过查看`Content-Type`首部字段确定(若事前知道返回类型, 就省了查询的功夫)
+
+### 21.7 urllib.response
+
+- 该模块定义了最简单的类文件接口, 包括`read()`和`readline()`
+- 典型的`response`对象是一个`addinfourl`实例, 它定义了`info`方法, 可以此查看头部信息, 并由`geturl`方法.
+- 其他函数与`urllib.request`模块定义的一样
+
 ## 21.7
 
 ## 21.8 urllib.parse
@@ -258,4 +280,90 @@ password |   |    Password                       | None
 hostname |   |    Host name (lower case)         | None
 port     |   | Port number as integer, if present| None
 
-- `urllib.parse.parse_qs(qs, keep_blank_values=False, strict_parsing=False, encoding='utf-8', errors='replace')` -
+- `urllib.parse.parse_qs(qs, keep_blank_values=False, strict_parsing=False, encoding='utf-8', errors='replace')` - 解析查询语句, 数据类型是`application/x-www-form-urlencoded`, 返回值是字典类型的. `keep_blank_values`用于指示忽略空格(false)或将空格当空格(true). `strict_parsing`指示忽略解析错误(false)或抛出`ValueError`异常(true). `encoding`与`error`指定解码方式.
+- 使用`urllib.parse.urlencode()`函数将解析得到的字典重新组装为查询字符串
+- `urllib.parse.parse_qsl(qs, keep_blank_values=False, strict_parsing=False, encoding='utf-8', errors='replace')` - 与`parse_qs()`相同, 但返回值是二元tuple的list
+
+```python
+In [3]: url = pas.urlparse("https://www.google.co.jp/?gfe_rd=cr&ei=wqhHV-zBLOXC8gf9qZMw&gws_rd=ssl#q=kissg+%E8%B5%B5%E5%96%A7%E5%85%B8")
+In [5]: pas.parse_qs(url.query)
+Out[5]: {'ei': ['wqhHV-zBLOXC8gf9qZMw'], 'gfe_rd': ['cr'], 'gws_rd': ['ssl']}
+In [14]: pas.parse_qsl(url.query)
+Out[14]: [('gfe_rd', 'cr'), ('ei', 'wqhHV-zBLOXC8gf9qZMw'), ('gws_rd', 'ssl')]
+```
+- `urllib.parse.urlunparse(parts)` - 将`urlparse()`函数返回的tuple重新组装成url. 事实上, `parts`可以是任意6个元素的可迭代对象
+
+```python
+In [19]: pas.urlunparse(url)
+Out[19]: 'https://www.google.co.jp/?gfe_rd=cr&ei=wqhHV-zBLOXC8gf9qZMw&gws_rd=ssl#q=kissg+%E8%B5%B5%E5%96%A7%E5%85%B8'
+In [22]: t = {"a": '1', "b": '2', 'c': '3', 'd': '4', 'e': '5', 'f': '6'}
+In [23]: pas.urlunparse(t)
+Out[23]: 'a://b/d;c?e#f'
+```
+
+- `urllib.parse.urlsplit(urlstring, scheme='', allow_fragments=True)` - 与`urlparse`类似, 但不再分出`params`, 因此返回值是一个5元tuple`(addressing scheme, network location, path, query, fragment identifier)`
+- `urllib.parse.urlunsplit(parts)` - 与`urlunparse`类似, 只不过是将`urlsplit`得到的tuple复原, 也可以是任意5元可迭代对象.
+- `urllib.parse.urljoin(base, url, allow_fragments=True)` - 用base url(`base`)和另外的url(`url`)构造新的完整的url. 相当于用base url的内容补全url. `allow_fragments`的用法见上
+
+```python
+> from urllib.parse import urljoin
+> urljoin('http://www.cwi.nl/%7Eguido/Python.html', 'FAQ.html')
+'http://www.cwi.nl/%7Eguido/FAQ.html'
+```
+
+- `urllib.parse.urldefrag(url)` - 若url包含片段标志符, 返回去片段标志符的url与片段标志符字符串, 即完成分离的操作, 返回2元tuple.
+
+```python
+In [26]: pas.urldefrag('https://www.google.co.jp/?gfe_rd=cr&ei=wqhHV-zBLOXC8gf9qZMw&gws_rd=ssl#q=kissg+%E8%B5%B5%E5%96%A7%E5%85%B8')
+Out[26]: DefragResult(url='https://www.google.co.jp/?gfe_rd=cr&ei=wqhHV-zBLOXC8gf9qZMw&gws_rd=ssl', fragment='q=kissg+%E8%B5%B5%E5%96%A7%E5%85%B8')
+```
+
+### 21.8.3 Structured Parse Results
+
+- `urllib.urlparse()`解析的返回值实际是tuple的子类--`urllib.parse.ParseResult`:
+
+```python
+In [28]: url.__class__
+Out[28]: urllib.parse.ParseResult
+In [30]: isinstance(url, tuple)
+Out[30]: True
+```
+
+- 同理, `urllib.urlsplit`的解析结果是`urllib.parse.SplitReuslt`对像, `urllib.urldefrag`的解析结果是`urllib.parse.DefragResult`对象.
+- 若传入`urllib.urlparse`的url是二进制形式的, 返回结果为`urllib.parse.ParseResultBytes`. 同样适用于其他二者.
+- `urllib.parse.SplitResult.geturl()` - 用`SplitReuslt`对象重构url, 与原url相比, 更标准化, 比如scheme会被转为小写形式, 空的字段将被移除:
+
+```python
+> url = 'HTTP://www.Python.org/doc/#'
+> r1 = urlsplit(url)
+> r1.geturl()
+'http://www.Python.org/doc/'
+```
+
+### 21.8.4 URL Quoting
+
+- `urllib.parse.quote(string, safe='/', encoding=None, errors=None)` - 用`%xx`将给定字符串中的特殊字符转义. 字母, 数字, `_.-`这些字符不会被转义. 另外不希望被转义的字符用`safe`参数给定. 另外2个参数与上相同:
+
+```python
+In [37]: pas.quote("kissg.me/赵喧典")
+Out[37]: 'kissg.me/%E8%B5%B5%E5%96%A7%E5%85%B8'
+```
+
+- `urllib.parse.quote_plus(string, safe='', encoding=None, errors=None)` - 与`quote()`类似, 但字符串中的空格用`+`替换, 原串中的`+`会被转义. `safe`默认不再是`/`
+- `urllib.parse.quote_from_bytes(bytes, safe='/')` - 与`quote()`相类, 参数不一样
+- `urllib.parse.unquote(string, encoding='utf-8', errors='replace')` - `quote()`的逆, 用单一字符替换`%xx`
+- `urllib.parse.unquote_plus(string, encoding='utf-8', errors='replace')` - `quote_plus()`的逆
+- `urllib.parse.unquote_to_bytes(string)` - `quote_from_bytes()`的逆
+- `urllib.parse.urlencode(query, doseq=False, safe='', encoding=None, errors=None, quote_via=quote_plus)` - 将映射对象(mapping object), 或二元tuple的序列转为ascii文本串.
+ - 若返回值是作为POST方法的`data`, 需要编码成二进制形式, 否则将报`TypeError`
+ - 返回值是一些列的`key=value`, 用`&`连接. `quote_via`参数指定了转换的函数, `key`与`value`都将用指定函数转换
+ - 当`query`的`value`本身是一个序列时, 若`doseq`参数为True, 则这每一对键值都被处理为一个`key=value`, 并用`&`分隔开; `doseq`为False, 则序列被当作一个整体对待, 有所转义.
+ - `safe`, `encoding`, `errors`参数将传入`quote_via`
+
+```python
+In [39]: a = {"a": 1, "b": [1,2,3]}
+In [42]: pas.urlencode(a)
+Out[42]: 'b=%5B1%2C+2%2C+3%5D&a=1'
+In [43]: pas.urlencode(a, doseq=True)
+Out[43]: 'b=1&b=2&b=3&a=1'
+```
