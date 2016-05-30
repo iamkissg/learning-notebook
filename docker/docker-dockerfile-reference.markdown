@@ -192,7 +192,31 @@ ENV <key>=<value> ...
 - `docker run <image>`之后的参数, 都将作为`ENTRYPOINT`的`exec`形式的参数, 会覆盖`CMD`指定的元素.
 - shell形式防止任何`CMD`或`run`命令行参数被使用, 缺点是, `ENTRYPOINT`将作为`/bin/sh -c`的子命令被执行, 并且不支持传入信号. 这意味着这个`executable`不是容器的`PID 1`的进程, 它不会接收任何Unix信号, 包括`SIGTERM`, 因此无法结束.
 - 与`CMD`类似, 只有最后一条`ENTRYPOINT`才会生效
-- 
+- 参数`--entrypoint`将会覆盖`ENTRYPOINT`, 但仅可用于`exec`的二进制设置?
+- 与shell形式不同, exec形式不会调用shell.
+- shell形式会使用shell来进行处理, 将会忽略`CMD`或`docker run`命令参数
+- 为确保`docker stop`能向`ENTRYPOINT executable`正确地发送信号(signal), 切记要以`exec`作为shell命令的参数:
+
+```docker
+FROM ubuntu
+ENTRYPOINT exec top -b
+```
+
+- 若忘了添加在命令前添加`exec`, 用`docker stop`并不能正确地关闭容器, 超时之后, `stop`命令将会强制发送`SIGKILL`信号关闭容器
+- `CMD`和`ENTRYPOINT`指令都定义了运行容器时, 需要被执行的命令. 使用规则如下:
+ 1. Dockerfile需要指定至少一条`CMD`或`ENTRYPOINT`命令
+ 2. 当容器被当作可执行文件使用时, 定义`ENTRYPOINT`
+ 3. `CMD`一般用于为`ENTRYPOINT`命令设定默认参数, 或指定容器需要执行的特定命令
+ 4. 运行容器时, 给定的参数(`<image>`之后的)会覆盖`CMD`
+
+![What command is executed for diffrent ENTRYPOINT/CMD combinations](CMD-ENTRYPOINT.png)
+
+## VOLUME
+
+- `VOLUME ["/data"]`
+- `VOLUME`指令用给定的字符串创建一个挂载点, 并将它标记为本地主机或其他容器的外部挂载卷.
+- `VOLUME`指令的值(后接的一大串内容), 可以是JSON数组, 或普通字符串(`VOLUME /var/log /var/db`)
+- `docker run`命令在初始化时, 会将新加卷挂载到基镜像的指定位置
 
 ## USER
 
@@ -206,3 +230,42 @@ ENV <key>=<value> ...
 - 若`WORKDIR`不存在, 即使没有`Dockerfile`中后续没有任何指令用到, 也会创建一个`WORKDIR`
 - 若使用相对路径, 路径是相对于前一条`WORKDIR`指令的
 - (有点像, mkdir && cd 啊)
+
+## ARG
+-
+- `ARG <name>[=<default value>]`
+- `ARG`指令定义了创建镜像时, 用户可传递给构造器的变量, 使用方法是:`docker build --build-arg <varname>=<value>`
+- 若参数不存在(未在Dockerfile中定义), 创建过程中会报错
+- `ARG`就是argument的缩写吗- -.
+- `ARG`变量定义在`Dockerfile`中, 其定义的那一行生效, 而非参数被使用的那一行或其他地方
+- 在`ARG`指令之前, 变量的值为空串
+- 不建议在创建时, 通过传递变量的方式传递密码或证书
+- `ENV`定义的环境变量会覆盖`ARG`指令给定的同名变量
+- docker预定义的一些变量:
+ - HTTP_PROXY
+ - http_proxy
+ - HTTPS_PROXY
+ - https_proxy
+ - FTP_PROXY
+ - ftp_proxy
+ - NO_PROXY
+ - no_proxy
+- `ARG`定义的变量并不能像`ENV`定义的环境变量一样, 在镜像中长存.
+
+
+## ONBUILD
+
+- `ONBUILD [INSTRUCTION]`
+- `ONBUILD`指令为镜像添加一个触发器指令, 在当前镜像作为基镜像被使用时被执行.
+- 触发器在`downstream build`的`context`中被执行(子镜像的创建context?)
+- 任何创建指令都能作为触发器
+- 工作原理:
+ 1. 当遇到`ONBUILD`指令时, 构建器将触发器加入正被创建的镜像的元数据中. 这条指令不影响当前的创建过程
+ 2. 在创建结束时, 所有触发器以一个列表的形式存储在镜像中, 作为`OnBuild`的值. 可通过`docker inspect`查看
+ 3. 在镜像被作为基镜像用于创建新镜像时, 在`FROM`指令被执行时, 将会查看`ONBUILD`触发器, 并按它们被注册的顺序依次执行. 若任何触发器指令执行失败, `FROM`指令中止, 创建镜像失败
+ 4. 触发器被执行之后就失效了, 换言之, 它们不会被孙子镜像继承
+
+## STOPSIGNAL
+
+- `STOPSIGNAL signal`
+- `STOPSIGNAL`指令用于设置系统调用的终止信号. 可以是内核系统调用表上的任意有效无符号数, 可用数字表示, 也可用信号名表示, 例如SIGKILL
