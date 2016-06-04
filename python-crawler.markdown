@@ -47,9 +47,6 @@ seen.insert(begin_site)
 urls.put(begin_site)
 
 while True:
-    if u
-
-while True:
     if urls.size > 0:
         current_url = urls.get()
         store(current_urk)
@@ -76,6 +73,3 @@ while True:
  3. 获取登录必要的额外信息
  4. 发送post请求, 一旦登录, 服务器会设置一个cookie并发回给用户, 这时需要做的就是处理cookie
 - 第三方库: `Request`, `BeautifulSoup`
-- 
-- 
-

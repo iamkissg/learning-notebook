@@ -20,16 +20,16 @@
 
 ```python
 html → <html><head>...</head><body>...</body></html>
-    — head → <head><title>A Useful Page<title></head>
-        — title → <title>A Useful Page</title>
-    — body → <body><h1>An Int...</h1><div>Lorem ip...</div></body>
-        — h1 → <h1>An Interesting Title</h1>
-        — div → <div>Lorem Ipsum dolor...</div>
+    - head → <head><title>A Useful Page<title></head>
+        - title → <title>A Useful Page</title>
+    - body → <body><h1>An Int...</h1><div>Lorem ip...</div></body>
+        - h1 → <h1>An Interesting Title</h1>
+        - div → <div>Lorem Ipsum dolor...</div>
 ```
 
 - 因此可以通过`bsObj.html.body.h1`的方式提取标签
 - 请求的网页在服务器上不存在时, 程序会返回http错误, urlopen函数会抛出`HTTPError`异常, 对此, 可使用`try ... except ...`语句来处理
-- 服务器不错在, urlopen返回一个None对象, 可通过条件判断简单地处理
+- 服务器不存在, urlopen返回一个None对象, 可通过条件判断简单地处理
 - 当调用的标签不存在时, BeautifulSoup会返回None对象, 请求None对象的子标签, 会发生`AttributeError`错误, 同样地, 也用`try ... except ... `语句来处理
 - `一个良好的爬虫程序首先要具备强大而周密的异常处理能力, 随时应对网络中可能存在的异常`
 - 在写爬虫的时候, 思考代码的总体格局, 让代码既可以**捕捉异常**又**容易阅读**, 很重要. 考虑代码的重用性
