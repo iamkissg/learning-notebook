@@ -2,9 +2,9 @@
 
 ## 装饰器基础
 
-### python的函数是对象
+### Python的函数是对象
 
-为了理解装饰器, 你必须先理解: 在python中, 函数是对象. 这一点很重要. 让我们通过一个简单的例子来看看为什么:
+为了理解装饰器, 你必须先理解: 在Python的世界, 函数是对象. 这一点很重要. 让我们通过一个简单的例子来看看为什么:
 
 ```python
 def shout(word="yes"):
@@ -32,15 +32,15 @@ try:
     print shout()
 except NameError, e:
     print e
-    # 输出: 'shout'未定义
+    # 输出: "name 'shout' is not defined"
 
 print scream()
 # 输出: 'Yes!'
 ```
 
-好! 在脑海中保留这个概念. 我们之后会用到它.
+Okay! 在脑海中保留这个概念. 我们之后会用到它.
 
-python函数的另一个有趣的属性是: 它们可以在另一个函数的内部被定义...
+Python函数的另一个有趣的属性是: 它们可以在另一个函数的内部被定义...
 
 ```python
 def talk():
@@ -65,8 +65,8 @@ try:
     print whisper()
     except NameError, e:
         print e
-        #输出 : 'whisper'未定义
-        #python的函数是对象
+        #输出 : "name 'whisper' is not defined"
+        #Python的函数是对象
 ```
 
 ### 函数引用
@@ -104,7 +104,6 @@ def getTalk(kind="shout"):
 talk = getTalk()
 
 # 此处, 你可以看见"talk"是一个函数对象
-# You can see that "talk" is here a function object:
 print talk
 #输出 : <function shout at 0xb7ea817c>
 
@@ -133,7 +132,7 @@ doSomethingBefore(scream)
 #Yes!
 ```
 
-现在, 你已经具备了理解装饰器所需的一切知识. 如你所见, 装饰器就是"包装", 也就是说, **装饰器允许你在被装饰的函数前后执行代码**, 而不对函数本身做任何修改.
+现在, 你已经具备了理解装饰器所需的一切知识. 如你所见, 装饰器就是"包装纸(wrapper)", 也就是说, **装饰器允许你在被装饰的函数前后执行代码**, 而不对函数本身做任何修改.
 
 ### 动手写装饰器
 
@@ -193,9 +192,9 @@ a_stand_alone_function()
 # 这就是装饰器的作用了
 ```
 
-### 揭秘装饰器
+### 装饰器揭秘
 
-装饰器的语法是这样的:
+用装饰器语法重现先前的例子, 是这样的:
 
 ```python
 @my_shiny_new_decorator
@@ -209,7 +208,7 @@ another_stand_alone_function(
 #After the function runs
 ```
 
-是的, 就是这样, 就这么简单. `@decorator`是以下形式的缩写:
+是的, 就是这样, 这么简单. `@decorator`是以下形式的缩写:
 
 ```python
 another_stand_alone_function = my_shiny_new_decorator(another_stand_alone_function)
@@ -341,8 +340,8 @@ def a_decorator_passing_arguments(function_to_decorate):
         function_to_decorate(arg1, arg2)
     return a_wrapper_accepting_arguments
 
-# 当你调用装饰器返回的函数时, 你调用了包装器(wrapper)
-# 向包装器传递的参数将可继续传递给被装饰函数
+# 当你调用装饰器返回的函数时, 你调用了包装纸(wrapper)
+# 向包装纸传递的参数将可继续传递给被装饰函数
 
 @a_decorator_passing_arguments
 def print_full_name(first_name, last_name):
@@ -358,7 +357,7 @@ print_full_name("Peter", "Venkman")
 
 python好的一点是, 方法(method)和函数(function)实际是一样的. 唯一的区别在于, 方法的第一个参数需要是当前对象(`self`)的引用.
 
-这意味着, 你可以用同样的方式创建方法的装饰器! 不过, 别忘了`self`
+这意味着, 你可以用同样的方式创建方法的装饰器! 不过, 别忘了`self`.
 
 ```python
 def method_friendly_decorator(method_to_decorate):
@@ -386,7 +385,7 @@ l.sayYourAge(-3)
 
 ```python
 def a_decorator_passing_arbitrary_arguments(function_to_decorate):
-    # 包装器接收任意参数
+    # 包装纸接收任意参数
     def a_wrapper_accepting_arbitrary_arguments(*args, **kwargs):
         print "Do I have args?:"
         print args
@@ -402,7 +401,7 @@ def function_with_no_argument():
     print "Python is cool, no argument here."
 
 function_with_no_argument()
-#outputs
+#输出
 #Do I have args?:
 #()
 #{}
@@ -413,7 +412,7 @@ def function_with_arguments(a, b, c):
     print a, b, c
 
 function_with_arguments(1,2,3)
-#outputs
+#输出
 #Do I have args?:
 #(1, 2, 3)
 #{}
@@ -513,7 +512,6 @@ def decorator_maker():
     print "As a decorator maker, I return a decorator"
     return my_decorator
 
-# Let’s create a decorator. It’s just a new function after all.
 # 让我们创建一个装饰器
 new_decorator = decorator_maker()
 # 输出:
@@ -596,7 +594,6 @@ def decorator_maker_with_arguments(decorator_arg1, decorator_arg2):
         print "I am the decorator. Somehow you passed me arguments:", decorator_arg1, decorator_arg2
 
         # 不要混淆了装饰器参数和函数参数!
-        # Don't confuse decorator arguments and function arguments!
         def wrapped(function_arg1, function_arg2) :
             print ("I am the wrapper around the decorated function.\n"
                   "I can access all the variables\n"
@@ -651,7 +648,7 @@ decorated_function_with_arguments(c2, "Howard")
 #I am the decorated function and only knows about my arguments: Leslie Howard
 ```
 
-如你所见, 使用该技巧, 你可以像任何(普通)函数一样向装饰器传递参数. 如果你愿意, 你甚至可以使用`*args, **kwargs`. 但是, 请记住装饰器只能被调用**1次**, 即在导入脚本的时候. 之后你就不能动态地设置参数了. 当你"import x"时, **函数已经被装饰了**, 你不能做任何修改.
+如你所见, 使用该技巧, 你可以像任何(普通)函数一样向装饰器传递参数. 如果你愿意, 你甚至可以使用`*args, **kwargs`. 但是, 请记住装饰器只能被调用**1次**, 即在导入脚本的时候. 之后你就不能动态地设置参数了. 当你"import x"时, **函数已经被装饰了**, 你不能再做任何修改.
 
 ---
 
@@ -661,7 +658,7 @@ decorated_function_with_arguments(c2, "Howard")
 
 我们对装饰器进行了包装.
 
-Anything else we saw recently that wrapped function?
+如前所见, 我们是用什么包装了函数?
 
 是的, 就是装饰器!
 
@@ -678,13 +675,12 @@ def decorator_with_args(decorator_to_enhance):
     # 使用了与上述一样的技巧传递参数
     def decorator_maker(*args, **kwargs):
 
-        # We create on the fly a decorator that accepts only a function
-        # but keeps the passed arguments from the maker.
+        # 我们在运行时创建了一个装饰器, 它接收一个函数作为参数
+        # 但它可以持有maker传来的参数
         def decorator_wrapper(func):
 
-            # We return the result of the original decorator, which, after all,
-            # IS JUST AN ORDINARY FUNCTION (which returns a function).
-            # Only pitfall: the decorator must have this specific signature or it won't work:
+            # 我们返回原始装饰器的结果, 一个普通函数
+            # 唯一的异错的地方在于: 装饰器必须这样才能正常工作
             return decorator_to_enhance(func, *args, **kwargs)
 
         return decorator_wrapper
@@ -729,7 +725,7 @@ decorated_function("Universe and", "everything")
 - **你无法对函数去装饰**. (确实有技巧可以创建可移除的装饰器, 但没有人会使用它们.) 因此, 一旦函数被装饰了, 在整个代码中, 它都是被装饰的.
 - 装饰器包装了函数, 这使得调试变得困难. (这一点在Pyhton2.5之后的版本得到缓解; 请看下面的内容)
 
-Python2.5引入了`functools`模块, 该模块包含的`funtools.wraps()`函数, 可以将被装饰函数名称, 模块, 文档字符串(docstring)拷贝到它的包装器中.
+Python2.5引入了`functools`模块, 该模块包含的`funtools.wraps()`函数, 可以将被装饰函数名称, 模块, 文档字符串(docstring)拷贝到它的包装纸中.
 
 (有趣的事实是: `funtools.wraps()`还是一个装饰器!)
 
