@@ -30,3 +30,4 @@ document.getElementById('container').addEventListener('click', function(event) {
 ```
 
 - 在一个<div>上注册事件(click)监听, 对div内所有元素的点击都会在控制台打印. (不需要为每个元素单独注册事件)
+- `docker exec -it <container id> /bin/bash` -  connect to a bash prompt on the running container.
