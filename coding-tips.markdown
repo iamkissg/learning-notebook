@@ -21,3 +21,12 @@ E: The package lists or status file could not be parsed or opened.
 - 上述问题解决: `sudo rm -vf /var/lib/apt/lists/*` - 删除Merge List
 
 - `System program problem detected`问题的解决: `sudo rm /var/crash/*` - 删除旧的crash. 虽然之前的问题已经解决了, 但旧的crash文件被保存了下来, 所以会持续报错. 
+
+```js
+document.getElementById('container').addEventListener('click', function(event) {
+	     console.log(event.target.innerHTML);
+	}
+})
+```
+
+- 在一个<div>上注册事件(click)监听, 对div内所有元素的点击都会在控制台打印. (不需要为每个元素单独注册事件)
