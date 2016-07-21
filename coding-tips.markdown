@@ -20,7 +20,7 @@ E: The package lists or status file could not be parsed or opened.
 
 - 上述问题解决: `sudo rm -vf /var/lib/apt/lists/*` - 删除Merge List
 
-- `System program problem detected`问题的解决: `sudo rm /var/crash/*` - 删除旧的crash. 虽然之前的问题已经解决了, 但旧的crash文件被保存了下来, 所以会持续报错. 
+- `System program problem detected`问题的解决: `sudo rm /var/crash/*` - 删除旧的crash. 虽然之前的问题已经解决了, 但旧的crash文件被保存了下来, 所以会持续报错.
 
 ```js
 document.getElementById('container').addEventListener('click', function(event) {
@@ -31,3 +31,57 @@ document.getElementById('container').addEventListener('click', function(event) {
 
 - 在一个<div>上注册事件(click)监听, 对div内所有元素的点击都会在控制台打印. (不需要为每个元素单独注册事件)
 - `docker exec -it <container id> /bin/bash` -  connect to a bash prompt on the running container.
+- `find . -name "filename"` - 在当前目录递归地查找指定文件名的文件
+- Linux process states:
+
+```txt
+D Uninterruptible sleep (usually IO)
+R Running or runnable (on run queue)
+S Interruptible sleep (waiting for an event to complete)
+T Stopped, either by a job control signal or because it is being traced.
+W paging (not valid since the 2.6.xx kernel)
+X dead (should never be seen)
+Z Defunct ("zombie") process, terminated but not reaped by its parent.
+
+# additional characters
+< high-priority (not nice to other users)
+N low-priority (nice to other users)
+L has pages locked into memory (for real-time and custom IO)
+s is a session leader
+l is multi-threaded (using CLONE_THREAD, like NPTL pthreads do)
++ is in the foreground process group
+```
+
+- `ps -ef` - 查看所有进程的父进程
+- `trap -l` - Linux查看信号及其编号
+- 交互式Bash获取进程PID:
+
+```shell
+ps -ef | grep "name" | grep -v grep | awk '{print $2}'
+ps -ef | awk '/[n]ame/{print $2}'
+ps x | awk '/[n]ame/{print $1}'
+pgrep -f name  # 最简单的方法
+pkill -f name  # 通过名称找到进程并杀死
+pidof name     # ?
+```
+
+- shell 脚本获得进程 pid:
+
+```shell
+#! /bin/bash
+# process-monitor.sh
+process=$1
+pid=$(ps -ef | grep $process | grep 'name' | grep -v grep | awk '{print $2}')
+echo $pid
+```
+
+- `$$` - 当前 Shell 进程的 pid; `$!` - 上一个后台进程的 pid
+- 查看指定进程是否存在:
+
+```shell
+if ps -p $PID > /dev/null
+then
+    echo "$PID is running"
+    # Do something knowing the pid exists, i.e. the process with $PID is running
+fi
+```
