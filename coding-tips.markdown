@@ -85,3 +85,5 @@ then
     # Do something knowing the pid exists, i.e. the process with $PID is running
 fi
 ```
+
+- Python str 2 time/datetime - datetime.datetime.strptime(str, time\_format).date() | time.time.strptime(str, time\_format)
