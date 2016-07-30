@@ -99,8 +99,22 @@ ingest(environ,
 - `show_progress` - 布尔值
 - `output_dir` - 字符串, 表示数据输出的位置.
 
+---
+
 ## API
 
+- 算法必须实现一个 `initialize` 方法。`handle_data` 和 `before_trading_start` 是可选的
+- `initialize(context)`
+ - 回测的最开始调用一次，算法可用该方法设置 bookkeeping
+ - context - 初始化好的空的Python字典，可用点标记法的扩展字典
+- `handle_data(context, data)`
+ - 每分钟调用
+ - context - 就是`initialize`中修改的 context，保存用户定义的状态，以及 portfolio 对象。
+ - data - 提供了下列方法的对象，获得价格与卷数据，检查 security(证券) 是否存在，检查证券交易的最新时间
+- `before_trading_start(context, data)`
+ - 每天开市之前调用。在该方法中，不能放置 orders。该方法的目的是使用管道创建证券集，以便算法需要。
+
+### 恒生投研平台API
 - zipline.api.symbol(self, symbol_str) - 对指定的股票代码进行序列化, 返回股票代码序列
 - zipline.api.order(self, asset, amount, limit_price=None, stop_price=None, style=None) - 买卖股票下单
  - asset - 股票代码
@@ -241,5 +255,3 @@ symbol: 股票代码
 id:  订单ID
 commission: 佣金费用
 ```
-
-- 
