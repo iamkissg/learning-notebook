@@ -4,7 +4,7 @@
 - It is also used for analyzing the past performance of algorithms. (分析算法性能)
 - historical data & live data
 - 算法仿真期间，使用仿真交易的价格
-- 当算法调用历史价格或卷数据时，将会对当前仿真日期进行拆分（splits），兼并（mergers），分红（dividends）进行调整。
+- 当算法调用历史价格或交易量数据时，将会对当前仿真日期进行拆分（splits），兼并（mergers），分红（dividends）进行调整。
 - 研究环境是自定义的 IPython server。
 - 研究环境还能分析回测与实时交易算法的性能
 - 当**回测**完成后，可进行模拟交易（paper trading）
@@ -81,10 +81,11 @@ def myfunc(context,data):
   pass
 ```
 
-- 算法最经常的动作之一是**取证券的价格和卷信息**，可以特定分钟获取数据，or data for a window of minutes
+- 算法最经常的动作之一是**取证券的价格和交易量信息**，可以特定分钟获取数据，or data for a window of minutes
 - 使用 `data.current` 获取特定分钟的数据，可向其传递一个或多个证券，也可以是一个或多个字段。返回的数据将作为交易值
  - 通过参数 `last_traded`，`data.current` 也可以用于查找最近一分钟内交易的资产
-- 使用 `data.history` 获取 data for a window of time，可传递一个或多个资产，一个或多个字段，`1m (minute)` 或 `1d` 指定数据的粒度，以及 the number of bars。返回的数据将被调整，为当前仿真时间进行拆分，兼并，分红
+- 使用 `data.history` 获取 data for a window of time，可传递一个或多个资产，一个或多个字段，`1m (minute)` 或 `1d` 指定数据的粒度，以及 the number of bars。返回的数据将被调整，为当前仿真时间进行拆分，兼并，股利
+- `bar_count` 字段指定了 `history` 函数返回的 DataFrame 数据的天或分钟数
 - `price` 是 forward-filled 的。若价格存在，返回最近的价格。否则，返回 `NaN`
 - 若证券没有被交易或在给定时间不存在，`volume`返回 0，`open`，`high`，`low`，`close` 返回 `NaN`
 - 不要将某天的 `data.history` 结果保存到下一天。当天的调用获得的是当天的价格，是调整过的（今天有今天的价格，明天有明天的价格）
@@ -96,4 +97,168 @@ def myfunc(context,data):
  - 多个资产和多个字段 - pandas Panel，以字段为索引，日期为主轴，证券为次轴
  - 所有的价格都是分流，并根据仿真当天日期股息 (dividend-adjusted) 调整过的。`data.history` 返回的价格数据不应该被保存或被传递
  - **"price" is always forward-filled. The other fields ("open", "high", "low", "close", "volume") are never forward-filled.**
+
+#### History and Backtest Start
+
+###### 常规应用：当前价格与昨日收盘价
+
+```python
+def initialize(context):
+    # AAPL, MSFT, and SPY
+    context.securities = [sid(24), sid(5061), sid(8554)]
+
+def handle_data(context, data):
+    price_history = data.history(context.securities, "price", bar_count=2, frequency="1d")
+    for s in context.securities:
+        prev_bar = price_history[s][-2]  # 昨日收盘价
+        curr_bar = price_history[s][-1]  # 当前价
+        if curr_bar > prev_bar:
+            order(s, 20)
+```
+
+###### 常规应用：回看 X 轴
+
+- 计算对定历史时间的百分比变化
+
+```python
+def initialize(context):
+    # AAPL, MSFT, and SPY
+    context.securities = [sid(24), sid(5061), sid(8554)]
+
+def handle_data(context, data):
+    prices = data.history(context.securities, "price", bar_count=10, frequency="1d")
+    pct_change = (prices.ix[-1] - prices.ix[0]) / prices.ix[0]  # 取 x 维度?
+    log.info(pct_change)
+```
+
+- pandas DataFrame 的函数 `iloc` 将两个值以一对的方式返回： `rice_history.iloc[[0, -1]]`。因此上述策略可以改写为：
+
+```python
+def initialize(context):
+    # AAPL, MSFT, and SPY
+    context.securities = [sid(24), sid(5061), sid(8554)]
+
+def handle_data(context, data):
+    price_history = data.history(context.securities, "price", bar_count=10, frequency="1d")
+    pct_change = price_history.iloc[[0, -1]].pct_change()  # 最后的 ptc_change() 可以直接对一对值计算百分比变化？
+    log.info(pct_change)
+```
+
+- 查看不同的值
+
+```python
+def initialize(context):
+    # AAPL, MSFT, and SPY
+    context.securities = [sid(24), sid(5061), sid(8554)]
+
+def handle_data(context, data):
+    price_history = data.history(context.securities, "price", bar_count=10, frequency="1d")
+    diff = price_history.iloc[[0, -1]].diff()
+    log.info(diff)
+```
+
+###### 常规使用：滚动变换
+
+- 通过 pandas 提供的方法进行滚动变换计算：
+ - mavg(moving average, 移动平均线) -> DataFrame.mean
+ - stddev(standard deviation, 标准差) -> DataFrame.std
+ - vwap(volume weighted average price, 成交量加权平均价) -> DataFrame.sum
+
+```python
+# moving average
+def initialize(context):
+    # AAPL, MSFT, and SPY
+    context.securities = [sid(24), sid(5061), sid(8554)]
+
+def handle_data(context, data):
+    price_history = data.history(context.securities, "price", bar_count=5, frequency="1d")
+    log.info(price_history.mean())
+```
+
+```python
+# standard deviation
+def initialize(context):
+    # AAPL, MSFT, and SPY
+    context.securities = [sid(24), sid(5061), sid(8554)]
+
+def handle_data(context, data):
+    price_history = data.history(context.securities, "price", bar_count=5, frequency="1d")
+    log.info(price_history.std())
+```
+
+```python
+# volume weighted average price
+def initialize(context):
+    # AAPL, MSFT, and SPY
+    context.securities = [sid(24), sid(5061), sid(8554)]
+
+def vwap(prices, volumes):
+    return (prices * volumes).sum() / volumes.sum()
+
+def handle_data(context, data):
+    hist = data.history(context.securities, ["price", "volume"], 30, '1d')
+
+    vwap_15 = vwap(hist["price"][-15:], hist["volume"][-15:])
+    vwap_30 = vwap(hist["price"], hist["volume"])
+
+    for s in context.securities:
+        if vwap_15[s] > vwap_30[s]:
+            order(s, 50)
+```
+
+###### 常规使用：使用外部库
+
+- `history` 返回 pandas DataFrame，因此其值可以传给能对 numpy 和 pandas 数据结构进行操作的库
+
+```python
+# 使用 OLS 策略
+import statsmodels.api as sm
+
+def ols_transform(prices, sec1, sec2):
+    """
+    Computes regression coefficients (slope and intercept)
+    计算回归系数（斜率与截距）
+    OLS - Ordianry Least Squares（普通最小二乘法）
+    via Ordinary Least Squares between two securities.
+    """
+    p0 = prices[sec1]
+    p1 = sm.add_constant(prices[sec2], prepend=True)
+    return sm.OLS(p0, p1).fit().params
+
+def initialize(context):
+    # KO
+    context.sec1 = sid(4283)
+    # PEP
+    context.sec2 = sid(5885)
+
+def handle_data(context, data):
+    price_history = data.history([context.sec1, context.sec2], "price", bar_count=30, frequency="1d")
+    intercept, slope = ols_transform(price_history, context.sec1, context.sec2)
+```
+
+###### 常规使用：使用 TA-Lib
+
+- `history` 可以返回 pandas Series 对象，其可以传递给 TA-Lib
+
+```python
+# Python TA-Lib wrapper
+# https://github.com/mrjbq7/ta-lib
+# EMA(exp moving average) 计算举例
+import talib
+
+def initialize(context):
+    # AAPL
+    context.my_stock = sid(24)
+
+def handle_data(context, data):
+    my_stock_series = data.history(context.my_stock, "price", bar_count=30, frequency="1d")
+    ema_result = talib.EMA(my_stock_series, timeperiod=12)
+    record(ema=ema_result[-1])
+```
+
+## Ordering
+
+- 调用 `order(security, amount)` 模拟简单的市场订购。`security` 是期望交易的**证券**。`amount` 为正则买入，为负则卖出。返回 order id，以便跟踪交易状态。
+- 订购摘牌的证券是错误的，在 IPO 之前进行订购也是错误的
+- 使用 `data.can_trade` 来检查股票在算法当前点是否可交易。
 - 

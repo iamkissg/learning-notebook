@@ -87,3 +87,61 @@ fi
 ```
 
 - Python str 2 time/datetime - datetime.datetime.strptime(str, time\_format).date() | time.time.strptime(str, time\_format)
+- Python get pid of the running program, or you can apply this to check if the program is running
+
+```
+# check_output - Run command with arguments and return its output.
+# If the exit code was non-zero it raises a CalledProcessError.
+from subprocess import check_output
+def get_pid(name):
+    return check_output(["pidof",name])
+
+    # or handle multiple entries and cast into ints
+    # using set for quick search
+    # return set(map(int,check_output(["pidof",name]).split()))
+
+    # or with -s flag to get a single pid
+    # return int(check_output(["pidof","-s",name]))
+```
+
+- jQuery 显隐元素: `$(selector).hide();`, ` $(selector).show();`
+- JavaScript 使用 document.createElement() 动态创建 DOM 节点:
+
+```JavaScript
+var childNode = document.createElement('p');
+childNode.innerHTML = '<span>这里是提示信息〜〜</span>';
+childNode.setAttribute('class', 'alerts');
+childNode.setAttribute('onclick', 'this.style.display = "none"');
+/*or
+childNode.className = 'alerts';
+childNode.onclick = function () {
+    this.style.display = 'none';
+}
+*/
+document.getElementsByTagName('body')[0].appendChild(childNode);
+```
+
+- CSS, `inline-block` 替代 `float:left` 实现横向列表. 默认情况下, inline 元素之间会有空隙, 通过设置 padding, margin 等属性可消除空隙
+- jQuery 绑定事件与 not 函数, button 反 click 应用举例:
+
+```JavaScript
+$(".trade-filter button").on("click", function(){
+    $(".trade-filter button").not(this).removeClass('active');
+    switch($(this).attr("id")){
+        case "trade-all":
+            $("tr").show();
+            break;
+        case "trade-running":
+            $("tr").not($(".running")).hide();
+            $(".running").show();
+            break;
+        case "trade-stopped":
+            $(".running").hide();
+            $("tr").not($(".stopped")).hide();
+            $(".stopped").show();
+            break;
+    };
+});
+```
+
+- 不同于 C/C++ 的 `switch`, ECMAScript 的 `switch` 可用于字符串, 即 `case "kissg": do_something`

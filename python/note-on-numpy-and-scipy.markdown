@@ -72,3 +72,90 @@ array([[5, 4],
 
 #### 通用函数
 
+- **一维**数组可以被索引，切片，迭代，就如 list 和其他 Python 序列一样
+- **多维**数组每个轴上都有一个索引，这些索引是一个由逗号分隔开的组合给定，如 `b[2,3]` 就是 `b[2][3]`，再如 `b[1:3, : ]  `
+- 多维数组的索引缺省时，索引缺省的轴（那一维）返回全部结果。即缺省的索引被自动被填充，比如三维数组 `b[i]` 被填充为 `b[i,:,:]`
+- NumPy 也提供 `...` 来补全索引，比如五维数组 `x[1,2,...]` 等价于 `x[1,2,:,:,:]`，`x[...,3]` 等价于 `x[:,:,:,:,3]`
+- 对多维数组的迭代，默认在第一个维度进行。使用 `flat` 属性，返回一个包含数组所有元素的迭代器，因此可对所有元素进行迭代
+
+#### 形状操作
+
+- 数组的形状由每一轴上的元素数量决定
+- 数组的形状可通过多种方式改变：
+ - `.ravel()` - 将多维数组转换成一维的
+ - `a.shape = (x, y, z, ..) - 修改数组的形状属性，修改表现形式，从而改变形状。
+ - `.resize((n, m, ..))` - 对数组本身修改
+ - `.reshape((n, m, ..)) - 返回某一形状的数组，但不对数组本身进行修改
+ - `a.T` - 返回 a 转置的结果
+- `ravel()` 的结果的元素顺序是 C 风格的，即 a[0, 0] 的下一个元素是 a[0, 1]。NumPy 默认的数组存储顺序就是 C 风格的。\\
+`NumPy 的内部存储就是 C 风格的形式，看上去像一维数组`
+- 使用一个可选参数，可用 Fortran 风格的数组，最左边的下标先改变，即 a[0, 0] 的下一个元素是 a[1, 0]
+- 在重塑形状的操作中，若某一维指定为 `-1`，该为的元素个数将根据其他维的长度自动计算出
+
+#### 不同数组叠加
+
+- `vstack(tuple of arrays)` - 竖直叠加
+- `hstack(tuple of arrays)` - 水平叠加
+- `column_stack` - 将一维数组看作多行(column)
+- `r_` 和 `c_` 允许在一个轴上直接进行叠加, 可使用 `:`, `np.r_[1:4,0,4]` -> `array([1, 2, 3, 0, 4])`
+
+#### 拆分数组
+
+- `hsplit` - 水平方向进行拆分, 可指定将数组分成多少部分, 或指定拆分后的数组的形状
+- `vsplit` - 竖直方向进行拆分
+
+#### 是否拷贝
+
+- 部分操作直接对数组本身进行操作, 部分操作返回对数组副本的操作结果
+- Python 参数传递使用可变对象作为引用, 因此函数调用不会创建副本
+- 浅拷贝, 新瓶装旧酒
+- 切片实现的是浅拷贝
+- 深拷贝, 新瓶装新瓶
+
+#### 其他基础
+
+- 广播法则1: 若所有输入的数组维度不相同, 用 `1` 扩充小数组, 直到维度相等
+- 灵活的索引机制: 1. 数字下标, 2. 切片, 3. 整数数组作为索引, 4. 布尔数组作为索引
+- 当数组是多维数组是, 充当索引的单一数组指向多维数组的第一维
+- 索引数组可以是多维的, 但每一维形状必须相同
+
+# 此处已经看不懂了, 先跳过
+
+## NumPy basis
+
+#### Data types
+
+- NumPy 提供的数学数据类型, 数字代表该类型在内存中所占位数, 不带数字的, 通常是平台依赖的:
+
+| Data type |  Description |
+| :--:      | :-: |
+| bool\_    |  Boolean (True or False) stored as a byte |
+| int\_     |  Default integer type (same as C `long`; normally either `int64` or `int32`) |
+| intc      |  Identical to C `int` (normally `int32` or `int64`) |
+| intp      |  Integer used for indexing (same as C `ssize_t`; normally either `int32` or `int64`) |
+| int8      |  Byte (-128 to 127) |
+| int16     |  Integer (-32768 to 32767) |
+| int32     |  Integer (-2147483648 to 2147483647) |
+| int64     |  Integer (-9223372036854775808 to 9223372036854775807) |
+| uint8     |  Unsigned integer (0 to 255) |
+| uint16    |  Unsigned integer (0 to 65535) |
+| uint32    |  Unsigned integer (0 to 4294967295) |
+| uint64    |  Unsigned integer (0 to 18446744073709551615) |
+| float\_   |  Shorthand for `float64`. |
+| float16   |  Half precision(精度) float: sign bit, 5 bits exponent, 10 bits mantissa |
+| float32   |  Single precision float: sign bit, 8 bits exponent, 23 bits mantissa |
+| float64   |  Double precision float: sign bit, 11 bits exponent, 52 bits mantissa |
+| complex\_ |  Shorthand for complex128. |
+| complex64 |  Complex number(复数), represented by two 32-bit floats (real and imaginary components) |
+| complex128|  Complex number, represented by two 64-bit floats (real and imaginary components) |
+
+- 此外, NumPy `intc` 的变种: `short`, `long`, `longlong` 及它们的无符号形式也有定义
+- NumPy 的数字类型是 `dtype` (data-type) 对象的实例, 每个都有独有的特征
+- 当与低层进行交互时, 需要考虑数据类型的平台依赖性问题
+- 用 `.astype(dtype)` 进行数据类型转换, 若用数据类型本身进行转换
+- Python 数据类型与 NumPy 的对应关系, 只有这些: `int` -> `np.int_`, `bool` -> `np.bool_`, `float` -> `np.float_`, `complex` -> `np.complex_`
+- `.dtype`属性查看数组类型
+- NumPy 以标量形式返回数组元素, NumPy 标量与 Python 标量相差较大, 要混用时, 用类型函数进行显式的转换
+- ?使用数组标量的主要优点是, 保存了数组类型
+
+#### Array creation

@@ -8,6 +8,7 @@
  - `-d` -  runs the container in the background (to daemonize it).
  - `-P` - map any required network ports inside container to host
  - `<image>:<tag>` - 指定某一版本的镜像，默认是最新的（latest） - 最好每次都指定镜像的 tag
+ - `--name <container-name>` - name the container
 - `docker pull` - download images，you can see that each layer of the image has been pulled down
 - `docker search <term>` - search imaegs that contain the specified term
  - 官方仓库（official repositories）是由 Docker 公司维护的仓库
@@ -34,6 +35,10 @@
 - `docker tag` - add a tag to an existing image. such as: `docker tag 5db5f8471261 ouruser/sinatra:devel`
 - `docker push` - push image to repository. By default，Docker Hub
 - `docker rmi` - remove image
+- `docker network` - show network information
+ - `ls` - list network
+ - `inspect bridge` - 查看 bridge 网络
+ - `disconnect bridge <container>` - 
 
 
 
@@ -76,3 +81,9 @@ PORTS
 `docker pull ouruser/sinatra@sha256:cbbf2f9a99b47fc460d422812b6a5adff7dfee951d8fa2e4a98caa0382cfbdbf`
 - 还可以用摘要作为 `create`，`run`，`rmi` 命令的引用，甚至 `Dockerfile` 的 `FROM` 都行
 - 要删除本地镜像，需要确保基于它的容器不在运行中
+
+## Network containers
+
+- 容器名必须是独一无二的，重用一个容器名时，必须先删除旧的容器
+- Docker 使用网络驱动容器提供网络支持。Docker 提供 2 种网络驱动：`bridge` 和 `overlay`，此外，用户还能编写自己的网络驱动扩展，但这是个技术活
+- Docker 默认使用 `bridge` 网络模式
