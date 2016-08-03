@@ -1,3 +1,4 @@
+#### Before 2016-08-01
 - 求余数: (-len(s)) % 4 => 4 - (len(s))%4
 - Linux下, 以非root用户身份, 用nvm安装Node.JS, Node.JS将被安装在当前用户家目录下. 其他用户, 甚至root用户并不知道系统中已经安装了Node.JS, 之后用户通过npm安装的工具程序, 也只能被当前用户使用, 即, 此时`sudo　cmd`会提示`cmd`不存在. 解决方法是：软链接
 
@@ -86,6 +87,8 @@ then
 fi
 ```
 
+#### 2016-08-02
+
 - Python str 2 time/datetime - datetime.datetime.strptime(str, time\_format).date() | time.time.strptime(str, time\_format)
 - Python get pid of the running program, or you can apply this to check if the program is running
 
@@ -145,3 +148,9 @@ $(".trade-filter button").on("click", function(){
 ```
 
 - 不同于 C/C++ 的 `switch`, ECMAScript 的 `switch` 可用于字符串, 即 `case "kissg": do_something`
+- jQuery, `$(selector)` 选择器从**从父级标签一路定位到子级标签, 不是把子级标签写在父级标签之前**
+
+#### 2016-08-03
+- 新学 2 个前端日期选择器: jqueryui datepicker 和 bootstrap datetimepicker. 前者的使用见[这里](http://api.jqueryui.com/datepicker/), 后者使用见[这里](http://www.bootcss.com/p/bootstrap-datetimepicker/)
+- JavaScript 获取当前日期时间: `var dt = new Date()`, `Data` 对象提供了多种日期时间操作
+- JavaScript 切片操作: `stringObject.slice(start,end)`
