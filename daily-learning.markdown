@@ -154,3 +154,9 @@ $(".trade-filter button").on("click", function(){
 - 新学 2 个前端日期选择器: jqueryui datepicker 和 bootstrap datetimepicker. 前者的使用见[这里](http://api.jqueryui.com/datepicker/), 后者使用见[这里](http://www.bootcss.com/p/bootstrap-datetimepicker/)
 - JavaScript 获取当前日期时间: `var dt = new Date()`, `Data` 对象提供了多种日期时间操作
 - JavaScript 切片操作: `stringObject.slice(start,end)`
+
+#### 2016-08-06
+
+- Chrome -> editor：`data:text/html, <html contenteditable>`
+- Ubuntu install the latest version of git, add ppa: `sudo apt-add-repository ppa:git-core/ppa`
+- Python 运行时, 查看版本: `import sys; sys.version_info`
