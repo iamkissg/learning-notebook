@@ -48,7 +48,7 @@ bool isPowerOfFour(int num){
 
 #### Number of 1 Bits
 
-- 位移法
+- 位移法, 不管多少个 1, 都循环 31 次
 
 ```c
 int hammingWeight(uint32_t n) {
@@ -58,5 +58,72 @@ int hammingWeight(uint32_t n) {
         sum += (n >> i) & 1;
     }
     return sum;
+}
+```
+
+(学习自 [CSDN](http://blog.csdn.net/zzc8265020/article/details/46524199)
+
+- $n - 1$ 之后, 最低位的 1 变为 0, 其后所有 0 变成 1.
+- 因此, $n$ 位与上 $n - 1$, $n$ 最低位的 1 被消除. 1 不多的时候, 递减速度特别快. 1 多的时候, 效果一般.
+
+```c
+int hammingWeight(uint32_t n){
+    char count = 0;
+    while(n){
+        n = n & (n - 1);
+        count++;
+    }
+    return count;
+}
+```
+
+#### Reverse String
+
+- 如果 `strrev()` 函数可以使用, 可以简单地:
+
+```c
+#include <string.h>
+
+char* reverseString(char* s){
+    return strrev(s);
+}
+```
+
+- 但是 Linux 下, `<string.h>` 不包括 `strrev()` 函数, 替代的方法是:
+
+```c
+#include <string.h>
+char *strrev(char *str){
+    char *p1, *p2;
+
+    if (! str || ! *str)
+        return str;
+    for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2){
+        *p1 ^= *p2;  // 采用异或, 就不需要借助第三个变量了
+        *p2 ^= *p1;
+        *p1 ^= *p2;
+    }
+    return str;
+}
+```
+
+[CSDN 博客](http://blog.csdn.net/turingo/article/details/8124432) 提供的不使用 `strlen` 的思路 (效率更高):
+
+```c
+char* reverseString(char *s){
+    char* h = s;
+    char* t = s;
+    char ch;
+
+    while(*t++){};
+    t--;
+    t--;
+
+    while(h<t){
+        ch = *h;
+        *h++ = *t;
+        *t-- = ch;
+    }
+    return s;
 }
 ```
