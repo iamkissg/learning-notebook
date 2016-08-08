@@ -160,3 +160,11 @@ $(".trade-filter button").on("click", function(){
 - Chrome -> editor：`data:text/html, <html contenteditable>`
 - Ubuntu install the latest version of git, add ppa: `sudo apt-add-repository ppa:git-core/ppa`
 - Python 运行时, 查看版本: `import sys; sys.version_info`
+
+#### 2016-08-08
+
+- CentOS, 查看系统版本: `cat /etc/*elease`, 其中 `*elease` 包括 centos-release, os-release, redhat-release, system-release, 每一个都带有版本信息, 其中 `os-release` 最详细, 并且在其他发行版也通用 (Ubuntu 可用)
+- 局域网内, 切记要修改 IP 地址绑定! 比如使用多个容器来运行主从 redis 数据库应用, redis.conf 默认是 `bind 127.0.0.1`, 这就造成了主从数据库之间无法同步, 必须同时修改为 `bind 0.0.0.0` 才能使已经通过 `--link` 连接的多个容器的数据库同步, 从数据库才能查询到主数据写入的值.
+- `$$` 表示 shell 中当前运行的进程 pid
+- 查看进程 namespace: `ls -l /proc/[pid]/ns`
+- UTS - Unix Timesharing System
