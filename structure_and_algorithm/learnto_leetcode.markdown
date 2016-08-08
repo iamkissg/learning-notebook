@@ -127,3 +127,78 @@ char* reverseString(char *s){
     return s;
 }
 ```
+
+#### Maximum Depth of Binary Tree
+
+- 最简短的代码, 利用递归和数结构的特点:
+
+```cpp
+int maxDepth(TreeNode *root){
+    if (root == nullptr) return 0;
+    return max(maxDepth(root -> left), maxDepth(root -> right)) + 1;
+}
+```
+
+#### Nim Game (4 的倍数)
+
+- 4 的倍数, 二进制表示最低 2 位都为 0, 因此, 位与上 3 就可以判断了:
+
+```c
+bool is4n(int n){
+    return n & 3;
+}
+```
+
+#### Sum of Two Intergers (without + and -)
+
+- 类似于寻址, 借助数组下标进行类似于相对寻址的操作, 最后取地址:
+
+```c
+int getSum(int a, int b){
+    char *c = (char*) a; // 这句比较难懂, 莫名奇妙, c 就是以 a 为地址的内存地址
+    return (int)&c[b];   // b 作为偏移量
+}
+```
+
+#### Add Digits (各位数之和)
+
+- 数字各位之和与 9 有关: 9 的倍数, 各位之和为 9 (0 除外), 非 9 的倍数, 各位之和就是该数模 9 的结果
+
+```python
+int addDigits(int num){
+    return (num % 9) ? (num % 9) : (num ? 9 : 0);
+}
+```
+
+#### Invert Binary Tree
+
+- 递归, 二叉树完美演绎了递归: 只要不是空节点, 就交换左右子树, 单边的子树也换到另一边.
+
+```c
+struct TreeNode* invertTree(struct TreeNode* root){
+    if(!root) return NULL;
+    struct TreeNode* tmp = root -> left;  // 保存当前左节点, 就保存了左子树
+    root -> left = invertTree(root -> right);
+    root -> right = invertTree(tmp);
+    return root;
+}
+```
+
+- 非递归写法, 学习自 [博客园](http://www.cnblogs.com/grandyang/p/4572877.html) 和 [这篇博客](http://bookshadow.com/weblog/2015/06/12/leetcode-invert-binary-tree/): 利用队列来辅助, 根节点入队, 再出队, 若存在子节点, 交换子节点, 并将它们加入队列.
+
+```python
+class Solution(object):
+    def invertTree(self, root):
+        if not root:
+            return None
+        queue = [root]
+        while queue:
+            front = queue.pop(0)
+            front.left, front.right = front.right, front.left  # python 的易用之处
+            # left, right 加入队列的顺序不重要, 反正都要交换
+            if front.left:
+                queue.append(front.left)
+            if front.right:
+                queue.append(front.right)
+        return root
+```
