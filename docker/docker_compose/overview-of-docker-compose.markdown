@@ -1,0 +1,36 @@
+#Overview of Docker Compose
+
+- Compose 是一个定义和运行多容器 Docker 应用的工具
+- 使用 Compose, 可以用一个 Compose 文件配置应用服务. 之后用一条命令, 从配置文件创建和启动所有的服务
+- Compose 适用于开发, 测试, 部署与持续集成
+- 使用 Compose 可大致分成 3 步:
+ - 用 `Dockerfile` 定义应用环境
+ - 用 `docker-compose.yml` 定义服务
+ - 用 `docker-compose up` 命令启动应用
+- Compose 在整个应用的生命周期都提供了用于管理的命令:
+ - 启动, 停止, 重建服务
+ - 查看运行中服务的状态
+ - 输出运行中服务的日志
+ - 针对单个服务, 提供了一次性命令
+- Compose 的特点
+ - 在单个主机上提供多个隔离的环境
+  - 以项目为单位进行隔离, 默认的项目名就是项目所在目录的名称
+ - 在创建容器时保留数据卷
+  - 使用 `docker-compose up` 命令时, 若容器有数据卷的, 将从旧的容器将数据卷复制到新容器中, 确保了数据卷的数据不丢失
+ - 只重建已修改的容器
+  - 重启服务, 若服务没有被修改, Compose 复用存在的容器. 这意味着修改环境可以很快
+ - Variables and moving a composition between environments
+  - Compose 支持在 Compose 文件中使用变量, 可以利用变量自定义不同的环境
+- 在 Compose 文件中, 使用 `extends` 字段进行拓展, 或使用多个 Compose 文件.
+- 用例:
+ - 开发环境
+  - 软件开发, 在隔离的环境运行应用并进行交互是关键
+  - Compose 文件提供了对所有应用服务依赖性的配置 (数据库, 队列, 缓存, web 服务, API 等)
+ - 自动测试环境
+  - 任何持续部署或持续集成过程的重点是自动测试套件
+  - 自动端到端的测试需要一个能进行测试的环境. Compose 提供了方便的方式创建和销毁用于测试的隔离环境
+ - 单机部署
+  - Compose 一直致力于开发与测试工作流
+  - 可以使用 Compose 部署远程 Docker Engine, Docker Engine 可以是 Docker Machine 提供的单一实例, 也可以是整个 Docker Swarm cluster
+- 
+
