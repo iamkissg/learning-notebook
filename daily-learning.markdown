@@ -168,3 +168,17 @@ $(".trade-filter button").on("click", function(){
 - `$$` 表示 shell 中当前运行的进程 pid
 - 查看进程 namespace: `ls -l /proc/[pid]/ns`
 - UTS - Unix Timesharing System
+
+#### 2016-08-10
+
+- 查看进程的能力: `cat /proc/$pid/status` (功能不止如此)
+
+#### 2016-08-11
+
+- 查看 IP 路由表, 指令 `route`
+- `lo` - 回环网卡 (lookback adaptor), 本地进程与另一本地进程通信时可用
+- `eth0` - 与外网通信的网卡
+- `pscap` - 查看进程的能力, 需要安装工具: `sudo apt-get install libcap-ng-utils`
+- `brctl` - 查看和管理网桥, 需要安装工具包: `sudo apt-get install bridge-utils`
+- `exec $SHELL -l` - reload shell
+- `pip -r <file>` - Install from the given requirements file, can be used multiple times
