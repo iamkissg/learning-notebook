@@ -129,6 +129,11 @@ Out[37]: 2
 - `plot.plot(*args, **kw)` - 绘制线图
 - `plot.bar(left, height, width=0.8, bottom=None, hold=None, **kw)` - 绘制条形图
 - `plot.xticks(*args, **kw)` - 为x轴添加标记
+- `plot.subplot(column, row, active_area) - 使用子图, 3 个参数分别表示子图的总行数, 总列数, 已经当前子图是哪一个活跃区
+- `plot.hist()` - 直方图
+- `label` - 作为关键字参数, 为图形添加图例, 最后需要 `plot.legend()` 展示图例
+- `plot.xlabel(str)` - 为 x 轴添加标签
+- `plot.title(str)` - 添加标签
 
 ## Chapter4 线性代数
 
