@@ -177,3 +177,18 @@ Out[37]: 2
 - 如果E发生意味着F发生(或者F发生意味着E发生),就称事件E与事件F为不相互独立(dependent)。反之,E与F就相互独立(independent)。
 - 从数学角度讲,事件E和事件F独立意味着两个事件同时发生的概率等于它们分别发生的概率的乘积
 - `条件概率`可以理解为,已知F发生,E会发生的概率: `P(E, F)=P(E|F)P(F)`
+
+## Chapter25 数据科学前瞻
+
+- 要想成为一名优秀的科学家, 需要知道更多关于这些领域的知识, 而我鼓励你对每一个领域开展深入的学习
+- NumPy 提供了比 list `向量`性能更好的数组, 提供了比 list of list `矩阵`性能更好的矩阵, 以及大量利用它们来工作的`数值函数`
+- pandas 提供了处理 Python 数据集的更多的数据结构, 主要抽象概念是 DataFrame
+- scikit-learn 处理机器学习问题的库, 决策树
+- 数据可视化, 首选 matplotlib, 另外可试试 seaborn, 若想创建可以在网络上分享的`交互式可视化`, 首选 `D3.js` (Data Driven Documents), Bokeh 是一个把 D3 风格的功能整合到 Python 中的项目
+- R 语言
+- 数据科学的一部分, 可能包括`数据获取`, 一些好的站点:
+ - Data.gov: 政府开放数据的门户网站
+ - reddit 上有 r/datasets 和 r/data 两个论坛, 是一个可以请求数据和发现数据的地方
+ - Amazon.com 的公用数据集: aws.amazon.com/cn/public-data-sets/
+ - Robb Seaton 的博客上的专业数据集的列表: rs.io/100-interesting-data-sets-for-statistics
+ - Kaggle (www.kaggle.com) 是一个举办数据科学竞赛的网站
