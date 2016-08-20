@@ -182,3 +182,76 @@ $(".trade-filter button").on("click", function(){
 - `brctl` - 查看和管理网桥, 需要安装工具包: `sudo apt-get install bridge-utils`
 - `exec $SHELL -l` - reload shell
 - `pip -r <file>` - Install from the given requirements file, can be used multiple times
+
+#### 2016-08-16
+
+- `netifaces` - Python, portable network interface information
+- 逻辑运算符是简化嵌套条件语句的常用方法, 对非嵌套条件同样适用:
+
+```python
+s = some_function_that_returns_a_string()
+if s:
+    first_char = s[0]
+else:
+    first_char = ""
+
+# 更好的写法应该是
+first_char = s and s[0]
+```
+
+#### 2016-08-17
+
+- Unix 系统测试程序运行时间: `time cmd`, 比如: `time python3 hw.py`
+- 有一些嵌套的 if 语句其实不能用逻辑运算符取消嵌套：
+
+
+```python
+if "." in package:
+    if package[:package.find(".")] not in  LT:
+        print("2")
+elif "as" in package:
+    if package[:package.find("as") - 1] not in  LT:
+        print("3")
+elif package not in LT:
+    print("4")
+
+# wrong way (也许只是还没找到合适的方式)
+# 以第一条为例，写成以下形式，就不能判断带 "." 的但属于 LT 的包了
+# 会直接跳到第 3 个逻辑, 然后判断出错
+if "." in package and package[:package.find(".")] not in  LT:
+    print("2")
+elif "as" in package and package[:package.find("as") -LT:
+    print("3")
+elif package not in LT:
+    print("4")
+```
+
+- utc: 协调世界时，世界上调节时钟和时间的主要时间标准
+
+#### 2016-08-19
+
+- regex `\w` (word) matches any letter, number or underscore, 即[a-zA-Z\_]
+- svg (Scalable Vector Graphics) - 是**基于 XML**, 用于描述二维矢量图形的一种图形格式, 所以需要浏览器或其他可查看 svg 的图片查看器来打开
+- git 回溯到打了某个 tag 的版本: `git reset --hard tag_name`
+- Python 的 Counter, 可用于统计序列中元素出现的次数, 以元素为 key, 出现次数为 value.
+- `Counter.values()` 和 `Counter.keys()` 会按 keys 从小到大的顺序返回 values/keys 的序列, 类型分别是 dict\_values 和 dict\_keys
+- `not` 与 `is None`, 大多数情况下可以混用, 但 `not 0` 和 `0 is None` 不能混用, 前者返回`True`, 后者返回 `False`
+- `strptime(str, format)` -> new datetime parsed from a string\\
+`strftime(format, ttime)` or `time.strftime(format)` -> convert time to formatting str
+- Python, 有些操作, 将文件内容加载到对象, 之后关闭文件也能操作; 另一些, 需要文件一直打开, 相当于创建了一个文件指针对象, 比如:
+
+```python
+with open(filename, 'r') as f:
+    reader = csv.reader(f)  # 就我所理解, reader 应该是一个文件指针对象
+    next(reader)  # ok
+next(reader)  # I/O operation closed file
+
+with open(filename, 'r') as f:
+    pop_data = json.load(f)
+# ok,
+# json.load - deserialize file-like object to Python object
+for pop_dict in pop_data:
+    some_operations
+```
+
+- Python, Pygal 移除了 i18n module, 不过可以安装pyga\_maps\_world 插件
