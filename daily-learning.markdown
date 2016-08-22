@@ -255,3 +255,27 @@ for pop_dict in pop_data:
 ```
 
 - Python, Pygal 移除了 i18n module, 不过可以安装pyga\_maps\_world 插件
+
+#### 2016-08-21
+
+- 作为程序猿, 需要学习的最重要的技能之一是如何高效地摆脱困境. 陷入困境之后, 首先要判断形势. 必须明确地问自己 3 个问题, 才能从他人哪里获得帮助:
+ 1. 你想要做什么?
+ 2. 你已尝试哪些方式?
+ 3. 结果如何?
+- 通过回答这三个问题, 你会发现遗漏了什么, 从而无需再做其他事情就能摆脱困境. (橡皮鸭子调试法)
+- `git checkout` - 放弃工作区的修改, 恢复到之前的任何提交.
+ - `git checkout .` - 放弃最后一次提交之后所做的所有修改, 将项目恢复到最后一次提交的状态.
+ - `git checkout hash_val` - 切换到某一节点
+ - `git checkout -b` - 创建分支, 并切换
+- `in` 操作对于 dict, 是在 keys 范围内进行检查
+- 对 list of multi-elements tuple 进行排序, 会按元素在 tuple 中的顺序依次排序, 即先按 0 号元素排序, 若 0 号元素相同, 再按 1 号元素进行排序, 依次类推. 因此, 对于字典的一个处理技巧是, 用列表推导式生成 list of multi-elements tuple, 再对 list 进行排序, 如下:
+
+```python
+value_key_pairs = [(v, k) for k, v in some_dict.items()]
+value_key_pairs.sort()
+# return value_key_pairs[-len(some_dict):]  # 逆序
+```
+
+- 使用列表推导式读取 JSON-line 的技巧: records = [json.loads(line) for line in open(path)]
+
+#### 2016-08-22
