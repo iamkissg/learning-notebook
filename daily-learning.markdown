@@ -279,3 +279,11 @@ value_key_pairs.sort()
 - 使用列表推导式读取 JSON-line 的技巧: records = [json.loads(line) for line in open(path)]
 
 #### 2016-08-22
+
+- IPython 加载扩展命令: `%load_ext xx`, 比如 `%load_ext zipline`
+
+#### 2016-08-25
+
+- Vim 窗口移动: `ctrl-w` + `H/J/K/L`
+- shell, `find /path -type f -print | wc -l` - 查看某目录下文件总数 (递归地), `-type f` 只查找 regular file, `-print` - print the full file name on the standard output, followed by a newline
+- shell, `find .` - 递归地查看当前目录下所有文件, 最简单的方式, 没有之一
