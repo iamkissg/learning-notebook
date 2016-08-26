@@ -287,3 +287,18 @@ value_key_pairs.sort()
 - Vim 窗口移动: `ctrl-w` + `H/J/K/L`
 - shell, `find /path -type f -print | wc -l` - 查看某目录下文件总数 (递归地), `-type f` 只查找 regular file, `-print` - print the full file name on the standard output, followed by a newline
 - shell, `find .` - 递归地查看当前目录下所有文件, 最简单的方式, 没有之一
+
+#### 2016-08-26
+
+- tar 命令, 最后一个 flag 必须是 `f`, 以指出 tar包
+ - `-t` - 列出 tar 包中的文件
+ - `-c` - 创建 tar 包
+ - `-r` - 追加文件到 tar 包
+ - `-x` - 解压 tar 包
+ - `-u` - 更新 tar 包中的指定文件
+ - `-z` - 调用 gzip, `.gz` 结尾
+ - `-j` - 调用 bzip2, `.bz2` 结尾
+ - `-Z` - 调用 compress, `.Z` 结尾, 实际上 `.Z` 结尾的文件就是 bzip2 压缩的结果
+ - `-v` - verbose, 显示处理过程
+ - `-O` - 将文件解压到标准输出
+- zip 与 unzip, 使用与 tar 命令类似, 先指定压缩包名, 再指定文件 (如果存在的话). 血与泪的教训, 如果是压缩一个目录, 需要递归!
