@@ -74,7 +74,29 @@ value_key_pairs.sort()
 - `pd.Series.groupby(self, by=None, axis=0, level=None, as_index=True, sort=True, group_keys=True, squeeze=False` - Group series using mapper (dict or key function, apply given function to group, return result as series) or by a series of columns, 即按列分组或按映射器的结果进行分组
 - , 即按列分组或按映射器的结果进行分组
 - `pd.core.groupby.DataFrameGroupBy.size(self)` - Compute group sizes, return Series
-- `pd.Series.unstack()` - Unstack, a.k.a. pivot, Series with MultiIndex to produce DataFrame. Series -> DataFrame
+- `pd.Series.unstack()` - Unstack, a.k.a. pivot, Series with MultiIndex to produce DataFrame. `Series -> DataFrame`
 - `pd.DataFrame.sum(self, axis=None, skipna=None, level=None, numeric_only=None, **kwargs)` - Return the sum of the values for the requested axis
-- `pd.DataFrame.plot` - 直接利用 matplotlib 绘图
+- `pd.DataFrame.plot` - 直接利用 matplotlib 绘图, `subplots` 为 True 时, 每列 (Series) 绘在一个子图上, `figsize` - 指定图片大小
 - `pd.DataFrame.plot(kind="barh", stacked=True)` - 生成堆积条形图
+- 对于堆积条形图, 较小的分组无法识别相对比例, 可将各行规范为"总计为1"
+- `pd.read_table()` - 将文件读取到 pandas DataFrame 对像，唯一的位置参数是路径, `sep` 指定字段间分隔符, `header` 指定有无标题, `engine` 指定解析引擎, 可选为 `c` 或 `python`, 快速与灵活的选择, `names` 类数组对象, 用作 DataFrame 的列名
+- 分析散布在多张表中的数据, 可将所有数据都合并到一张表中, 利用 pandas 的 `merge` 函数, pandas 会根据列名的重叠情况推断出哪些列是合并键. 一次只能合并 2 张表, 若要合并多张表, 和多次调用 merge 函数
+- `pd.DataFrame.ix` - 属性, 基于标签位置的索引, 也返回某一行
+- `pd.DataFrame.pivot_table()` - 创建电子表格形式的数据透视表(pivot table), `数据聚合`的方式之一, 唯一位置参数 `data` 用 `DataFrame` 对象指定数据, `index`, `columns` 指定索引与列 (默认是数字索引), `aggfunc` 默认是 `numpy.mean` 函数, 或者可以是 list of functions,\\
+(数据透视表, 是一种交互式的表, 可进行某些计算. 之所以称为数据透视表, 因为可以动态地改变版面布置, 以便按照不同方式分析数据, 也可以重新安排行号, 列标等. 每次改变版面布置, 数据透视表会立即按照新的布置重新计算数据)
+- `pd.Series.index` - 返回一个 Index obj
+- `pd.DataFrame.sort_values` - sort by values, 唯一位置参数 `by` 可以是 str 或 list of names, 指定排序的的列, `ascending` 指定升降序的布尔值
+- 要找出两列的分歧, 可用两列的差创建新的一列, 对新列进行排序, 就可知哪些是分分歧最大的,不过要注意可能需要使用绝对值
+- `pd.Series.sort_values` - 无 `by` 关键字参数
+- 计算分歧的标准姿势应该是计算或标准差
+- `pd.Series.std()` - 返回标准差
+- `pd.read_csv` - 读取 .csv 文件到 DataFrame. 实际上, 只要是标准的逗号分隔的内容, 文件类型不重要
+- pandas 可以用点标记法, 取数据
+- `pd.Series.sum()` - Return the sum of the values for the requested axis
+- `pd.concat(objs, ...)` - 在某一维度, 联接 pandas 对象 (Concatenate pandas objects along a particular axis with optional set logic along the other axes). 默认按行组合, `ignore_index=True` 将忽略原始行号, 有时候有用.
+- `pd.DataFrame.apply()` - Applies function along input axis of DataFrame.
+- `pd.obj.astype(numpy.dtype)` - Cast object to input numpy.dtype
+- 进行分组处理时, 一般都应该做一些有效性检查. 对于浮点性数据, 不能判断它是否等于某个值, 用 `np.allclose(a, b)` 来检查 a 是否近似于 c
+- `np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)` - 当两个数组近似时, 返回 True
+- `技巧`: 通过多少加起来才够总数的 50%, for 循环是一种方式. 但 NumPy 提供了一种更聪明的矢量方式: 先排序, 计算累计和 cumsum, 然后再通过 searchsortd 方法找出 0.5 应该被插在哪个位置才能保证不破坏原顺序
+-找出 0.5 应该被插在哪个位置才能保证不破坏原顺序
