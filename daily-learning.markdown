@@ -315,3 +315,20 @@ value_key_pairs.sort()
 - 调用一次 `fork`, 会得到 2 次返回值, 分别返回给父进程和子进程, 向子进程返回 `pid=0`, 向父进程返回 `pid` 为子进程的 id
 - 当 `fork` 了一个子进程, 并执行命令, 命令并不会在父进程中执行, 比如 `cd` 仅仅会改变子进程的目录, 而不是改变父进程的目录. 之后子进程终止, 父进程保持原先的目录
 - 因此, 如 `cd`, `exit` 的命令必须为 shell 本身内置, 并在 shell 进程中执行, 而不是通过 `fork`
+
+#### 2016-08-29
+
+- shell, `groups` - 查看当前用户所在组
+- shell, `cut -d: -f1 /etc/passwd` - 查看系统中所有的用户
+- shell, `cut -d: -f1 /etc/group` - 查看系统中所有的组
+- Python 判断字符串是否有效日期, 如下. 因为会直接以格式化字符串读取, 若读入的日期非法, 直接抛出异常, 因此通过是否抛出异常判断日期是否有效
+
+```python
+def is_valid_date(str):
+    '''判断是否是一个有效的日期字符串'''
+    try:
+        time.strptime(str, "%Y%m%d")
+        return True
+    except:
+        return False
+```
