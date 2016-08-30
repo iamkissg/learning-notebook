@@ -332,3 +332,28 @@ def is_valid_date(str):
     except:
         return False
 ```
+
+#### 2016-08-30
+
+- CR(Carriage Return), LF(Line Feed). Dos 和 Windows 采用回车+换行 CR / LF 换行
+- 而 UNIX / Linux 采用换行符 LF 换行
+- 苹果系统则采用回车符 CR 换行
+- CR 用符号 `\r`表示, 十进制 ASCII 代码是 13, 十六进制代码为 0x0D
+- LF 使用 `\n`符号表示, ASCII 代码是 10, 十六制为 0x0A
+- 所以 Windows 平台上换行在文本文件中是使用 0d 0a 两个字节表示，而 UNIX 和苹果平台上换行则是使用 0a 或 0d 一个字节表示
+- 在不同平台间使用 FTP 软件传送文件时，在 ASCII 文本模式传输模式下，一些 FTP 客户端程序会自动对换行格式进行转换。经过这种传输的文件字节数可能会发生变化。`如果不想FTP修改原文件，可以使用 bin 模式(二进制模式)传输文本`
+- Python 的三元操作符(类 `a?b:c`): `res =  exp1 if condition else exp2`
+- 列表推导式可以用 `[x*y for x in [1,2,3] for y in  [1,2,3]]` 两个 for 的形式, 同时对两个iterable进行迭代, 返回 [1, 2, 3, 2, 4, 6, 3, 6, 9]
+- Python, 正常的 for 语句, 可用 `for x, y in zip([1, 2, 3], [1, 2, 3])`, 采用 `zip` 函数对多个序列进行迭代, 但元素是对应的, 即 NumPy 所谓的 Broadcast. 若需要 n * m 的迭代, 另外写一个生成器函数吧, 比如:
+
+```python
+def unique_pairs(n):
+    """在 range(n) 范围内生成索引对"""
+    for i in range(n):
+        for j in range(i+1, n):
+            yield i, j
+```
+
+- Python, 查看 str 是否另一个 str 的子串:
+ 1. `in` 操作符, 最简单最 Pythonic 的方法
+ 2. `str.find` 方法, 找不到时返回 `-1`
