@@ -100,3 +100,10 @@ value_key_pairs.sort()
 - `np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)` - 当两个数组近似时, 返回 True
 - `技巧`: 通过多少加起来才够总数的 50%, for 循环是一种方式. 但 NumPy 提供了一种更聪明的矢量方式: 先排序, 计算累计和 cumsum, 然后再通过 searchsortd 方法找出 0.5 应该被插在哪个位置才能保证不破坏原顺序
 -找出 0.5 应该被插在哪个位置才能保证不破坏原顺序
+- `pd.DataFrame.head(self, n=5)`, `pd.DataFrame.tail(self, n=5)` - 类 shell 的 head, tail 用法, 返回首尾 n 行
+- `plt.subplots(nrows=1, ncols=1, sharex=False, sharey=False, squeeze=True, subplot_│ving file at /Untitled.ipynb
+kw=None, gridspec_kw=None, **fig_kw)` - 创建子图
+- `pd.Series.map(self, arg, na_action=None)` - 使用 arg 为 Series 映射值
+- `pd.Series.unique()` - 返回互异值的数组. Return array of unique values in the object. Significantly fast than numpy.unique. Includes NA values.
+- `pd.Series.isin(self, values)` - Return a boolean :class:`~pandas.Series` showing whether each element in the :class:`~pandas.Series` is exactly contained in the passe
+- `pd.DataFrame.div()` - Floating division of dataframe and other.
