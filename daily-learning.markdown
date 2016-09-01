@@ -357,3 +357,9 @@ def unique_pairs(n):
 - Python, 查看 str 是否另一个 str 的子串:
  1. `in` 操作符, 最简单最 Pythonic 的方法
  2. `str.find` 方法, 找不到时返回 `-1`
+
+#### 2016-08-31
+
+- Ubuntu 更新软件时提示, `The following packages have been kept back:`, 而无法更新, 原因:
+- `If the dependencies have changed on one of the packages you have installed so that a new package must be installed to perform the upgrade then that will be listed as "kept-back".`
+- 解决办法: `apt-get install <list of packages kept back>`
