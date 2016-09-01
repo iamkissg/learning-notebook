@@ -363,3 +363,30 @@ def unique_pairs(n):
 - Ubuntu 更新软件时提示, `The following packages have been kept back:`, 而无法更新, 原因:
 - `If the dependencies have changed on one of the packages you have installed so that a new package must be installed to perform the upgrade then that will be listed as "kept-back".`
 - 解决办法: `apt-get install <list of packages kept back>`
+
+#### 2016-09-01
+
+- shell, `id -Z` - 查看当前用户的上下文
+- shell, `ls -Z` - 查看文件的上下文
+- shell, `ps -efZ` - 查看进程的上下文
+- Centos 上的 Docker 容器内, 挂载的数据卷, root Permission denied. 原因是宿主机开启了 `SELinux`. 此时, 即使容器内没有开启 SELinux, 挂载的数据卷由于是容器与宿主机共享的, 文件自带 SELiunx 限制, 因此无法访问:
+
+```shell
+The host：
+[root@centos-minion share]# id -Z
+unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+
+[root@centos-minion share]# ls -ldZ /home/share
+drwxr-xr-x. root root unconfined_u:object_r:home_root_t:s0 /home/share
+
+The container：
+[root@4ccce73bed9d share]# id -Z
+id: --context (-Z) works only on an SELinux-enabled kernel
+
+[root@4ccce73bed9d share]# ls -ldZ /home/share
+drwxr-xr-x. root root unconfined_u:object_r:home_root_t:s0 /home/share
+```
+
+- 取消 SELinux 的方法:
+    1. 永久方法: 修改 `/etc/sysconfig/selinux` 文件, `SELINUX=permissive|enforcing|disabled`, 需重启生效
+    2. 临时方法: 设置系统参数 `setenforce 0|1`. 0 - permissive 模式; 1 - enforcing 模式
