@@ -390,3 +390,44 @@ drwxr-xr-x. root root unconfined_u:object_r:home_root_t:s0 /home/share
 - 取消 SELinux 的方法:
     1. 永久方法: 修改 `/etc/sysconfig/selinux` 文件, `SELINUX=permissive|enforcing|disabled`, 需重启生效
     2. 临时方法: 设置系统参数 `setenforce 0|1`. 0 - permissive 模式; 1 - enforcing 模式
+- 因此, 要实现容器内的文件安全, 限制访问权限, 可以使用 SELinux
+
+#### 2016-09-02
+
+- shell, `crontab` 命令的使用:
+
+```python
+# 五个时间点, 从左到右依次是: min, hour, day of month, month, day of week, 具体看下面
+
+# *     *   *   *    *  command to be executed
+# -     -    -    -    -
+# |     |     |     |     |
+# |     |     |     |     +----- day of week (0 - 6) (Sunday=0)
+# |     |     |     +------- month (1 - 12)
+# |     |     +--------- day of month (1 - 31)
+# |     +----------- hour (0 - 23)
+# +------------- min (0 - 59)
+```
+
+- shell, `sed` is a `stream editor`. A stream editor is used to perform `basic text transformations on an input stream` (a file or input from a pipeline).  While in some ways similar to an editor which permits scripted edits (such as ed), sed works by making only one pass over the input(s), and is consequently more efficient. But it is sed's ability to `filter text in a pipeline` which particularly distinguishes it from other types of editors.
+- shell, 九九乘法表! `seq 9 | sed 'H;g' | awk -v RS='' '{for(i=1;i<=NF;i++)printf("%dx%d=%d%s", i, NR, i*NR, i==NR?"\n":"\t")}'`
+
+#### 2016-09-04
+
+- Python2.7, `print repr(s)` 输出原生字符串
+- Python2.7, 在线编程网站的多行读入写法:
+
+```python
+import sys
+
+for line in sys.stdin:
+    pass
+```
+
+- Python, `str.strip()` remove leading & tailing `whitespace characters`
+- Code, 三角形数(1, 3, 4, 10, 15, 21, ... 这样的数列), 公式 `n * (n + 1) / 2`
+- Python2.7, `print` 是一条语句, `print exp1,` 在表达式后加 `,` 就取消了换行, 但多了空格
+- Python, `sys.stdout.write()` 对输出到标准输出的更灵活的控制
+- `pyenv virtualenv 3.3.0 env`    #创建一个 Python 版本为 3.3.0 的环境, 环境叫做 env
+- `pyenv activate env_name`       #激活 env 这个环境, 此时 Python 版本自动变为 3.3.0, 且是独立环境
+- `pyenv deactivate`              #离开已经激活的环境
