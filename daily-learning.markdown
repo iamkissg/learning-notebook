@@ -394,10 +394,13 @@ drwxr-xr-x. root root unconfined_u:object_r:home_root_t:s0 /home/share
 
 #### 2016-09-02
 
-- shell, `crontab` 命令的使用:
+###### crontab
+
+- shell, `crontab` 命令的使用如下:
 
 ```python
-# 五个时间点, 从左到右依次是: min, hour, day of month, month, day of week, 具体看下面
+# 五个时间点, 从左到右依次是: 分, 小时, 日, 月, 周
+# 五个域用空格分隔, 域内可用`,`分隔, 指定多个时间点
 
 # *     *   *   *    *  command to be executed
 # -     -    -    -    -
@@ -409,8 +412,31 @@ drwxr-xr-x. root root unconfined_u:object_r:home_root_t:s0 /home/share
 # +------------- min (0 - 59)
 ```
 
+- crontab 命令格式: `crontab [-u user] file` 或 `crontab [-u user] [ -e | -l | -r ]`
+    - -u user：用来设定某个用户的crontab服务；
+    file：file是命令文件的名字,表示将file做为crontab的任务列表文件并载入crontab。如果在命令行中没有指定这个文件，crontab命令将接受标准输入（键盘）上键入的命令，并将它们载入crontab。
+    - -e(dit)：编辑某个用户的crontab文件内容。如果不指定用户，则表示编辑当前用户的crontab文件。
+    - -l(ist)：显示某个用户的crontab文件内容，如果不指定用户，则表示显示当前用户的crontab文件内容。
+    - -r(emove)：从/var/spool/cron目录中删除某个用户的crontab文件，如果不指定用户，则默认删除当前用户的crontab文件。
+    - -i(nteractive)：在删除用户的crontab文件时给确认提示
+- `crontab -e` 将在 `/tmp` 目录下创建临时文件并打开, 这样做是为了确保编写的 crontab 命令没有错误 (完整性检查), 起保护作用. 若直接打开真正的 crontab 文件进行编辑, 在编写 crontab 文件出错的时候, 会有问题.
+    - 真正的 crontab 保存在 `/var/spool/cron/crontabs` 目录下
+- 手动执行某个任务时，是在当前shell环境下进行的，程序能找到环境变量, 而系统自动执行任务调度时，是不会加载任何环境变量的，因此，就需要在crontab文件中指定任务运行所需的所有环境变量. 要注意以下几点:
+    - 脚本中涉及文件路径时写全局路径
+    - 脚本执行要用到 java 或其他环境变量时, 通过 source 命令引入环境变量:  `source /etc/profile`
+    - 当手动执行脚本OK，但是crontab死活不执行时,很可能是环境变量惹的祸，可尝试在crontab中直接引入环境变量解决问
+- 系统级任务调度主要完成系统的一些维护操作，用户级任务调度主要完成用户自定义的一些任务，可以将用户级任务调度放到系统级任务调度来完成（不建议这么做），但是`反过来却不行` ，root用户的任务调度操作可以通过”crontab –u root –e”来设置，也可以将调度任务直接写入 `/etc/crontab` 文件
+- `crontab -r` - 将从 crontab 目录 (/var/spool/cron) 中删除用户的 crontab 文件, 用户所有的 crontab
+- 在 crontab 中, `%` 表示换行的意思
+
+---
+
 - shell, `sed` is a `stream editor`. A stream editor is used to perform `basic text transformations on an input stream` (a file or input from a pipeline).  While in some ways similar to an editor which permits scripted edits (such as ed), sed works by making only one pass over the input(s), and is consequently more efficient. But it is sed's ability to `filter text in a pipeline` which particularly distinguishes it from other types of editors.
 - shell, 九九乘法表! `seq 9 | sed 'H;g' | awk -v RS='' '{for(i=1;i<=NF;i++)printf("%dx%d=%d%s", i, NR, i*NR, i==NR?"\n":"\t")}'`
+- `VI` 的替换应该是借鉴了 `sed`, 用 `s/to_be_replaced/replacing_character/g` 表示全局替换
+- `-i` 是 `--in-place` 的缩写, 将直接对文本进行修改. 若不适用 `-i`, 会将修改后的副本输出到标准输出, 而不修改文件本身
+
+---
 
 #### 2016-09-04
 
@@ -431,3 +457,169 @@ for line in sys.stdin:
 - `pyenv virtualenv 3.3.0 env`    #创建一个 Python 版本为 3.3.0 的环境, 环境叫做 env
 - `pyenv activate env_name`       #激活 env 这个环境, 此时 Python 版本自动变为 3.3.0, 且是独立环境
 - `pyenv deactivate`              #离开已经激活的环境
+- shell 配置文件:
+    1. `/etc/profile`
+    2. `$SHELL/.bashrc`
+    3. `$SHELL/.profile`
+
+---
+
+###### ps
+
+- ps 命令列出的是当前进程的快照，就是执行 ps 命令的那个时刻的进程，如果想要动态的显示进程信息，可以使用`top`命令。
+- linux 上进程有 5 种状态:
+    1. 运行 `R` (正在运行或在运行队列中等待)
+    2. 中断 S` (休眠中, 受阻, 在等待某个条件的形成或接受到信号)
+    3. 不可中断 `D` (收到信号不唤醒和不可运行, 进程必须等待直到有中断发生)
+    4. 僵死 `Z` (进程已终止, 但进程描述符存在, 直到父进程调用wait4(系统调用后释放)
+    5. 停止 `T` (进程收到SIGSTOP, SIGSTP, SIGTIN, SIGTOU信号后停止运行运行))
+- 常用参数:
+    - a 显示所有进程
+    - -a 显示同一终端下的所有程序
+    - -A 显示所有进程
+    - c 显示进程的真实名称
+    - -N 反向选择
+    - -e 等于“-A”
+    - e 显示环境变量
+    - f 显示程序间的关系
+    - -H 显示树状结构
+    - r 显示当前终端的进程
+    - T 显示当前终端的所有程序
+    - u 指定用户的所有进程
+    - -au 显示较详细的资讯
+    - -aux 显示所有包含其他使用者的行程
+    - -C<命令> 列出指定命令的状况
+    - --width<字符数> 每页显示的字符数
+    - lines<行数> 每页显示的行数
+    - --help 显示帮助信息
+    - --version 显示版本显示
+- 输出列含义:
+    - F 代表这个程序的旗标 (flag)， 4 代表使用者为 super user
+    - S 代表这个程序的状态 (STAT)，关于各 STAT 的意义将在内文介绍
+    - UID 程序被该 UID 所拥有
+    - PID 进程的ID
+    - PPID 则是其上级父程序的ID
+    - C CPU 使用的资源百分比
+    - PRI 这个是 Priority (优先执行序) 的缩写，详细后面介绍
+    - NI 这个是 Nice 值，在下一小节我们会持续介绍
+    - ADDR 这个是 kernel function，指出该程序在内存的那个部分。如果是个 running的程序，一般就是 “-“
+    - SZ 使用掉的内存大小
+    - WCHAN 目前这个程序是否正在运作当中，若为 - 表示正在运作
+    - TTY 登入者的终端机位置
+    - TIME 使用掉的 CPU 时间。
+    - CMD 所下达的指令为何
+
+```shell
+# To list every process on the system:
+ps aux
+
+# To list a process tree
+ps axjf
+
+# To list every process owned by foouser:
+ps -aufoouser
+
+# To list every process with a user-defined format:
+ps -eo pid,user,command
+```
+---
+
+- `-u user` - `-u` 通常用于指定用户
+
+#### 2016-09-05
+
+```python
+from math import factorial as f
+def nCr(n,r):
+    return f(n) / f(r) / f(n-r)
+```
+
+- 排列公式: `nAm = n! / (n - m)!`
+- 组合公式: `nCm = n! / m! / (n - m)!`
+
+```python
+from math import factorial as f
+
+def nCr(n, r):
+    return f(n) / f(r) / f(n - r)
+
+def nAr(n, r):
+    return f(n) / f(n - r)
+```
+
+- Python 组合: [itertools.combinations](https://docs.python.org/3/library/itertools.html#itertools.combinations):
+
+```python
+>>> import itertools
+>>> itertools.combinations('abcd',2)
+<itertools.combinations object at 0x01348F30>
+>>> list(itertools.combinations('abcd',2))
+[('a', 'b'), ('a', 'c'), ('a', 'd'), ('b', 'c'), ('b', 'd'), ('c', 'd')]
+>>> [''.join(x) for x in itertools.combinations('abcd',2)]
+['ab', 'ac', 'ad', 'bc', 'bd', 'cd']
+```
+
+---
+
+- [关于索引](http://blog.csdn.net/pang040328/article/details/4164874). 以下是一些重要的:
+    - 创建索引可以大大提高系统的性能
+        - 通过创建唯一性索引，可以保证数据库表中每一行数据的唯一性
+        - 加快数据的检索速度
+        - 加速表和表之间的连接
+    - 索引的代价:
+        - 创建索引和`维护索引`要耗费时间，这种时间随着数据 量的增加而增加
+        - 索引需要占物理空间
+        - 当对表中的数据进行增加、删除和修改的时候，索引也要`动态的维护`，这样就降低了数据的维护速度。
+    - 一般应该建立索引的列特征:
+        - 在经常需要搜索的列上，可以加快搜索的速度；
+        - 在作为主键的列上，强制该列的唯一性和组织表中数据的排列结构；
+        - 在经常用在连接的列上，这 些列主要是一些外键，可以加快连接的速度;
+        - 在经常需要根据范围进行搜索的列上创建索引，因为索引已经排序，其指定的范围是连续的；
+        - 在经常需要排序的列上创 建索引，因为索引已经排序，这样查询可以利用索引的排序，加快排序查询时间；
+        - 在经常使用在WHERE子句中的列上面创建索引，加快条件的判断速度。
+    - 索引的特征:
+        - 唯一性索引: 唯一性索引保证在索引列中的全部数据是唯一的，不会包含冗余数据
+        - 复合索引就是一个索引创建在两个列或者多个列上。在搜索时，当两个或者多个列作为一个关键值时，最好在这些列上创建复合索引
+
+---
+
+- 子网掩码的作用就是用来区分网络上主机是否在同一网段内, 不能单独存在, 必须结合 IP 地址一起使用。子网掩码只有一个作用，就是将某个 IP 地址划分成网络地址和主机地址两部分。是一种 `IP 网络地址复用方式`
+- 网间网规模的迅速扩展对IP地址模式的威胁:
+    - 巨大的网络地址管理开销
+    - 网关寻径急剧膨胀, 寻径表的膨胀不仅会降低网关寻径效率, 更重要的是将增加内外部路径刷新时的开销，从而加重网络负担。
+- 在实际应用中通常各网点采用连续方式的子网掩码 (不连续的子网掩码给分配主机地址和理解寻径表都带来一定困难)
+- 子网划分的步骤:
+    1. 将子网数目转为 $2^m$ 形式, 如果不是恰好是 2  的指数, 取多一位
+    2. 将第 1 步确定的 m, 按高序占用主机地址 m 位, 转为十进制. 若 C 类子网, m = 3, 则 `11100000`, 最终的子网掩码是 `255.255.255.224`
+- 利用主机数划分子网:
+    1. 将子网中需要容纳的主机数转为二进制
+    2. 如果主机数小于或等于 254(`0`, 和 `255` 是保留 IP 地址), 则取该主机数的二进制位数 n
+    3. 将 `255.255.255.255` 的掩码, 从低位开始, 将低 n 位置为 0
+
+---
+
+###### coolshell 上的 sed 简明教程
+
+- `sed` 是流编辑器, 用程序的方式编辑文本, 其基本上是`正则模式匹配`
+- `/^` 匹配行首, 因此 `sed 's/^/#/g' pets.txt`, 可以在每行首添加 `#`. `/$` 匹配行尾
+
+---
+
+###### 二叉树的遍历
+
+- 前、中、后是指`根结点的访问时机`，在左、右子树之前、中间、或之后。层序就是从根结点开始从上至下、从左到右地依次访问。
+
+```python
+# 递归方式实现前, 中, 后序遍历
+def VisitTree_Recursive(root, order):
+  if root:
+    if order == 'NLR': print(root.data)
+    VisitTree_Recursive(root.left, order)
+    if order == 'LNR': print(root.data)
+    VisitTree_Recursive(root.right, order)
+    if order == 'LRN': print(root.data)
+```
+
+---
+
+- IPv6 二进制下为 `128` 位长度, 16 位为一组, 用 `:` 分隔, 分为 8 组, 每组以 4 位十六进制方式表示. 举例: `2001:0db8:85a3:08d3:1319:8a2e:0370:7344`
