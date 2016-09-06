@@ -600,8 +600,51 @@ def nAr(n, r):
 
 ###### coolshell 上的 sed 简明教程
 
-- `sed` 是流编辑器, 用程序的方式编辑文本, 其基本上是`正则模式匹配`
+- `sed` 是流编辑器, 用程序的方式编辑文本, 其基本上是`正则模式匹配`, (`regex`)
 - `/^` 匹配行首, 因此 `sed 's/^/#/g' pets.txt`, 可以在每行首添加 `#`. `/$` 匹配行尾
+- `sed` 使用反引号转义, 但是没办法用 `\'`, 在双引号内, 用 `\"` 转义可以
+- 不带任何参数的 `sed` 不会对文件本身进行修改, 可通过 `重定向` 写回文件, 或者 `-i` (--in-place)
+- 再谈 regex
+    - `^` 表示一行的开头。如：/^#/ 以#开头的匹配。
+    - `$` 表示一行的结尾。如：/}$/ 以}结尾的匹配。
+    - `\<` 表示词首。 如 \<abc 表示以 abc 为首的詞。
+    - `\>` 表示词尾。 如 abc\> 表示以 abc 結尾的詞。
+    - `.` 表示任何单个字符。
+    - `*` 表示某个字符出现了0次或多次。
+    - `[ ]` 字符集合。 如：[abc]表示匹配a或b或c，还有[a-zA-Z]表示匹配所有的26个字符。如果其中有^表示反，如[^a]表示非a的字符
+- `s 命令` 替换:
+    - `sed "3s/my/your/g" pets.txt` - 指定替换第 3 行的内容, 文件的行号从 1 开始
+    - `sed "3,6s/my/your/g" pets.txt` - 替换第 3 到 6 行文本
+    - `sed 's/s/S/1' my.txt` - 替换每行的第一个 s
+    - `sed 's/s/S/3g' my.txt` - 替换第一行的第 3 个 以后的所有 S
+    - 多匹配模式: `sed '1,3s/my/your/g; 3,$s/This/That/g' my.txt`, 替换 1 到 3 行的 my 为 your, 替换第 3 行以后的所有 This 为 That
+    - 上面的多匹配等价于 `sed -e '1,3s/my/your/g' -e '3,$s/This/That/g' my.txt`, 参数解释: `-e script, --expression=script`
+    - 使用 `&` 当作被匹配的变量, 比如 `sed 's/my/[&]/g' my.txt`, 此处 `&` 匹配 my
+    - 使用圆括号匹配的示例：（圆括号括起来的正则表达式所匹配的字符串会可以当成变量来使用，sed中使用的是\1,\2…）:
+    - `sed 's/This is my \([^,]*\),.*is \(.*\)/\1:\2/g' my.txt`
+- `N 命令` - 把下一行的内容纳入当成缓冲区做匹配, 比如 `sed 'N;s/my/your/' pets.txt` 会将原文本的偶数行纳入奇数行匹配, 且只匹配替换一次
+- `a 命令` - (append) `sed "$ a This is my monkey, my monkey's name is wukong" my.txt` - 在最后一行之后追加 (默认每行之后都会追加, 按行修改嘛~)
+- `i 命令` - (insert) `sed "1 i This is my monkey, my monkey's name is wukong" my.txt` - 在第 1 行插入 (默认每行之前都会插入)
+- `c 命令` - 替换匹配行 - `sed "2 c This is my monkey, my monkey's name is wukong" my.txt` - 替换第 2 行
+- `d 命令` - 删除匹配行 - `sed '2,$d' my.txt` - 删除第 2 行到尾行的所有行
+- `p 命令` - 打印命令, 可以看作 `grep` 式的命令 - `sed '2 p' my.txt` - 匹配第 2 行并打印, 这时会打印匹配的行 2 次, 其他行则打印一次
+    - `-n` 参数, 解决以上问题, 只打印匹配的行
+    - `/mode1/,/mode2/p` - 与 `2,$` 类似的用法
+- `sed "/fish/a This is my monkey, my monkey's name is wukong" my.txt` - 匹配到 fish 之后就追加, 对 `i`, `c`, `d`, `p` 都同样适用
+- sed 的四个基本点:
+    - `-n 参数
+    - 几乎所有的命令都是 `[address[,address]][!]{cmd}`, `!` 表示匹配成功后是否执行命令. `address` 可以是数字也可以是一个模式
+        - `adddress` 可以使用相对位置, `sed '/dog/,+3s/^/# /g' pets.txt` - `+3` 表示向后 3 行
+    - cmd 可以是多个, 可以用 `;` 分隔, 可以用大括号括起来作为嵌套命令
+        - `sed '3,6 {/This/d}' pets.txt` - 对 3 到 6 行执行命令 `/This/d`
+        - `sed '3,6 {/This/{/fish/d}}' pets.txt` - 对3行到第6行，匹配/This/成功后，再匹配/fish/，成功后执行d命令
+        - `sed '1,${/This/d;s/^ *//g}' pets.txt` - 从第一行到最后一行，如果匹配到This，则删除之；如果前面有空格，则去除空格
+    - `hold space`:
+        - g： 将hold space中的内容拷贝到pattern space中，原来pattern space里的内容清除
+        - G： 将hold space中的内容append到pattern space\n后
+        - h： 将pattern space中的内容拷贝到hold space中，原来的hold space里的内容被清除
+        - H： 将pattern space中的内容append到hold space\n后
+        - x： 交换pattern space和hold space的内容
 
 ---
 
@@ -623,3 +666,4 @@ def VisitTree_Recursive(root, order):
 ---
 
 - IPv6 二进制下为 `128` 位长度, 16 位为一组, 用 `:` 分隔, 分为 8 组, 每组以 4 位十六进制方式表示. 举例: `2001:0db8:85a3:08d3:1319:8a2e:0370:7344`
+- Python, 排序, str 默认按字典序排序, 数值型默认按数值大小排序, 升序
