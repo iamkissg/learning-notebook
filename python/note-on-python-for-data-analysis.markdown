@@ -553,3 +553,64 @@ Out[14]:
     - `fillna` 默认返回新对象. `inplae=True` 对现有对象进行修改
     - 对 `reindex` 有效的的插值方法可用于 `fillna`: `df.fillna(method="ffill")`, `df.fillna(method="ffill", limit=2)`
     - 可以将一些其他值作为填充值传入 `fillna`, 如 `Series.fillna(data.mean())`, 使用平均值作为插值
+
+#### 层次化索引
+
+- 层次化索引是 pandas 的一项重要功能, 使用户能在一个轴上拥有多个`索引级别`. 抽象点说, 它使用户能以低维度形式处理高维度数据
+
+```python
+In [50]: data = pd.Series(np.random.randn(10), index=[['a', 'a', 'a', 'b', 'b', 'b', 'c', 'c', 'd', 'd'],
+                                                      [1, 2, 3, 1, 2, 3, 1, 2, 2, 3]])
+
+In [51]: data
+Out[51]:
+a  1   -2.224864
+   2   -0.234775
+   3   -1.143708
+b  1    0.186533
+   2    0.251844
+   3    0.680129
+c  1   -1.360122
+   2    0.906973
+d  2   -0.727403
+   3    1.494060
+dtype: float64
+```
+
+- 以上就是带有 `MultiIndex` 索引的 Series 的格式化输出形式.
+- 对于层次化索引的对象, 选取子集的操作很简单:
+
+```python
+In [53]: data['b']
+Out[53]:
+1    0.186533
+2    0.251844
+3    0.680129
+dtype: float64
+In [54]: data['b':'c']
+...
+In [55]: data[['b', 'd']]
+...
+```
+
+- 甚至可以在内层选取: `In [4]: data[:, 2]`
+- 层次化索引在`数据重塑`和`基于分组的操作`(如透视表生成)中扮演重要角色. 具有层次化索引的 Series 通过 `unstack` 可以重被安排到一个 DataFrame 中
+- DataFrame 对象使用 `stack` 方法也可以转成具有层次化索引的Series
+- 对于 DataFrame, 每个轴都可以有分层索引
+- `swaplevel` - 接收 2 个级别编号或名称, 并返回一个互换了级别的新对象(数据不发生改变)
+- `sortlevel` - 根据单个级别中的值对数据进行排序(稳定的). 交换级别时, 常常也会用到 `sortlevel`, 这样最终结果就是有序的了
+- 在层次化索引的对象上, 如果索引是按字典方式从外到内排序(即调用 `sortlevel(0)` 或 `sort_index()` 的结果), 数据选取操作的性能会好很多
+- `DataFrame.set_index()` 方法将一个或多个`列转为行索引`, 并返回一个新的 DataFrame 对象. 如 `df.set_index(['c', 'd'])`
+- 默认情况下, 转换成行索引的列会从 DataFrame 对象中删除, 使用 `drop=False` 保留
+- `DataFrame.reset_index()` 的功能与 `set_index()` 相反
+
+#### 其他 pandas 话题
+
+- `整数索引`, 使用负数(比如 -1)会带来歧义(很难推断用户想要什么), 因此会直接报错; 非整数索引, 没有这样的歧义, 使用负数索引不报错
+- 为了保持良好的一致性, 如果轴索引含有索引器, 那么根据整数进行数据选取的操作将总是面向标签的
+- 如果需要可靠的, 不考虑索引类型的, 基于位置的索引, 可以使用 `iloc` 属性
+- `Panel` 数据结构可以看作是一个 `三维版的 DataFrame`
+-  可以用一个`由 DataFrame 对象组成的字典`或一个`三维 ndarray` 来创建 Panel 对象
+- `Panel.swapaxes` - 交换轴
+- 基于 ix 的标签索引被推广到了三个维度, `panel.ix[items, major, minor]` 如此来指定
+- 另一种呈现 Panel 数据(尤其是对拟合统计模型)的办法是 `堆积式` 的 DataFrame 形式, Panel 的 `to_frame()` 将 Panel 转为具有层次化索引的 DataFrame. DataFrame 有一个相应的 `to_panel` 方法, 是 `to_frame` 的逆运算
