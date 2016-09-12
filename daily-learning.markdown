@@ -687,3 +687,74 @@ Dijkstra 表示, 真正合理的表示方式应该能适应以下两种情况:
     1. 子序列包含最小的自然数 0
     2. 子序列是空的
 因此, 可以首先排除 1 和 3, 因为它们将使用到 `-1<i` 的形式, 而 -1 不是自然数 (Dijkstra 说这太丑了). 其次, 可以排除 4, 因为需要表示一个空集时, 4 需要使用 `0 <= i <= -1` 来表示, 会显得混乱. 此外, 2 的范围一减, 就得到了序列的长度, 这算是一项加分吧.
+
+###### Python 排序数据的多种方法(部分学习自编程派 codingpy)
+
+- `list.sort()` - 对 list 进行排序, 会改变 list 本身
+- `sorted()` - 对一个 iterable 进行排序, 返回一个新的有序 list. 返回排序后的副本, 不会对原 iterable 作修改
+- 当不需要保留原始列表时, `list.sort()` 方式会略高效一些. 但是 `sorted()` 更通用, 它支持任意的 iterable, 而 `list.sort` 是 method of list
+- `list.sort()` 和 `sorted()` 都带 `key` 关键字参数, `用于指定比较之前, 调用何种函数对元素进行处理`. `key` 参数的值应该是一个函数, 该函数接收一个参数, 并返回一个 key 为排序时所用. `可以用 lambda 的匿名函数作为 key 的参数`
+- Python 提供了一些简单快速地访问属性的函数, 如 `operator` 模块的 `itemgetter()`、`attrgetter()` 和 `methodcaller()`, 这些方法还允许多级排序, 按序指定排序的列即可.
+- `reverse` 关键字参数用于指定是否反序.
+- `list.sort()` 和 `sorted()` 的排序是`稳定`的, 这就允许通过一系列排序进行复杂排序
+- Python 使用的 `Timsort` 算法由于可以有效利用数据集中已有的顺序, 因而可以高效地进行多级排序
+- Decorate-Sort-Undecorate(旧方法, 已经被 key 的方式取代):
+    1. 初始的列表进行转换, 获得用于排序的新值
+    2. 将转换为新值的列表进行排序
+    3. 还原数据并得到一个排序后仅包含原始值的列表
+
+```python
+>> decorated = [(student.grade, i, student) for i, student in enumerate(student_objects)]
+>> decorated.sort()
+>>> [student for grade, i, student in decorated]  # undecorate
+```
+
+- Python 的 tuple 按字典序比较, 且先比较第一项, 再比较第二项, 依此类推
+- 在排序过程中, 包含原始下标的好处:
+    - 排序是稳定的, 如果有两项有相同的 key，排序后的列表会保留他们的顺序
+    - 原始项不需要是可比较的
+- Python2.x 提供了 cmp 关键字参数, 接收一个函数, 函数接收 2 个参数, 返回比较的结果, 作为排序的依据
+- Python3.x 不再提供 cmp, 可能需要将用户提供的排序函数转换为 key 函数, 可使用下述的包装器:
+
+```python
+def cmp_to_key(mycmp):
+    'Convert a cmp= function into a key= function'
+    class K:
+        def __init__(self, obj, *args):
+            self.obj = obj
+        def __lt__(self, other):
+            return mycmp(self.obj, other.obj) < 0
+        def __gt__(self, other):
+            return mycmp(self.obj, other.obj) > 0
+        def __eq__(self, other):
+            return mycmp(self.obj, other.obj) == 0
+        def __le__(self, other):
+            return mycmp(self.obj, other.obj) <= 0
+        def __ge__(self, other):
+            return mycmp(self.obj, other.obj) >= 0
+        def __ne__(self, other):
+            return mycmp(self.obj, other.obj) != 0
+    return K
+
+sorted([5, 2, 4, 1, 3], key=cmp_to_key(reverse_numeric))
+```
+
+- Python3.2 `functools.cmp_to_key()` 函数已经添加到标准库的 functools 模块中
+- 针对时区的相关排序, 使用 `locale.strxfrm()` 作为 key 函数, 或使用 `locale.strcoll()` 作为比较函数
+- 在两个对象进行比较时，sort 使用的是 lt() 方法。所以，只需要为类添加 lt() 方法，就可以为类加入排序顺序
+
+```python
+>>> Student.__lt__ = lambda self, other: self.age < other.age
+>>> sorted(student_objects)
+[('dave', 'B', 10), ('jane', 'B', 12), ('john', 'A', 15)]
+```
+
+- key 函数不需要直接依赖于排序的对象, 可以访问外部资源. 例如:
+
+```python
+>>> students = ['dave', 'john', 'jane']
+>>> newgrades = {'john': 'F', 'jane':'A', 'dave': 'C'}
+>>> sorted(students, key=newgrades.__getitem__)
+['jane', 'dave', 'john']
+```
+
