@@ -758,3 +758,64 @@ sorted([5, 2, 4, 1, 3], key=cmp_to_key(reverse_numeric))
 ['jane', 'dave', 'john']
 ```
 
+#### 2016-09-13
+
+###### Python 爬虫经验
+
+- 通过代理访问, 可以从 header 的 X-Forwarded-For 字段查看真实 IP. (真的吗?)
+- 多线程并发抓取
+- 增加 gzip/deflate 支持, 通过压缩网页, 减小传输时间. Python 2.x 和 3.x 默认都不提供压缩, 以下是 Python 2.x 的做法, Python 3.x 类似:
+
+```python
+import urllib2
+from gzip import GzipFile
+from StringIO import StringIO
+
+class ContentEncodingProcessor(urllib2.BaseHandler):
+  """A handler to add gzip capabilities to urllib2 requests """
+
+  # add headers to requests
+  def http_request(self, req):
+    req.add_header("Accept-Encoding", "gzip, deflate")
+      return req
+
+  # decode
+  def http_response(self, req, resp):
+    old_resp = resp
+    # gzip
+    if resp.headers.get("content-encoding") == "gzip":
+        gz = GzipFile(
+                    fileobj=StringIO(resp.read()),
+                    mode="r"
+                  )
+        resp = urllib2.addinfourl(gz, old_resp.headers, old_resp.url, old_resp.code)
+        resp.msg = old_resp.msg
+    # deflate
+    if resp.headers.get("content-encoding") == "deflate":
+        gz = StringIO( deflate(resp.read()))
+        resp = urllib2.addinfourl(gz, old_resp.headers, old_resp.url, old_resp.code)
+        # class to add info() and
+        resp.msg = old_resp.msg
+        return resp
+        # deflate support
+
+import zlib
+def deflate(data):
+
+   # zlib only provides the zlib compress format, not the deflate format;
+  try:
+# so on top of all there's this workaround:
+    return zlib.decompress(data, -zlib.MAX_WBITS)
+  except zlib.error:
+    return zlib.decompress(data)
+
+encoding_support = ContentEncodingProcessor
+opener = urllib2.build_opener( encoding_support, urllib2.HTTPHandler )
+#直接用opener打开网页，如果服务器支持gzip/defalte则自动解压缩
+
+content = opener.open(url).read()
+```
+
+- 简单的爬虫 - requests
+- 讲究效率的 - scrapy
+- 页面复杂的 - mechanize + bs4
