@@ -847,3 +847,10 @@ content = opener.open(url).read()
 - 使用 Docker 会增加运行时的复杂度, PEX 会增加构建时的复杂度
 - 包 (package) 是原始的容器. `dh-virtualenv`, 用于构建内含 virtualenv 的 debian 包. 这个包将包含 virtualenv 和罗列在 requirement.txt 文件里的所有依赖
 - 利用持续集成服务器 (Jenkins) 运行 dh-virtualenv 来构建包, 用 Python 的 wheel 缓存来避免对依赖重新构建. 然后对其进行大量的单元测试和系统测试
+
+#### 2016-09-18
+
+- 获取当前时间的时间戳: `import time; time.time()`
+- 获得结构化的时间对象: `time.localtime([TimeStamp])` - Convert seconds since the Epoch to a time tuple expressing local time. When 'seconds' is not passed in, convert the current time instead.
+- `time.strftime('%Y-%m-%d',time.localtime(time.time()))` - 也许是你想要的
+
