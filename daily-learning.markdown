@@ -819,3 +819,31 @@ content = opener.open(url).read()
 - 简单的爬虫 - requests
 - 讲究效率的 - scrapy
 - 页面复杂的 - mechanize + bs4
+
+#### 2016-09-17
+
+- Python 设置布尔变量的一种方式: `is_busy = (amount > 0)`
+
+> 你不知道的 C♯
+真正的名字是"C♯", 而不是"C#". 前一个是乐谱里常用的代表升半音的符号, 后一个是表示数字的符号
+"c♯"这一名字的由来并不只是大多数人认识到的是对"c++++"的简写，读作 sharp 表示一种编程利器的含义。sharp 在音乐中原本就有提升的意思。恰巧的是 sharp 的符号 ♯ 拆开又可以看做是++++的简写。于是就有了c sharp 的井号标记和 sharp 读音的由来，取其对 c 的提升之意。
+
+###### Python 部署方法 (源自伯乐在线)
+
+- 通过 `pip` 是从 Python 包索引 (PyPI, Python Package Index) 下载和安装. The Python Package Index is a repository of software for the Python programming language.
+- pip 没有提供“部署回滚”策略. pip unistall 并不是每次都能正常工作，也没有办法“回滚”到上一个状态
+- pip 安装依赖会让部署变得缓慢, 尤其是安装一个由 C 编写的模块,经常需要从源码进行编译. `部署应用应该是一个以秒计算的快速而轻量的过程`
+- 在每台主机上分别构建代码会有一致性问题
+- `pip install` 和 `git pull` 通常依赖于外部服务器, 可靠性不太强
+- Python 部署应当这样:
+    - 能够构建代码成单一, 有版本控制的工件
+    - 受版本控制的工件可以进行单元测试和系统测试
+    - 一种简单的机制可以从远程主机完全地安装或卸载工件
+- 更快的迁移代码并不应该重新执行整个基础架构自动化和编排层. 因此, 利用 Docker 来部署也存在问题:
+    - 内核版本可能不能完美支持 Docker
+    - 在专用网络里分发 Docker 镜像要有一个独立服务, 这时需要对服务进行配置, 测试和维护
+    - 将 ansible 自动化安装转换为 Dockerfile 的过程是痛苦的, 需要对日志配置, 用户权限和密钥管理进行大量繁琐的编辑
+- `PEX` 是 Twitter 开发的智能工具, 允许 Python 代码以可执行压缩文件进行传送
+- 使用 Docker 会增加运行时的复杂度, PEX 会增加构建时的复杂度
+- 包 (package) 是原始的容器. `dh-virtualenv`, 用于构建内含 virtualenv 的 debian 包. 这个包将包含 virtualenv 和罗列在 requirement.txt 文件里的所有依赖
+- 利用持续集成服务器 (Jenkins) 运行 dh-virtualenv 来构建包, 用 Python 的 wheel 缓存来避免对依赖重新构建. 然后对其进行大量的单元测试和系统测试
