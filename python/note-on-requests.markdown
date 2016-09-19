@@ -105,3 +105,54 @@ with open(filename, 'wb') as fd:
 - Requests 不会因为自定义头部的指定而改变行为. 头部只是简单地传递给最终的请求
 
 #### 更复杂的 POST 请求
+
+- 一些时候, 用户可能想要发送非格式化编码的数据. 如果传递的是一个 `str`, 而不是 `dict`, 数据会直接被 POST
+- 一些网站可能接收 JSON 格式的数据, 此时一种方式是手动将 `dict` 编码为 `json`: `data=json.dumps(payload)`. Requests 提供了更简单的方法, 将传给 `json` 关键字参数
+
+#### POST 多部分编码的文件
+
+- Requests 使上传多部分编码的文件变得容易:
+
+```python
+>>> url = 'http://httpbin.org/post'
+>>> files = {'file': open('report.xls', 'rb')}
+
+# tuple 的顺序是关键, 不能有差
+# 显式地设置 filename, content_type, headers:
+# >>> files = {'file': ('report.xls', open('report.xls', 'rb'), 'application/vnd.ms-excel', {'Expires': '0'})}
+
+# 还可以发送字符串, 并以文件形式接收
+# files = {'file': ('report.csv', 'some,data,to,send\nanother,row,to,send\n')}
+
+>>> r = requests.post(url, files=files)
+>>> r.text
+{
+  ...
+  "files": {
+  "file": "<censored...binary...data>"
+  },
+  ...
+}
+```
+
+- 当要以 `multipart/form-data` 请求方式 POST 一个超大文件时, 合适的方式是以流 (stream) 的方式发送. 但 Requests 默认不支持此, 可用一个分离的包 `request-toolbelt`. [Toolbelt 文档](https://toolbelt.readthedocs.io/)
+
+> 强烈建议以[二进制模式](https://docs.python.org/3/tutorial/inputoutput.html#reading-and-writing-files)打开文件. 因为 Requests 会试着补全 `Content-Length` 头部, 这样, `Content-Length` 头部的值会被设置成文件的字节数. 若以文本模式打开文件, 可能会报错
+
+#### 响应状态码
+
+- `r.status_code` 查看响应状态码
+- 为了方便检查响应结果, Requests 提供了内建的状态码检查对象. 比如: `r.status_code == requests.codes.ok`
+- 当发送了一个坏的请求 (bad request), 我们可以用 `Response.raise_for_status()` 抛出异常: `bad_r.raise_for_status()`. 若状态码是 200 时, `r.raise_for_status()` 返回 `None`
+
+#### 响应头部
+
+- `r.headers` 将以 Python 字典的形式展示响应头部信息. 根据 [RFC 7230](https://tools.ietf.org/html/rfc7230#section-3.2), **HTTP 头部是大小写不敏感的**
+- 两种方式查看某头部字段: `r.headers['Content-Type']` 或 `r.headers.get('content-type')`
+- 服务器在相同的头部使用了多个不同的值. 但由于请求是绑定的, 它们在字典中只需要用一个单一映射表示, 用逗号分隔
+
+#### Cookies
+
+- `r.cookies[example_cookie_name]` 可以快速访问 Cookies (如果响应包含 Cookies 的话)
+- 使用 `cookies` 关键字参数, 向服务器发送带 Cookies 的请求
+- Cookies 以 `RequestsCookies
