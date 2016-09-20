@@ -854,3 +854,53 @@ content = opener.open(url).read()
 - 获得结构化的时间对象: `time.localtime([TimeStamp])` - Convert seconds since the Epoch to a time tuple expressing local time. When 'seconds' is not passed in, convert the current time instead.
 - `time.strftime('%Y-%m-%d',time.localtime(time.time()))` - 也许是你想要的
 
+#### 2016-09-20
+
+- NumPy, `np.any()` 类似于 Python 内置的 `any()` 函数, 当数组中有一个元素为 True, 返回 `True`. 同理, `np.all()` 在数组中所有元素都为 True 的情况下, 才返回 `True`
+- NumPy, 数组的逻辑操作符不同于 Python 的逻辑操作符, 非用 `-`, 与用 `&`, 或用 `|`
+- 服务器端针对用户的定时任务需要定到用户所在时区的时。
+- `pd.Panel.drop()` 指定 `axis` 参数, 可丢弃某一维度的 XX (好吧, 我不知道怎么称呼)
+- Python, 双向字典: `bidict` (第三方库, bidict), 简单用法:
+
+```python
+>>> from bidict import bidict
+>>> D=bidict({'a':'b'})
+>>> D['a']
+'b'
+>>> D[:'b']  # 修改该切片语法
+'a'
+>>> ~D  #反转字典
+bidict({'b': 'a'})
+>>> dict(D)  # 转为普通字典
+{'a': 'b'}
+>>> D['c']='c'  # 添加元素，普通字典的方法都可以用
+>>> D
+bidict({'a': 'b', 'c': 'c'})
+```
+
+- 可以使用 namedbidict 类给双向字典取两个两个别名, 对外提供正向和逆向的 2 个子字典, 实际仍是一个双向字典
+
+```python
+# namedbidict(typename, keyname, valname, base_type=<class 'bidict._bidict.bidict'>)
+>>> HTMLEntities = namedbidict('HTMLEntities', 'names', 'codepoints')
+>>> entities = HTMLEntities({'lt': 60, 'gt': 62, 'amp': 38}) # etc
+>>> entities.names['lt']
+60
+>>> entities.codepoints[38]
+'amp'
+```
+
+###### Python 时区问题
+
+- datetime 模块定义了如下类:
+    - datetime.date - 理想化的日期对象
+    - datetime.time - 理想化的时间对象，不考虑闰秒（即认为一天总是24*60*60秒），有hour, minute, second, microsecond, tzinfo五个属性
+    - datetime.datetime - datetime.date和datetime.time的组合
+    - datetime.timedelta - 后面我们会用到的类，表示两个datetime.date, datetime.time或者datetime.datetime之间的差。
+    - datetime.tzinfo - 时区信息
+- time 模块提供了各种时间操作转换的方法
+- calendar 模块提供日历相关的方法
+- pyt 模块, 使用 [Olson TZ Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) 解决了跨平台的时区计算一致性问题, 解决了夏令时带来的计算问题
+- `datetime.fromtimestamp()`, 从时间戳创建 datetime 对象
+- 未完待续
+
