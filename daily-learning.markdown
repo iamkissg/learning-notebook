@@ -30,7 +30,7 @@ document.getElementById('container').addEventListener('click', function(event) {
 })
 ```
 
-- 在一个<div>上注册事件(click)监听, 对div内所有元素的点击都会在控制台打印. (不需要为每个元素单独注册事件)
+- 在一个`<div>`上注册事件(click)监听, 对div内所有元素的点击都会在控制台打印. (不需要为每个元素单独注册事件)
 - `docker exec -it <container id> /bin/bash` -  connect to a bash prompt on the running container.
 - `find . -name "filename"` - 在当前目录递归地查找指定文件名的文件
 - Linux process states:
@@ -54,7 +54,7 @@ l is multi-threaded (using CLONE_THREAD, like NPTL pthreads do)
 ```
 
 - `ps -ef` - 查看所有进程的父进程
-- `trap -l` - Linux查看信号及其编号
+- `trap -l` - Linux查看信号及其编号 (Ubuntu 14.04 没找到这个命令诶)
 - 交互式Bash获取进程PID:
 
 ```shell
@@ -63,7 +63,7 @@ ps -ef | awk '/[n]ame/{print $2}'
 ps x | awk '/[n]ame/{print $1}'
 pgrep -f name  # 最简单的方法
 pkill -f name  # 通过名称找到进程并杀死
-pidof name     # ?
+pidof name     # 包含 name 的所有命令的 pid
 ```
 
 - shell 脚本获得进程 pid:
@@ -89,8 +89,8 @@ fi
 
 #### 2016-08-02
 
-- Python str 2 time/datetime - datetime.datetime.strptime(str, time\_format).date() | time.time.strptime(str, time\_format)
-- Python get pid of the running program, or you can apply this to check if the program is running
+- Python, str to time/datetime - datetime.datetime.strptime(str, time\_format).date() | time.time.strptime(str, time\_format)
+- Python, get pid of the running program, or you can apply this to check if the program is running
 
 ```
 # check_output - Run command with arguments and return its output.
@@ -164,8 +164,7 @@ $(".trade-filter button").on("click", function(){
 #### 2016-08-08
 
 - CentOS, 查看系统版本: `cat /etc/*elease`, 其中 `*elease` 包括 centos-release, os-release, redhat-release, system-release, 每一个都带有版本信息, 其中 `os-release` 最详细, 并且在其他发行版也通用 (Ubuntu 可用)
-- 局域网内, 切记要修改 IP 地址绑定! 比如使用多个容器来运行主从 redis 数据库应用, redis.conf 默认是 `bind 127.0.0.1`, 这就造成了主从数据库之间无法同步, 必须同时修改为 `bind 0.0.0.0` 才能使已经通过 `--link` 连接的多个容器的数据库同步, 从数据库才能查询到主数据写入的值.
-- `$$` 表示 shell 中当前运行的进程 pid
+- Docker, 局域网内, 切记要修改 IP 地址绑定! 比如使用多个容器来运行主从 redis 数据库应用, redis.conf 默认是 `bind 127.0.0.1`, 这就造成了主从数据库之间无法同步, 必须同时修改为 `bind 0.0.0.0` 才能使已经通过 `--link` 连接的多个容器的数据库同步, 从数据库才能查询到主数据写入的值.
 - 查看进程 namespace: `ls -l /proc/[pid]/ns`
 - UTS - Unix Timesharing System
 
@@ -176,12 +175,12 @@ $(".trade-filter button").on("click", function(){
 #### 2016-08-11
 
 - 查看 IP 路由表, 指令 `route`
-- `lo` - 回环网卡 (lookback adaptor), 本地进程与另一本地进程通信时可用
-- `eth0` - 与外网通信的网卡
+    - `lo` - 回环网卡 (lookback adaptor), 本地进程与另一本地进程通信时可用
+    - `eth0` - 与外网通信的网卡
 - `pscap` - 查看进程的能力, 需要安装工具: `sudo apt-get install libcap-ng-utils`
 - `brctl` - 查看和管理网桥, 需要安装工具包: `sudo apt-get install bridge-utils`
 - `exec $SHELL -l` - reload shell
-- `pip -r <file>` - Install from the given requirements file, can be used multiple times
+- `Python 批量安装包, pip -r <file>` - Install from the given requirements file, can be used multiple times
 
 #### 2016-08-16
 
@@ -236,8 +235,8 @@ elif package not in LT:
 - Python 的 Counter, 可用于统计序列中元素出现的次数, 以元素为 key, 出现次数为 value.
 - `Counter.values()` 和 `Counter.keys()` 会按 keys 从小到大的顺序返回 values/keys 的序列, 类型分别是 dict\_values 和 dict\_keys
 - `not` 与 `is None`, 大多数情况下可以混用, 但 `not 0` 和 `0 is None` 不能混用, 前者返回`True`, 后者返回 `False`
-- `strptime(str, format)` -> new datetime parsed from a string\\
-`strftime(format, ttime)` or `time.strftime(format)` -> convert time to formatting str
+- `strptime(str, format)` -> new datetime parsed from a string
+- `strftime(format, ttime)` or `time.strftime(format)` -> convert time to formatting str
 - Python, 有些操作, 将文件内容加载到对象, 之后关闭文件也能操作; 另一些, 需要文件一直打开, 相当于创建了一个文件指针对象, 比如:
 
 ```python
@@ -311,7 +310,7 @@ value_key_pairs.sort()
 - `exec` 会将当前进程的内存替换为一个即将执行的进程. 这意味着原进程将被终止, 新进程成为主进程
 - `fork` 则会分配新的内存, 在新内存中拷贝当前进程, 称为子进程. 子进程与父进程完全一样. 子进程中再执行 `exec`, 则会将子进程替换为新的进程, 不影响父进程.
 - 在 Linux 中，创造新进程的方法只有一个，就是 `fork`
-- Python, 当父进程调用 `os.fork` 时, 可以认为所有的源码都被拷贝进父进程, 这是父子进程的代码相同, 且并行执行
+- Python, 当父进程调用 `os.fork` 时, 可以认为所有的源码都被拷贝进子进程, 这时父子进程的代码相同, 且并行执行
 - 调用一次 `fork`, 会得到 2 次返回值, 分别返回给父进程和子进程, 向子进程返回 `pid=0`, 向父进程返回 `pid` 为子进程的 id
 - 当 `fork` 了一个子进程, 并执行命令, 命令并不会在父进程中执行, 比如 `cd` 仅仅会改变子进程的目录, 而不是改变父进程的目录. 之后子进程终止, 父进程保持原先的目录
 - 因此, 如 `cd`, `exit` 的命令必须为 shell 本身内置, 并在 shell 进程中执行, 而不是通过 `fork`
@@ -321,7 +320,7 @@ value_key_pairs.sort()
 - shell, `groups` - 查看当前用户所在组
 - shell, `cut -d: -f1 /etc/passwd` - 查看系统中所有的用户
 - shell, `cut -d: -f1 /etc/group` - 查看系统中所有的组
-- Python 判断字符串是否有效日期, 如下. 因为会直接以格式化字符串读取, 若读入的日期非法, 直接抛出异常, 因此通过是否抛出异常判断日期是否有效
+- Python 判断字符串是否有效/合法日期, 如下. 因为会直接以格式化字符串读取, 若读入的日期非法, 直接抛出异常, 因此通过是否抛出异常判断日期是否有效.
 
 ```python
 def is_valid_date(str):
@@ -453,6 +452,7 @@ for line in sys.stdin:
 - Python, `str.strip()` remove leading & tailing `whitespace characters`
 - Code, 三角形数(1, 3, 4, 10, 15, 21, ... 这样的数列), 公式 `n * (n + 1) / 2`
 - Python2.7, `print` 是一条语句, `print exp1,` 在表达式后加 `,` 就取消了换行, 但多了空格
+- Python3.x, `print` 函数带 `end`参数, 可用于指定结束字符, 默认是 `\n`. 另有 `sep` 参数, 用于指定分隔符, 默认时空格. `print` 函数可在一次打印中打印不同类型的变量
 - Python, `sys.stdout.write()` 对输出到标准输出的更灵活的控制
 - `pyenv virtualenv 3.3.0 env`    #创建一个 Python 版本为 3.3.0 的环境, 环境叫做 env
 - `pyenv activate env_name`       #激活 env 这个环境, 此时 Python 版本自动变为 3.3.0, 且是独立环境
@@ -469,7 +469,7 @@ for line in sys.stdin:
 - ps 命令列出的是当前进程的快照，就是执行 ps 命令的那个时刻的进程，如果想要动态的显示进程信息，可以使用`top`命令。
 - linux 上进程有 5 种状态:
     1. 运行 `R` (正在运行或在运行队列中等待)
-    2. 中断 S` (休眠中, 受阻, 在等待某个条件的形成或接受到信号)
+    2. 中断 `S` (休眠中, 受阻, 在等待某个条件的形成或接受到信号)
     3. 不可中断 `D` (收到信号不唤醒和不可运行, 进程必须等待直到有中断发生)
     4. 僵死 `Z` (进程已终止, 但进程描述符存在, 直到父进程调用wait4(系统调用后释放)
     5. 停止 `T` (进程收到SIGSTOP, SIGSTP, SIGTIN, SIGTOU信号后停止运行运行))
@@ -567,13 +567,13 @@ def nAr(n, r):
         - 加快数据的检索速度
         - 加速表和表之间的连接
     - 索引的代价:
-        - 创建索引和`维护索引`要耗费时间，这种时间随着数据 量的增加而增加
+        - 创建索引和`维护索引`要耗费时间，这种时间随着数据量的增加而增加
         - 索引需要占物理空间
         - 当对表中的数据进行增加、删除和修改的时候，索引也要`动态的维护`，这样就降低了数据的维护速度。
     - 一般应该建立索引的列特征:
         - 在经常需要搜索的列上，可以加快搜索的速度；
         - 在作为主键的列上，强制该列的唯一性和组织表中数据的排列结构；
-        - 在经常用在连接的列上，这 些列主要是一些外键，可以加快连接的速度;
+        - 在经常用在连接的列上，这些列主要是一些外键，可以加快连接的速度;
         - 在经常需要根据范围进行搜索的列上创建索引，因为索引已经排序，其指定的范围是连续的；
         - 在经常需要排序的列上创 建索引，因为索引已经排序，这样查询可以利用索引的排序，加快排序查询时间；
         - 在经常使用在WHERE子句中的列上面创建索引，加快条件的判断速度。
@@ -589,7 +589,7 @@ def nAr(n, r):
     - 网关寻径急剧膨胀, 寻径表的膨胀不仅会降低网关寻径效率, 更重要的是将增加内外部路径刷新时的开销，从而加重网络负担。
 - 在实际应用中通常各网点采用连续方式的子网掩码 (不连续的子网掩码给分配主机地址和理解寻径表都带来一定困难)
 - 子网划分的步骤:
-    1. 将子网数目转为 $2^m$ 形式, 如果不是恰好是 2  的指数, 取多一位
+    1. 将子网数目转为 $2^m$ 形式, 如果恰好是 2  的指数, 取多一位
     2. 将第 1 步确定的 m, 按高序占用主机地址 m 位, 转为十进制. 若 C 类子网, m = 3, 则 `11100000`, 最终的子网掩码是 `255.255.255.224`
 - 利用主机数划分子网:
     1. 将子网中需要容纳的主机数转为二进制
@@ -602,13 +602,13 @@ def nAr(n, r):
 
 - `sed` 是流编辑器, 用程序的方式编辑文本, 其基本上是`正则模式匹配`, (`regex`)
 - `/^` 匹配行首, 因此 `sed 's/^/#/g' pets.txt`, 可以在每行首添加 `#`. `/$` 匹配行尾
-- `sed` 使用反引号转义, 但是没办法用 `\'`, 在双引号内, 用 `\"` 转义可以
+- `sed` 使用反斜杆转义, 但是没办法用 `\'`, 在双引号内, 用 `\"` 转义可以
 - 不带任何参数的 `sed` 不会对文件本身进行修改, 可通过 `重定向` 写回文件, 或者 `-i` (--in-place)
 - 再谈 regex
     - `^` 表示一行的开头。如：/^#/ 以#开头的匹配。
     - `$` 表示一行的结尾。如：/}$/ 以}结尾的匹配。
-    - `\<` 表示词首。 如 \<abc 表示以 abc 为首的詞。
-    - `\>` 表示词尾。 如 abc\> 表示以 abc 結尾的詞。
+    - `\<` 表示词首。 如 \\<abc 表示以 abc 为首的詞。
+    - `\>` 表示词尾。 如 abc\\> 表示以 abc 結尾的詞。
     - `.` 表示任何单个字符。
     - `*` 表示某个字符出现了0次或多次。
     - `[ ]` 字符集合。 如：[abc]表示匹配a或b或c，还有[a-zA-Z]表示匹配所有的26个字符。如果其中有^表示反，如[^a]表示非a的字符
