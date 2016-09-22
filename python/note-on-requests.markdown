@@ -155,4 +155,28 @@ with open(filename, 'wb') as fd:
 
 - `r.cookies[example_cookie_name]` 可以快速访问 Cookies (如果响应包含 Cookies 的话)
 - 使用 `cookies` 关键字参数, 向服务器发送带 Cookies 的请求
-- Cookies 以 `RequestsCookies
+- Cookies 以 `RequestsCookieJar` 形式返回, 类似一个 dict, 但能提供更复杂的接口, 适用于多域或多路径的情况. Cookie jars 也可以作为请求的参数
+
+#### 重定向与历史
+
+- 除了 `HEAD` 请求, Requests 默认会进行所有的位置重定向. 可使用 `history` 属性跟踪响应对象的重定向详情
+- `Response.history` 列表包含了对于一个请求所有的响应对象, 并按时间序列排序
+- GET, OPTIONS, POST, PUT, PATCH or DELETE 这些请求, 可以设置参数 `allow_redirects=False` 来取消重定向
+- HEAD, 也可以设置 `allow_redirects=True` 进行重定向. 该方法默认不重定向
+
+#### 超时
+
+- 使用 `timeout` 参数, 设置超时. Requests 在超过超时时间之后, 就不再等待响应. 如果没有显式地设置超时, 请求将不处理超时
+- `timeout` 不是对于整个响应到达的时间限制; 而是在 `timeout` 设置的时间之前, 服务器没有响应, 即底层 socket 没有收到任何字节信息, 抛出异常.
+
+#### 错误与异常
+
+- 由于网络问题(DNS 解析失败, 拒绝连接等等), Requests 会抛出 ConnectionError 异常
+- `Response.raise_for_status()`, 在HTTP 请求没有得到成功的状态码时, 会抛出 `HTTPError` 异常
+- 请求超时, 抛出 `Timeout` 异常
+- 若请求超出了设置的最大重定向数, 抛出 `TooManyRedirects` 异常
+- 所有 Requests 的显式异常都继承自 `requests.exceptions.RequestException`
+
+## 高级应用
+
+#### 会话对象
