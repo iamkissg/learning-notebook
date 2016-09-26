@@ -904,3 +904,35 @@ bidict({'a': 'b', 'c': 'c'})
 - `datetime.fromtimestamp()`, 从时间戳创建 datetime 对象
 - 未完待续
 
+#### 2016-09-26
+
+- Python, 浅拷贝, 它复制了对象，但对于对象中的元素，依然使用原始的引用. (新瓶旧酒)
+- Python, 赋值, 进行对象引用 (内存地址) 的传递 (旧瓶旧酒)
+- Python, 深拷贝, 复制了容器对象, 以及其中的所有元素 (新瓶新酒)
+- 对于非容器类型 (如数字、字符串、和其他'原子'类型的对象) 没有被拷贝一说
+- 如果元祖变量只包含原子类型对象, 则不能深拷贝
+- Pandas, `df.isnull` 用于判断 DataFrame 的 cell, 是否缺失值. 而不能用于判断 DataFrame 是否为空!
+- Pnadas, `df.empty` 才是用于判断 DataFrame 是否为空的方法!
+- Pandas, `Cannot cast DatetimeIndex to dtype <U0`, 错误可能是版本引起的, 更新可解决
+- Numpy, dtype (Data type objects) 描述了数组元素对应的的字节在固定大小的内存块中如何解释. 其包含几个部分:
+    1. 数据类型 (整型, 浮点型, Python 对象等)
+    2. 数据大小 (描述数据占多少字节的整型)
+    3. 数据的字节顺序 (小端还是大端)
+    4. 如果数据类型是结构化的, 即是其他数据类型的聚合:
+        1. 结构化数据的字段名, 即通过此可访问数据
+        2. 每个字段的数据类型
+        3. 每个字段占内存块数
+    5. 如果数据类型是子数组, 它的形状 (shape) 和数据类型
+- 常见 dtype 数据类型:
+    - 'b' boolean
+    - 'i' (signed) integer
+    - 'u' unsigned integer
+    - 'f' floating-point
+    - 'c' complex-floating point
+    - 'm' timedelta
+    - 'M' datetime
+    - 'O' (Python) objects
+    - 'S', 'a'    (byte-)string
+    - 'U' Unicode
+    - 'V' raw data (void)
+- Numpy, 数组是同质的 (homogeneous)
