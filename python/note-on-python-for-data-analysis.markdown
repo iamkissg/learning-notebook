@@ -477,8 +477,45 @@ Out[3]: array([ True, False,  True,  True, False,  True], dtype=bool)
 #### 线性代数
 
 - 线性代数 (矩阵乘法, 矩阵分解, 行列式以及其他方阵数学等) 是任何数组库的重要组成部分
-- NumPy 提供了一个用于矩阵乘法的 `dot` 函数 (既是一个数组方法, 也是 numpy 命名空间的一个函数)
-- `numpy.linalg` 模块提供了
+- `numpy.linalg` 模块提供标准的矩阵分解运算及诸如求逆和行列式之类的函数. 它们与 MATLAB, R 等语言所使用的是相同的行业标准 Fortran 库, 比如 `BLAS`, `LAPACK`, `Intel MKL` 等
+- 常用的 numpy.linalg 函数
+	- diag - 以一维数组的形式返回方阵的对角线(或非对角线)元素, 或将一维数组转换为方阵(非对角线元素为0)
+	- dot - 矩阵乘法
+	- trace - 计算对角线元素的和
+	- det - 计算矩阵行列式
+	- eig - 计算方阵的本征值和本征向量
+	- inv - 计算矩阵的逆
+	- pinv - 计算矩阵的 Moore-Penrose 伪逆
+	- qr - 计算 qr 分解
+	- svd - 计算奇异值分解(svd)
+	- solve - 解线性方程组 Ax=b, 其中 A 为一个方阵
+	- lstsq - 计算 Ax = b 的最小二乘解
+
+#### 随机数生成
+
+- `numpy.random` 模块提供了对 Python 内置的 random 进行`补充`, 增加了一些用于`高效生成多种概率分布的样本值`的函数. 而 Python 内置的 `random` 模块只能一次生成一个样本值. 如果需要产生大量样本值, numpy.random 将快上不止一个数量级:
+
+```python
+from random import normalvariate
+import numpy as np
+N = 1000000
+%timeit samples = [normalvariate(0, 1) for _ in range(N)]
+%timeit np.random.normal(size=N)
+```
+
+- 部分 numpy.random 函数
+    - seed - 确定随机数生成器种子
+    - permutation - 返回一个序列的随机排列或返回一个随机排列的范围
+    - shuffle - 对一个序列就地随机排列
+    - rand - 产生均匀分布的样本值
+    - randint - 从给定的上下限范围内随机选取整数
+    - randn - 产生正太分布 (平均值为 0, 标准差为 1) 的样本值, 类似于 MATLAB 的接口
+    - binomial - 产生二项分布的样本值
+    - normal - 产生正太 (高斯) 分布的样本值
+    - beta - 产生 Beta 分布的样本值
+    - chisquare - 产生卡方分布的样本值
+    - gamma - 产生 Gamma 分布的样本值
+    - uniform - 产生在 [0, 1) 中均匀分布的样本值
 
 
 ## 第 5 章: pandas 入门
@@ -948,3 +985,57 @@ In [55]: data[['b', 'd']]
 - `Panel.swapaxes` - 交换轴
 - 基于 ix 的标签索引被推广到了三个维度, `panel.ix[items, major, minor]` 如此来指定
 - 另一种呈现 Panel 数据(尤其是对拟合统计模型)的办法是 `堆积式` 的 DataFrame 形式, Panel 的 `to_frame()` 将 Panel 转为具有层次化索引的 DataFrame. DataFrame 有一个相应的 `to_panel` 方法, 是 `to_frame` 的逆运算
+
+#### 补充
+
+- `pd.date_range` 生成日期范围
+
+## Chapter 6 数据加载, 存储与文件格式
+
+- NumPy 提供了一个低级但异常高效的二进制数据加载和存储机制, 包括对内存映射数组的支持等
+- IO 通过可以划分为几大类:
+    - 读取文本文件和其他更高效的磁盘存储格式
+    - 加载数据库中的数据
+    - 利用 Web API 操作网络资源
+
+#### 读写文本格式的数据
+
+- Python 文本和文件处理的特点: 简单的文件交互语法, 直观的数据结构, 以及诸如元素打包解压之类的便利功能
+- pandas 提供了一些用于将表格型数据读取为 DataFrame 对象的函数, 以下是一些:
+    - read_csv - 从文件, url, 文件型对象中加载带分隔符的数据, 默认分隔符为逗号
+    - read_table - 从文件, url, 文件型对象中加载带分隔符的数据, 默认分隔符为制表符 (\t)
+    - read_fwf - 读取定宽列格式数据 (没有分隔符)
+    - read_clipboard - 读取剪贴板中的数据, 在将网页转换为表格时很有用
+- 将文本读取为 DataFrame 的函数的选项可以划分为几大类:
+    - 索引 - 将一个或多个列当作返回的 DataFrame 处理, 以及是否从文件, 用户获取列名
+    - 类型推断和数据转换 - 包括用户定义值的转换, 缺失值标记列表等
+    - 日期解析 - 包括组合功能, 比如将分散在多个列中的日期时间信息组合成结果中的单个列
+    - 迭代 - 支持对大文件进行逐块迭代
+    - 不规整数据问题 - 跳过一些行, 页脚, 注释或其他一些不重要的东西 (比如由成千上万个逗号隔开的数值数据)
+- 类型推断 (type inference) 是最重要的功能之一, 即不需要指定列的类型到底是数值, 整数, 布尔值, 还是字符串.
+
+###### read_csv/read_table
+
+- `header` - 指定 csv 文件的头部. 使用 `None` 让 pandas 为其分配默认的列名
+- `names` - 与创建 DataFrame 一样, 自定义列名
+- `index_col` - 指定某列为索引. 若要生成层次化索引, 则传入由列编号或列名组成的列表即可
+- 有些表格可能不用固定的分隔符去分隔字段(比如空白符或其他字符串), 对此, 可以编写一个正则表达式作为 read_table 的分隔符, 比如 `pd.read_table("filename", sep="\s+")`
+- 读取文件, 当列名比数据行数量少时, read_table 将推断第一列是 DataFrame 的索引
+- `skiprows` - 跳过文件的某些行
+- 缺失值处理是文件解析任务的一个重要组成部分, 缺失值数据经常是要么没有, 要么用某个标记值表示. 默认情况下, pandas 会用一组经常出现的标记值进行识别, 如 NA, -1.#IND 以及 NULL 等
+- `na_values` - 接受一组用于表示额外的缺失值的字符串, 可以是 str, list-like, dict. 默认是 None. 用 dict 可以针对各列指定不同的 NA 标记值
+
+###### 逐块读取文本文件
+
+- 在处理很大的文件时, 或找出大文件中的参数集以便于后续处理时, 可能只想读取文件的一小部分或逐块对文件进行迭代
+- `nrows` - 读取几行, 避免读取整个文件
+- `chunksize` - 逐块读取文件. 返回 TextFileReader 对象, 以便对文件进行逐块迭代. TextParser 还有一个 get_chunk 方法, 它可以用于读取任意大小的块.
+
+###### 将数据写出到文本格式
+
+- `DataFrame.to_csv` 可以将数据写到一个以逗号分隔的文件中, 也可以通过 `sep` 参数指定分隔符.
+- 缺失值在输出结果中会被表示为空字符串, 通过 `na_rep` 也可以表示为别的标记值
+- 如果没有设置其他选项, 会写出行和列的标签, 可以通过 `index=False`, `header=False` 禁用
+- 可以只写出一部分列, 通过 `columns` 指定, 将按顺序排列
+- Series 也有 to_csv 方法
+- 同理, read_csv 可以将 csv 文件读取为 Series, 但更为方便的方法是 from_csv
