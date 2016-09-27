@@ -1038,4 +1038,172 @@ In [55]: data[['b', 'd']]
 - 如果没有设置其他选项, 会写出行和列的标签, 可以通过 `index=False`, `header=False` 禁用
 - 可以只写出一部分列, 通过 `columns` 指定, 将按顺序排列
 - Series 也有 to_csv 方法
-- 同理, read_csv 可以将 csv 文件读取为 Series, 但更为方便的方法是 from_csv
+- 同理, read_csv 可以将 csv 文件读取为 Series (无 header 行, 第一列作为索引), 但更为方便的方法是 from_csv
+
+###### 手工处理分隔符格式
+
+- 大部分存储在磁盘上的表格型数据都能用 pandas.read_table 进行加载.
+- 对于任何单字符分隔符文件, 可直接使用 Python 内置的 csv 模块. 将打开的的文件或类文件对象传给 `csv.reader`:
+
+```python
+import csv
+
+lines = list(csv.reader(open("path/to/file")))
+header, values = lines[0], lines[1:]
+data_dict = {h: v for h, v in zip(header, zip(*values))}
+print(data_dict)
+```
+
+- 定义 csv.Dialect 的子类即可定义 csv 文件的新格式 (如专门的分隔符, 字符串引用约定, 行结束符等):
+
+```python
+class my_dialect(csv.Dialect):
+    lineterminator = "\n"
+    delimiter = ";"
+    quotechar = '"'
+
+reader = csv.reader(f, diaect=my_dialect)
+```
+
+- 各个 csv 语支的参数也可以关键字的形式提供给 csv.reader, 而无需定义子类 (同 pandas 读取 csv 到 DataFrame 类似咯)
+- csv.Dialect 属性及功能:
+    - delimiter - 用于分隔符的`单字符`字符串, 默认是 `,`
+    - lineterminator - 用于`写操作`的行结束符, 默认是 `\r\n`, 读操作将忽略此选项, 能认出跨平台的行结束符
+    - quotechar - 用于带特殊字符 (如分隔符) 的字段的引用符号, 默认是 `"`
+    - quoting - 引用约定. 可选值包括 csv.QUOTE_ALL (引用所有字段), csv.QUOTE_MINIMAL, (只引用带有诸如分隔符之类的特殊字符的字段), csv.QUOTE_NONNUMERIC 及 csv.QUOTE_NON (不引用). ,默认是 csv.QUOTE_MINIMAL
+    - skipinitialspace - 忽略分隔符之后的空白字符, 默认是 False
+    - doublequote - 如何处理字段内的引用符号. 若为 True, 则`双写`?
+    - escapechar - 用于对分隔符进行转义的字符串 (如果 quoting 被设置为 csv.QUOTE_NONE 的话). 默认禁用
+- 手工输出分隔符文件, 可以使用 csv.writer, 接受一个已打开并可写的文件对象, 以及与 csv.reader 相同的语支和格式化选项
+
+###### JSON 数据
+
+- JSON (JavaScript Object Notaion) 已经成为通过 HTTP 请求在浏览器和其他应用程序之间发送数据的标准格式之一. 是一种比表格型文本格式 (如 csv) 灵活得多的数据格式
+- 除了用 `null` 表示空值以及其他一些细微差别 (如列表末尾不允许存在多余的逗号) 之外, JSON 非常接近有效的 Python 代码.
+- JSON 的基本类型有对象 (dict), 数组 (list), 字符串, 数值, 布尔值及 null. 对象中所有的键都必须是 `str`
+- `json.loads` 将 JSON 字符串转换成 Python 形式; `json.dumps` 将 Python 对象转换成 JSON 格式
+- `pd.read_json` 将规范的 JSON 字符串或类文件对象转换为 pandas 对象 (Series or DataFrame).
+- `pd.read_csv` 则返回 DataFrame 或 TextParser (根据传入参数的不同)
+- 还可以向 `DataFrame` 构造函数传入 JSON 对象, 并选取数据字段的子集, 生成 DataFrame
+
+###### XML, HTML: Web 信息收集
+
+- Python 有许多读写 HTML 和 XML 格式数据的库. [lxml](http://lxml.de) 能高效且可靠地解析大文件, 并提供了多个编程接口.
+- 用 lxml.html 处理 HTML, 用 lxml.objectify 做 XML 处理
+- 许多网站将数据放在 HTML 表格中以便在浏览器中查看, 但不能以一种更易于机器阅读的格式 (JSON, HTML, XML) 进行下载
+- 期权 - 使你有权从现在开始到未来某个时间 (到期日) 内以某个特定价格 (执行价) 买进 (看涨期权) 或卖出 (看跌期权) 某个公司股票的衍生合约.
+- 从 HTML/XML 文档中找出正确表格的方法就是反复试验了...
+- pandas 有一个 `TextParser` 类, 可用于自动类型转换 (read_csv 和其他解析函数内部其实都用到了它)
+- XML (Extensible Markup Language) 是一种常见的支持分层, 嵌套数据以及元数据的结构化数据格式.
+- 利用 lxml.objectify 解析 XML 文件
+
+#### 二进制数据格式
+
+- 实现数据的二进制格式存储最简单的办法之一是使用 Python 内置的 pickle 序列化.
+- pandas 对象都有一个用于将数据`以 pickle 形式`保存到磁盘上的 `save` 方法
+- `pd.load` 可以将 pickle 形式保存的二进制数据读取到 Python
+
+> pickle 仅建议用于短期存储格式. 原因是很难保证该格式永远是稳定的; pickle 对象可能无法被后续版本的库 unpickle 出来.
+
+#### 使用 HDF5 格式
+
+- HDF5 是一个流行的工业级库, 是一个 C 库, 带有许多语言的接口, 能实现高效读写磁盘上以二进制格式存储的科学数据.
+- HDF5 中的 HDF 是指层次型数据格式 (hierarchical data format). 每个 HDF5 文件都含有一个文件系统式的节点结构, 因此能够`存储多个数据集`并`支持元数据`. 与其他简单格式相比, HDF5 支持多种压缩器的`即时压缩`, 还能更高效地存储重复模式数据. 对于非常大的无法直接放入内存的数据集, HDF5 是个不错的选择, 因为它可以高效地`分块读写`
+- Python 中的 HDF5 库有 2 个接口, PyTables 和 h5py, 它们各自采取了不同的问题解决方式. h5py 提供了一种直接而高级的 HDF5 API 访问接口, 而 PyTables 则抽象了 HDF5 的许多细节, 以提供多种灵活的数据容器, 表索引, 查询功能以及对核外计算技术 (out-of-core computation) 的某些支持.
+- pandas 提供了一个最小化的类似于字典的 HDFStore 类, 通过 PyTables 存储 pandas 对象.
+
+```python
+store = pd.HDFStore("mydata.h5")
+store["obj1"] = df
+store["obj1_col"] = df["a"]
+# File path: mydata.h5
+# obj1       DataFrame
+# obj1_col   Series
+```
+- HDF5 文件中的对象可以通过与字典一样的方式进行获取: `store["ojb1"]`
+- 如果需要处理海量数据, 研究一下 PyTables 和 h5py. 由于许多数据分析问题都是 IO 密集型 (而不是 CPU 密集型), 利用 HDF5 这样的工具能显著提升应用程序的效率
+
+#### 读取 Microsoft Excel 文件
+
+- pandas 的 ExcelFile 类支持读取存储在 Excel 2003 及更高版本中的表格型数据. ExcelFile 用到了 xlrd 和 openpyxl 包.
+- 通过传入一个 xls 或 xlsx 文件的路径即可创建一个 ExcelFile 实例; 存放在某个工作表中的数据可以通过 `parse` 读取到 DataFrame 中:
+
+```python
+xls_file = pd.ExcelFile("data.xls")
+table = xls_file.parse("Sheet1")
+```
+
+#### 使用 HTML 和 Web API
+
+#### 使用数据库
+
+- 在许多应用中, 数据很少取自文本文件, 这种方式存储大量数据很低效.
+- 数据库的选择通常取决于性能, 数据完整性, 以及应用程序的伸缩性需求
+- Python 内置了 sqlite3 驱动器:
+
+```python
+import sqlite3
+
+query = """
+CREATE TABLE test
+(a VARCHAR(20), b VARCHAR(20),
+ c REAL,        d INTEGER
+);
+"""
+
+con = sqlite3.connect(":memory:")  # 内存数据库连接
+con.execute(query)
+con.commit()
+
+data = [
+    ("Atlanta", "Georgia", 1.25, 6),
+    ("Tallahassee", "Florida", 2.6, 3),
+    ("Sacramento", "California", 1.7, 5)
+]
+stmt = "INSERT INTO test VALUES(?, ?, ?, ?)"
+
+con.executemany(stmt, data)  # 执行多次插入语句
+con.commit()
+
+cursor = con.execute("select * from test")
+rows = cursor.fetchall()
+DataFrame(rows, columns=list(zip(*cursor.description))[0])
+```
+
+- 从数据库表中选取数据时, 大部分 Python SQL 驱动器 (PyODBC, psycopg2, MySQLdb, pymssql 等) 都会返回一个元组列表 (list of tuple)
+- 将元组列表传给 DataFrame 构造器, 就可以创建 DataFrame 了. 此时可以通过 cursor.description 属性中的列名来为 DataFrame 添加列名
+- 更简单的方法是, pandas 提供了一个 read_frame 函数 (位于 pandas.io.sql 模块中). 只需传入 select 语句和连接对象即可实现从数据库加载数据并规整操作:
+
+```python
+import pandas.io.sql as sql
+sql.read_frame("select * from test", con)
+```
+
+###### 存取 MongoDB 中的数据
+
+- NoSQL 数据库有许多不同的形式. 有些是简单的`字典式键值对存储` (如 BerkeleyDB 和 Tokyo Cabinet), 另一些则是`基于文档的` (其中的基本单元是字典型的对象)
+- `pymongo` 是 MongoDB 的官方驱动器
+- 存储在 MongoDB 中的文档被组织在数据库的集合 (collections) 中. MongoDB 服务器的每个运行实例可以有多个数据库, 而每个数据库可以有多个集合.
+
+```python
+import pymongo
+import requests, json
+
+con = pymongo.Connection("localhost", port=27017)
+
+tweets = con.db.tweets  # MongoDB 的集合
+
+url = "http://search.twitter.com/search.json?q=python%20pandas"  # 接口已失效
+data = json.loads(requests.get(url).text)
+
+for tweet in data["results"]:
+    # 将 Python 字典写入 MongoDB, 逐个存入集合
+    tweets.save(tweet)
+
+# 对集合进行查询
+# 返回的游标是一个迭代器 iterator
+# 为每个文档产生一个字典
+cursor = tweets.find({"from_user": "wesmckinn"})
+tweet_fields = ["created_at", "from_user", "id", "text"]
+result = DataFrame(list(cursor), columns=tweet_fields)
+```
