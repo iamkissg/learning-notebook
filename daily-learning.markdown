@@ -691,7 +691,7 @@ Dijkstra 表示, 真正合理的表示方式应该能适应以下两种情况:
 ###### Python 排序数据的多种方法(部分学习自编程派 codingpy)
 
 - `list.sort()` - 对 list 进行排序, 会改变 list 本身
-- `sorted()` - 对一个 iterable 进行排序, 返回一个新的有序 list. 返回排序后的副本, 不会对原 iterable 作修改
+- `sorted()` - 对一个 iterable 进行排序, 返回一个新的有序 `list`. 返回排序后的副本, 不会对原 iterable 作修改
 - 当不需要保留原始列表时, `list.sort()` 方式会略高效一些. 但是 `sorted()` 更通用, 它支持任意的 iterable, 而 `list.sort` 是 method of list
 - `list.sort()` 和 `sorted()` 都带 `key` 关键字参数, `用于指定比较之前, 调用何种函数对元素进行处理`. `key` 参数的值应该是一个函数, 该函数接收一个参数, 并返回一个 key 为排序时所用. `可以用 lambda 的匿名函数作为 key 的参数`
 - Python 提供了一些简单快速地访问属性的函数, 如 `operator` 模块的 `itemgetter()`、`attrgetter()` 和 `methodcaller()`, 这些方法还允许多级排序, 按序指定排序的列即可.
@@ -936,3 +936,27 @@ bidict({'a': 'b', 'c': 'c'})
     - 'U' Unicode
     - 'V' raw data (void)
 - Numpy, 数组是同质的 (homogeneous)
+
+#### 2016-09-27
+
+- Python, 使用豆瓣的 PyPI 源, 用 `-i` 指定: `sudo pip3 install -i https://pypi.doubanio.com/simple/ package`
+- 添加豆瓣源为默认源的几种方法:
+    1. alias
+    2. 修改 `~/.config/pip/pip.conf`, 添加 `index-url = http://pypi.douban.com/simple`
+
+#### 2016-09-28
+
+- Shell, `grep` Normally the exit status is 0 if a line is selected, 1 if no lines were selected, and 2 if an error occurred
+- Python, subprocess 使用 PIPE 的正确姿势:
+
+```python
+docker_ps = Popen("docker ps -a".split(), stdout=PIPE)
+query_result = check_output(('grep', user_id), stdin=docker_ps.stdout)
+# query_result 实际上是 docker_ps 的子进程, 因此, 父进程等待子进程终止
+docker_ps.wait()
+```
+
+> If `shell` is `True`, the specified command will be executed through the shell. This can be useful if you are using Python primarily for the enhanced control flow it offers over most system shells and still want convenient access to other shell features such as shell `pipes`, `filename wildcards`, `environment variable expansion`, and expansion of `~` to a user’s home directory. However, note that Python itself offers implementations of many shell-like features (in particular, glob, fnmatch, os.walk(), os.path.expandvars(), os.path.expanduser(), and shutil).
+
+- Python, shlex -  A lexical analyzer class for simple shell-like syntaxes.
+    - `shlex.split(cmd_str)` - 将命令更科学地进行切分
