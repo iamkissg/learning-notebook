@@ -1207,3 +1207,514 @@ cursor = tweets.find({"from_user": "wesmckinn"})
 tweet_fields = ["created_at", "from_user", "id", "text"]
 result = DataFrame(list(cursor), columns=tweet_fields)
 ```
+
+## Chapter 7 数据规整化: 清理, 转换, 合并, 重塑
+
+- 数据分析和建模方面的大量编程工作都是用在数据准备上的: 加载, 清理, 转换以及重塑.
+- 有时候, 存放在文件或数据库中的数据并不能满足数据处理应用的要求, 就需要使用编程语言或 UNIX 文本处理工具对数据格式进行处理 (`数据规整化`). pandas 和 Python 标准库提供了一组高级的, 灵活的, 高效的核心函数和算法.
+
+#### 合并数据集
+
+- pandas 对象中的数据可以通过一些`内置方式` 进行合并:
+    - `pandas.merge` - 通过一个或多个键将不同 DataFrame 中的`行` 连接起来 (类似数据库的连接操作)
+    - `pandas.concat` - 沿一条轴将多个对象堆叠在一起
+    - 实例方法 `combine_first` - 将`重复数据编接`在一起, 用一个对象中的值填充另一个对象中的缺失值
+
+###### 数据库风格的 DataFrame 合并
+
+- 数据集的合并 (merge) 或连接 (join) 运算是通过一个或多个键将行链接起来的. 这些运算是关系型数据库的核心
+- 如果没有指定, `pd.merge` 会将重叠的列当作键. 当然最好显式地指定, 通过 `on` 参数
+- 如果两个对象的列名不同, 可以分别进行指定, 使用 `left_on` 和 `right_on` 分别指定.
+- 默认情况下, `merge` 做 `inner` 连接; 结果中的键是`交集`. 可以用 `how` 参数指定连接方式, 还有 `left`, `right`, `outer`. 外连接 (outer) 求的是键的并集, 组合了左右连接的效果
+- 连接产生的是行的笛卡尔积. 假设两边的 DataFrame 中都存在多个连接的 key (N:M), 则合并结果中就有 N * M 个对应 key
+- 要传入多个键进行合并, 传入一个由列名组成的列表 (`on`)
+- 结果中会出现哪些键组合取决于所选的合并方式. 可以这样理解: 多个键形成一系列元组, 并将其当作单个连接键
+
+> 在进行列-列连接时, DataFrame 对象中的索引会被丢弃
+
+- 合并可能会出现重复列名的情况, 即两边的对象都有相应列, 但并没有作为连接的 key, 此时可以手动处理, 但 `merge` 提供了更实用的 `suffixes` 参数, 用于指定附件到左右两个对象的重叠列名上
+- 其他参数说明
+    - left_index: boolean, 将左侧的行索引作为其连接键
+    - right_index: boolean, 将右侧的行索引作为其连接键
+    - sort: 根据连接键对合并后的数据进行排序, 默认是 False. 在处理大数据集时, 设为 False 可获得更好的性能
+    - copy: 默认是 True. 设为 False, 避免不必要的数据复制
+- 对于层次化索引, 必须以列表的形式指明用作合并键的多个列
+- DataFrame 对象的 `join` 方法, 可以更方便地实现按索引合并, 可用于合并多个带相同或相似索引的 DataFrame 对象, 而不管它们之间有没有重叠的列.
+- `df.join` 方法在连接键上做左连接. 它还支持参数 df 的索引用与调用者 df 的某个列之间的连接 (`on`)
+- 对于简单的索引合并, 还可以向 join 传入一组 DataFrame
+
+##### 轴向连接
+
+- 轴向连接又称为连接 (concatenation), 绑定 (binding) 或堆叠 (stacking)
+- NumPy 有一个用于合并原始 NumPy 数组的 concatenation 函数:
+
+```pythonIn [6]: import numpy as np
+
+In [7]: arr = np.arange(12).reshape(3, 4)
+
+In [8]: arr
+Out[8]:
+array([[ 0,  1,  2,  3],
+       [ 4,  5,  6,  7],
+       [ 8,  9, 10, 11]])
+
+In [9]: np.concatenate([arr, arr], axis=1)
+Out[9]:
+array([[ 0,  1,  2,  3,  0,  1,  2,  3],
+       [ 4,  5,  6,  7,  4,  5,  6,  7],
+       [ 8,  9, 10, 11,  8,  9, 10, 11]])
+
+In [10]: np.concatenate([arr, arr], axis=0)
+Out[10]:
+array([[ 0,  1,  2,  3],
+       [ 4,  5,  6,  7],
+       [ 8,  9, 10, 11],
+       [ 0,  1,  2,  3],
+       [ 4,  5,  6,  7],
+       [ 8,  9, 10, 11]])
+```
+
+- 对于 pandas 对象, 带有标签的轴能进一步推广数组的连接运算. 还需要考虑的是:
+    - 如果各对象其他轴上的索引不同, 那些轴应该是做并集还是交集
+    - 结果对象中的分组需要各不相同吗
+    - 用于连接的轴重要吗
+- 默认情况下, `pd.concat` 工作在 `axis=0` 上. 对于没有重叠索引的 Series, 若传入 axis=1 进行轴连接, 结果将变成一个 DataFrame, 另一条轴上没有重叠. 但传入 `join="inner"` 就可以得到交集
+
+```python
+
+In [11]: from pandas import Series
+
+In [12]: s1 = Series([0, 1], index=["a", "b"])
+
+In [13]: s2 = Series([2, 3, 4], index=["c", "d", "e"])
+
+In [14]: s3 = Series([5, 6], index=["f", "g"])
+
+In [15]: pd.concat([s1, s2, s3], axis=1)
+Out[15]:
+     0    1    2
+     a  0.0  NaN  NaNj
+     b  1.0  NaN  NaN
+     c  NaN  2.0  NaN
+     d  NaN  3.0  NaN
+     e  NaN  4.0  NaN
+     f  NaN  NaN  5.0
+     g  NaN  NaN  6.0
+
+In [16]: s4 = pd.concat([s1 * 5, s3])
+
+In [17]: s4
+Out[17]:
+a    0
+b    5
+f    5
+g    6
+dtype: int64
+
+In [18]: pd.concat([s1, s4], axis=1)
+Out[18]:
+     0  1
+a  0.0  0
+b  1.0  5
+f  NaN  5
+g  NaN  6
+
+In [19]: pd.concat([s1, s4], axis=1, join="inner")
+Out[19]:
+   0  1
+a  0  0
+b  1  5
+```
+
+> axis=1 是列
+
+- `join_axes` 指定要在其他轴上使用的索引:
+
+```python
+In [20]: pd.concat([s1, s4], axis=1, join_axes=[["a", "c", "b", "e"]])
+Out[20]:
+     0    1
+a  0.0  0.0
+c  NaN  NaN
+b  1.0  5.0
+e  NaN  NaN
+```
+
+- 若要在连接轴上创建层次化索引, 可以使用 `keys` 参数. 若沿着 axis=1 对 Series 进行合并, 则 keys 就会成为 DataFrame 的列名:
+
+```python
+In [22]: result = pd.concat([s1, s1, s3], keys=["one", "two", "three"])
+
+In [23]: result
+Out[23]:
+one    a    0
+       b    1
+two    a    0
+       b    1
+three  f    5
+       g    6
+dtype: int64
+
+In [26]: pd.concat([s1, s2, s3], axis=1, keys=["one", "twp", "three"])
+Out[26]:
+   one  twp  three
+a  0.0  NaN    NaN
+b  1.0  NaN    NaN
+c  NaN  2.0    NaN
+d  NaN  3.0    NaN
+e  NaN  4.0    NaN
+f  NaN  NaN    5.0
+g  NaN  NaN    6.0
+```
+
+- 对于 DataFrame, 向 `pd.concat` 传入 keys, 就是层次化的索引
+- 如果传入的不是 list 而是 dict, dict.key 会被当作keys 选项的值
+- 用 `names` 创建分层级别的名称, 以实施管理
+- `ignore_index` - 不保留连接轴上的索引, 产生一组新索引 range(total_length)
+
+###### 合并重叠数据
+
+- 神奇的 `np.where` 函数:
+
+```python
+In [30]: a = Series([np.nan, 2.5, np.nan, 3.5, 4.5, np.nan], index=['f', 'e', 'd', 'c', 'b', 'a'])
+
+In [31]: b = Series(np.arange(len(a), dtype=np.float64), index=['f', 'e', 'd', 'c', 'b', 'a'])
+
+n [34]: b[-1] = np.nan
+
+In [35]: np.where(pd.isnull(a), b, a)
+Out[35]: array([ 0. ,  2.5,  2. ,  3.5,  4.5,  nan])
+```
+
+- pandas 对象的`combine_first` 方法, 用于处理重叠数据, 并进行数据对齐. 可以看作: 用参数对象中的数据为调用者对象的缺失数据"打补丁"
+
+```python
+In [40]: b[:-2].combine_first(a[2:])
+```
+
+#### 重塑和轴向旋转
+
+- 层次化索引为 DataFrame 数据的重排任务提供了一种具有良好一致性的方式, 主要功能有:
+    1. stack - 将数据的列 "旋转" 为行 (`列->行`)
+    2. unstack - 将数据的行 "旋转" 为列 (`行->列`)
+- 对于一个层次化索引的 Series, 用 unstack 可以将其重排为一个 DataFrame
+- 默认情况下, unstack/stack 操作的是最内层, 传入分层级别的`编号`或`名称`, 可对其他级别进行操作
+- 如果不是所有的级别值都能在各分组中找到, unstack 操作可能会引入缺失值. stack 默认会滤除缺失数据, 因此运算是可逆的
+
+```python
+In [45]: s1 = Series([0, 1, 2, 3], index=['a', 'b', 'c', 'd'])
+
+In [46]: s2 = Series([4, 5, 6], index=['c', 'd', 'e'])
+
+In [47]: data2 = pd.concat([s1, s2], keys=['one', 'two'])
+
+In [48]: data2
+Out[48]:
+one  a    0
+     b    1
+     c    2
+     d    3
+two  c    4
+     d    5
+     e    6
+dtype: int64
+
+In [49]: data2.unstack()
+Out[49]:
+       a    b    c    d    e
+one  0.0  1.0  2.0  3.0  NaN
+two  NaN  NaN  4.0  5.0  6.0
+
+In [50]: data2.unstack().stack()
+Out[50]:
+one  a    0.0
+     b    1.0
+     c    2.0
+     d    3.0
+two  c    4.0
+     d    5.0
+     e    6.0
+dtype: float64
+```
+
+- 对 DataFrame 进行 unstack 操作时, 作为旋转轴的级别将成为结果中的`最低级别`
+
+###### 将"长格式"旋转为"宽格式"
+
+- 时间序列数据通常是以所谓的"长格式" (long) 或"堆叠格式" (stacked) 存储在数据库和 csv 中的. 关系型数据库中的数据经常都是这样存储的, 因为固定架构 (即列名和数据类型) 有一个好处: 随着表中数据的添加或删除, item 列中的值的种类能够增加或减少. 缺点是: 长格式的数据操作起来可能不那么轻松.
+
+```python
+In [61]: ldata[:10]
+Out[61]:
+        date     item     value
+0 1959-03-31  realgdp  2710.349
+1 1959-03-31     infl     0.000
+2 1959-03-31    unemp     5.800
+3 1959-06-30  realgdp  2778.801
+4 1959-06-30     infl     2.340
+5 1959-06-30    unemp     5.100
+6 1959-09-30  realgdp  2775.488
+7 1959-09-30     infl     2.740
+8 1959-09-30    unemp     5.300
+9 1959-12-31  realgdp  2785.204
+```
+
+- 使用 DataFrame, 不同 item 值分别形成一列, date 列中的时间值则作为索引
+
+```python
+In [62]: pivoted = ldata.pivot("date", "item", "value")
+
+In [64]: pivoted.head()
+Out[64]:
+item        infl   realgdp  unemp
+date
+1959-03-31  0.00  2710.349    5.8
+1959-06-30  2.34  2778.801    5.1
+1959-09-30  2.74  2775.488    5.3
+1959-12-31  0.27  2785.204    5.6
+1960-03-31  2.31  2847.699    5.2
+```
+
+- `df.pivot(self, index=None, columns=None, values=None)` - 前 2 个参数值分别用作行和列名, 最后一个参数值则用于填充 DataFrame 的数据列的列名
+- 如果有多个参与重塑的数据列, 忽略 `values` 参数, 得到的 DataFrame 就会带有层次化的列
+- 实际上, `pivot` 只是一个快捷方式: 用 `set_index` 创建层次化索引, 再用 `unstack` 重塑
+
+#### 数据转换
+
+###### 移除重复数据
+
+- DataFrame 中常会出现重复行, `df.duplicated` 方法返回一个布尔型 Series, 指示各行是否重复行, `df.drop_duplicates` 返回移除了重复行的 DataFrame
+- `df.duplicated` 和 `df.drop_duplicated` 默认会判断全部列, 可以指定部分列进行重复性判断, 传入列名的列表
+- `df.duplicated` 和 `df.drop_duplicated` 默认保留的是第一个出现的值组合, 传入 `take_last=True`, 则保留最后一个
+
+###### 利用函数或映射进行数据转换
+
+- Series 的 map 方法接受一个函数或含有映射关系的字典型对象:
+
+```python
+meat_to_animal = {
+    "bacon": "pig",
+    "pulled pork": "pig",
+    "pastrami": "cow"
+}
+
+data["animal"] = data["food"].map(str.lower).map(meat_to_animal)
+# or data["animal"] = data["food"].map(lambda x: meat_to_animal[x.lower()])
+```
+
+- 使用 map 是一种实现元素级转换以及其他数据清理工作的便捷方式
+
+###### 替换值
+
+- fillna 方法填充缺失数据可以看作值替换的一种特殊情况
+- map 可用于修改对象的数据子集, 而 `replace` 则提供了一种更简单, 更灵活的方式: `data.replace(-999, np.nan)`.
+- 一次替换多个值: `data.replace([-999, -1000], np.nan)`
+- 对不同值进行不同的替换, 则传入一个由替换关系组成的列表: `data.replace([-999, -1000], [np.nan, 0])` 或 字典: `data.replace({-999: np.nan, -1000: 0})`
+
+###### 重命名轴索引
+
+- 轴标签也可以通过函数或映射进行转换, 从而得到新的对象. 轴还可以被就地修改, 而无需新建一个数据结构
+- 轴标签也有 `map` 方法
+- 要创建数据集的转换版 (而不是修改原始数据), 比较实用的方法是 `rename` : `data.rename(index=str.title, columns)`
+- `rename` 可以结合字典型对象实现对部分轴标签的更新: `data.rename(index={"OHIO": "INDIANA"}, columns={"three": "peekaboo"})`
+- rename 实现了: 复制 DataFrame 并对其索引和列标签进行赋值. 若希望就地修改某个数据集, 传入 `inplace=True`
+
+###### 离散化和面元划分
+
+- 为了便于分析, 连续数据常常被离散化或拆分为 "面元" (bin). 使用 `pd.cut` 实现面元划分:
+
+```python
+In [6]: ages = [20, 22, 25, 27, 21, 23, 37, 31, 61, 45, 41, 32]
+
+In [7]: bins = [18, 25, 35, 60, 100]
+
+In [8]: cats = pd.cut(ages, bins)  # 传入的实际是面元边界
+
+In [9]: cats
+Out[9]:
+[(18, 25], (18, 25], (18, 25], (25, 35], (18, 25], ..., (25, 35], (60, 100], (35, 60], (35, 60], (25, 35]]
+Length: 12
+Categories (4, object): [(18, 25] < (25, 35] < (35, 60] < (60, 100]]
+
+In [10]: cats.__class__
+Out[10]: pandas.core.categorical.Categorical
+
+In [12]: cats.codes
+Out[12]: array([0, 0, 0, 1, 0, 0, 2, 1, 3, 2, 2, 1], dtype=int8)
+
+In [14]: cats.categories
+Out[14]: Index(['(18, 25]', '(25, 35]', '(35, 60]', '(60, 100]'], dtype='object')
+```
+
+- `pd.cut` 返回一个特殊的 `Categorical`. 可以看作一组表示面元名称的字符串. 实际上, 还含有一个表示不同`分类名称`的 `categories` 数组以及一个表示`标号`的 `codes`
+    - `labels` - 设置面元名称
+    - `right` - `True` 设置左开右闭; `False` 设置右开左闭
+    - `bins` - 可以是 int 表示切分的面元数量, 会根据数据范围计算等长面元; 可以是 `seq`, 表示面元边界
+    - `precision` - 保存以及显示的精度
+- `pd.qcut` - 类似于 cut 函数, 但根据样本`分位数`对数据进行面元划分.
+    - `q` - int or seq. 使用 int, 指定面元数, 自动计算分位数; 使用 seq, 指定一组分位数. (0 ~ 1 的值)
+- 根据数据的分布情况, cut 可能无法使各面元中含有相同数量的数据点, qcut 由于使用样本分位数, 可以得到大小基本相等的面元
+- `pd.cut` 和 `pd.qcut` 离散化函数对`分量`和`分组分析`非常重要
+
+###### 检测和过滤异常值
+
+- 异常值 (outlier, 也叫孤点或离群值) 的过滤或变换运算在很大程度上就是数组运算
+
+```python
+In [17]: import numpy as np
+
+In [18]: np.random.seed(1007)
+
+In [19]: data = DataFrame(np.random.randn(1000, 4))
+
+In [20]: data.describe()
+Out[20]:
+                 0            1            2            3
+count  1000.000000  1000.000000  1000.000000  1000.000000
+mean     -0.023420    -0.034958     0.024982    -0.018440
+std       0.963746     0.985293     1.007400     1.001887
+min      -2.763596    -3.663186    -3.398531    -3.451871
+25%      -0.670187    -0.673766    -0.664407    -0.670061
+50%      -0.007710    -0.036593    -0.007202     0.006934
+75%       0.612715     0.622338     0.733818     0.610463
+max       2.976731     3.181632     3.064691     2.812654
+
+# 选出所有含有绝对值超过 3 的行
+In [21]: data[(np.abs(data) > 3).any(1)]
+Out[21]:
+            0         1         2         3
+15   0.090781  3.181632  1.772342 -1.866222
+33  -0.005752 -3.663186  0.214131  0.346714
+549 -0.027051 -1.016217  1.444815 -3.451871
+725 -0.337286  0.869562  3.042866 -0.045890
+730  0.767084  0.357701  3.064691  0.385996
+859 -0.445822  0.153502 -3.398531 -0.172032
+950 -0.292218  1.824745 -3.336887  1.058328
+977 -0.875507  2.083475 -3.159357 -0.165712
+
+# 限制数据区间
+In [22]: data[(np.abs(data) > 3)] = np.sign(data) * 3
+
+In [23]: data.describe()
+Out[23]:
+                 0            1            2            3
+count  1000.000000  1000.000000  1000.000000  1000.000000
+mean     -0.023420    -0.034477     0.025769    -0.017988
+std       0.963746     0.982490     1.004237     1.000438
+min      -2.763596    -3.000000    -3.000000    -3.000000
+25%      -0.670187    -0.673766    -0.664407    -0.670061
+50%      -0.007710    -0.036593    -0.007202     0.006934
+75%       0.612715     0.622338     0.733818     0.610463
+max       2.976731     3.000000     3.000000     2.812654
+```
+
+- `np.sign` - ufunc, 根据数据的正负, 返回由 1 和 -1 组成的数组
+
+###### 排列和随机采样
+
+- `np.random.permutation` 函数, 实现对 Series 或 DataFrame 的列的排列工作 (permuting, 随机重排序). 通过需要排列的轴的长度调用 `permutation`, 可产生一个表示新顺序的整数数组. 之后就可以基于 ix 的索引操作或 `take` 函数使用顺序数组: `df.take(np.random.permutation(len(df))[:k])` (取前 k 个子集)
+
+###### 计算指标/哑变量
+
+- 另一种常用于统计建模或机器学习的转换方式是: 将分类变量 (categorical variable) 转换为 "哑变量矩阵" (dummy matrix) 或 "指标矩阵" (indicator matrix)
+- 如果 DataFrame 的**某一列含有 k 个不同值, 可以派生出一个 k 列矩阵或 DataFrame (值全为 0 或 1)**
+
+```python
+In [26]: df = DataFrame({"keys": ["b", 'b', 'a', 'c', 'a', 'b'], 'data1': range(6)})
+
+In [27]: df
+Out[27]:
+   data1 keys
+0      0    b
+1      1    b
+2      2    a
+3      3    c
+4      4    a
+5      5    b
+
+In [28]: pd.get_dummies(df["keys"])
+Out[28]:
+a    b    c
+0  0.0  1.0  0.0
+1  0.0  1.0  0.0
+2  1.0  0.0  0.0
+3  0.0  0.0  1.0
+4  1.0  0.0  0.0
+5  0.0  1.0  0.0
+```
+
+- 如上, `pd.get_dummies` 函数根据某列 k 个不同值, 派生出一个 DataFrame. (有点像位图)
+    - `prefix` - 为结果 DataFrame 的列添加前缀
+- `set.union` - 返回集合的并集
+
+```python
+mnames = ["movie_id", "title", "genres"]
+movies = pd.read_table("/home/kissg/Gode/pydata-book/ch02/movielens/movies.dat", sep="::", header=None, names=mnames)
+
+genre_gen = (set(x.split("|")) for x in movies.genres)  # genre generator
+genres = sorted(set.union(*genre_gen))  # genres is a sorted list
+
+# len(movies) * len(genres) 的零阵, 列名是 genres
+dummies = DataFrame(np.zeros((len(movies), len(genres))), columns=genres)
+
+# 构建指标 DataFrame
+for i, gen in enumerate(movies.genres):
+    dummies.ix[i, gen.split("|")] = 1
+
+movies_windic = movies.join(dummies.add_prefix("Genre_"))
+```
+
+> 对于很大的数据, 上述构建多成员指标变量会变得很慢. 肯定需要编写一个能利用 DataFrame 内部机制的更低级的函数
+
+- 一个对统计应用有用的秘诀: 结合 get_dummies 和诸如 cut 之类的离散化函数: `pd.get_dummies(pd.cut(values, bins))`
+
+#### 字符串操作
+
+- Python 能成为流行的数据处理语言, 部分原因是其简单易用的`字符串和文本处理功能`. 大部分文本运算都直接做成了 str obj 的内置方法. 对于更为复杂的模式匹配和文本操作, 加上 regex.
+- pandas 对字符串操作进行了加强, 使能够对`整组数据应用字符串表达式和正则表达式`, 而且能够处理缺失数据
+
+###### 字符串对象方法
+
+- 子串以某个分隔符连接, 一种方式是(比如分隔符是冒号) `subs + ':' + `subs2` + ':' + ...`, 更 Pythonic 的做法是使用 join 方法: `":".join(seq)`
+- `str.index(subs)` - 返回匹配的子串的第一个索引. 找不到, 会抛出异常.
+- `str.find(subs)` - 同 str.index, 但找不到子串时, 返回 -1
+- `str.count` - 返回指定子串出现的次数
+- `str.replace(old_str, new_str)` - 字面的意思. 常用于删除模式, 传入空串
+
+###### regex
+
+- re 模块的函数可分为 3 大: 模式匹配, 替换以及拆分
+- regex 描述了需要在文本中定位的一个模式
+- `match` - 只匹配 str 的首部
+- `findall` - 返回字符串中所有的匹配项
+- `search` - 在整个字符串中进行匹配, 但只返回第一个匹配项
+- `sub` - 将匹配到的模式替换为指定字符串, 并返回所得到的新字符串
+- 使用圆括号 `()` 对匹配模式进行分组. `groups` 方法返回一个由模式各段组成的 tuple
+- 带分组功能的模式, `findall` 会返回一个 list of tuple
+- `sub` 能通过 `\1`, `\2` 之类的特殊符号访问各匹配项中的分组
+
+###### pandas 中矢量化的字符串函数
+
+- 通过 `map` 方法, 所有字符串和 regex 方法都能被应用于各个值, 但如果存在 NA 会报错
+- 为了解决上述问题,  Serires 有一些能够跳过 NA 值的字符串操作方法, 通过 Series 的 `str` 属性访问
+- 矢量化的元素获取操作: 1. 使用 str.get 方法, 比如 str.get(1); 2. 在 str 属性上使用索引, 比如 str[0]
+- 矢量化字符串方法:
+    - cat - 实现元素级的字符串连接操作, 可指定分隔符
+    - contains - 返回表示各字符串是否含有指定模式的布尔型数组
+    - count
+    - endswith, startswith
+    - findall
+    - get
+    - join
+    - len - 计算各字符串的长度
+    - lower
+    - upper
+    - match
+    - pad - 在字符串的左或右或两边加上空白符
+    - center - 相当于 pad(side="both")
+    - repeat - 重复值, s.str.repeat(3) 相当于对各字符串执行 x * 3
+    - replace
+    - slice - 对 Series 中的各个字符串进行子串截取
+    - split
+    - strip, rstrip, lstrip
