@@ -960,3 +960,16 @@ docker_ps.wait()
 
 - Python, shlex -  A lexical analyzer class for simple shell-like syntaxes.
     - `shlex.split(cmd_str)` - 将命令更科学地进行切分
+    - Kenneth 的 envoy 就用到了 shelx 来科学地解析 shell cmd
+
+#### 2016-10-07
+
+- xterm, 对应的文件是: `.Xresources`, 命令: `.xrdb -merge .Xresources`
+
+###### kill vs. terminate:
+
+> SIGTERM 信号是可中途阻止的 (intercepted), 程序收到终止信号之后, 将启动一个关闭进程来终止自身, 以 clean exit.
+SIGKILL 是暴力不可终止的, 收到该信号的程序将立即被终止
+当关闭或重启计算机时, 通常会先发一个 SIGTERM, 优雅地退出进程 (如果进程支持的话), 几秒钟后, 向仍在运行的程序发送 SIGKILL, 强制退出进程.
+
+- Python, `__enter__` 和 `__exit__` (magic functions), 用于实现 `with` 语句的关键
