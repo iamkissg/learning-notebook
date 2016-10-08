@@ -973,3 +973,7 @@ SIGKILL 是暴力不可终止的, 收到该信号的程序将立即被终止
 当关闭或重启计算机时, 通常会先发一个 SIGTERM, 优雅地退出进程 (如果进程支持的话), 几秒钟后, 向仍在运行的程序发送 SIGKILL, 强制退出进程.
 
 - Python, `__enter__` 和 `__exit__` (magic functions), 用于实现 `with` 语句的关键
+
+#### 2016-10-08
+
+- After you have imported a module in Python, it's always good to see what functions ,classes and methods that the module provides. 导入模块之后, 使用 `dir(module)` 查看其提供了哪些函数, 类与方法是个好习惯
