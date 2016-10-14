@@ -175,3 +175,11 @@ import sys
 # 错误示范
 import os, sys
 ```
+
+- 但从一个库导入多个模块是可行的: `from subprocess import Popen, PIPE`
+- 导入应总是位于文件顶部, 在模块注释和 docstrings 之后, 模块内定义的全局变量和常量之前
+- 导入应下列顺序分好组, 每组之间用空行区分
+    1. standard library imports
+    2. related third party imports
+    3. local application/library specific imports
+- 建议使用`绝对导入`, 它们通常可读性更强, 在导入系统配置不正确时表现也会更好 (至少错误消息会更准确)
