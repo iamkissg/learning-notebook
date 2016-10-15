@@ -977,3 +977,56 @@ SIGKILL 是暴力不可终止的, 收到该信号的程序将立即被终止
 #### 2016-10-08
 
 - After you have imported a module in Python, it's always good to see what functions ,classes and methods that the module provides. 导入模块之后, 使用 `dir(module)` 查看其提供了哪些函数, 类与方法是个好习惯
+
+#### 2016-10-14
+
+- 2016-10-14
+
+###### tuple/list of 2 elements vs. dict
+
+- `(x, y)` - 其中 x, y 不一定意味着"此二者有关联"
+- `{"x": "y"}` - 意味着, x 与 y 之间有内在的联系
+- tuple 易于比较, 先比较首位元素, 再次位, 依此类推 
+
+###### Python 代码中直接插入断点
+
+```python
+import pdb
+pdb.set_trace()
+
+###### Ubuntu 解压缩工具大全
+
+`sudo apt-get install p7zip-rar p7zip-full unace unrar zip unzip sharutils rar uudeview mpack arj cabextract file-roller`
+
+###### Linux 开机自动运行脚本 (未试)
+
+1. 在 /etc/init 目录下写脚本
+2. 在 /etc/rc.local 文件的 exit 0 语句前编写执行语句 (python xxxx)
+
+###### 你不知道的 print
+
+- `print(value, ..., sep=' ', end='\n', file=sys.stdout, flush=False)`, 因为 `file` 默认值是 `sys.stdout`, 所以将打印到屏幕, 若修改为打开的 file obj, 亲测可写入
+
+###### 取得当前文件同目录下某个文件的绝对路径 & 目录操作
+
+```python
+def from_this_dir(filename):
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+```
+
+获取当前目录: `os.getcwd()`
+修改工作目录: `os.chdir()`
+
+###### 简单粗暴的设置缩进 (可用于 code_gen)
+
+`pad = " " * indent`
+
+###### dict.items() 方法返回的其实是 `(key, value)`
+
+```python
+In [14]: a = {"kissg": "echo", "echo": "kissg"}
+
+In [15]: a.items()
+Out[15]: [('kissg', 'echo'), ('echo', 'kissg')]
+```
+

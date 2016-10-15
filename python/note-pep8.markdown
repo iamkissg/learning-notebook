@@ -176,6 +176,7 @@ import sys
 import os, sys
 ```
 
+<<<<<<< HEAD
 - 形如 `from subprocess import Popen, PIPE` 的导入是可以的
 - 导入总是位于文件的头部, 在模块注释和 docstrings 之后, 模块的全局变量和常量之前
 - 导入应当以下列顺序分组:
@@ -371,3 +372,12 @@ do_one(); do_two(); do_three(long, argument,
 
 if foo == 'blah': one(); two(); three()
 ```
+=======
+- 但从一个库导入多个模块是可行的: `from subprocess import Popen, PIPE`
+- 导入应总是位于文件顶部, 在模块注释和 docstrings 之后, 模块内定义的全局变量和常量之前
+- 导入应下列顺序分好组, 每组之间用空行区分
+    1. standard library imports
+    2. related third party imports
+    3. local application/library specific imports
+- 建议使用`绝对导入`, 它们通常可读性更强, 在导入系统配置不正确时表现也会更好 (至少错误消息会更准确)
+>>>>>>> 9c24f89f471f22640b0b49c215fbd02a65552a02
