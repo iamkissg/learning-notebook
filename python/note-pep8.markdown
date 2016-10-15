@@ -175,3 +175,199 @@ import sys
 # 错误示范
 import os, sys
 ```
+
+- 形如 `from subprocess import Popen, PIPE` 的导入是可以的
+- 导入总是位于文件的头部, 在模块注释和 docstrings 之后, 模块的全局变量和常量之前
+- 导入应当以下列顺序分组:
+    1. 标准库的导入
+    2. 相关第三方库的导入
+    3. 本地应用/库的导入
+- 应该在每组导入之间插入空行, 以示区别
+- Put any relevant `__all__` specification after the imports.
+- 建议使用`绝对导入` (使用绝对路径), 这样通常更具可读性, 当导入系统没有配置正确时, 往往也表现得更好 (或者说至少会给出更好的错误信息).
+- `显式的相对导入`是绝对导入的可接受替代品, 特别是当包布局很复杂时,使用绝对导入会显得冗余
+- 标准库代码应当避免使用复杂的包布局, 并始终使用绝对导入
+- 隐式的相对导入绝不应该使用, 在 Python 3 中已经被移除
+- 当从一个包含类 (class-containing) 模块导入类时, 以下写法也是可以的:
+
+```python
+from myclass import MyClass
+from foo.bar.yourclass import YourClass
+```
+
+- 但是如果上述导入会造成局部命名冲突, 直接导入模块就好:
+
+```python
+import myclass
+import foo.bar.yourclass
+```
+
+- 通配符导入(`from <module> import *`) 应该避免, 它使命名空间存在变得模糊, 对于读者与许多自动化工具都会造成困扰.
+
+#### String Quoted
+
+- 当字符串中包含单引号或双引号时, 使用另一个来避免使用反斜杆来转义, 这样可读性更好
+- 三引号, 始终使用双引号来与 [PEP 257](https://www.python.org/dev/peps/pep-0257/) 中的 docstring 用例保持一致
+
+## 表达式与语句中的空白字符
+
+#### Pet Peeves
+
+- 下列情况, 避免使用多余的空白字符:
+    - 各种括号内, 紧随括号的情况
+        - 正确示范: `spam(ham[1], {eggs: 2})`
+        - 错误示范: `spam( ham[ 1 ], { eggs: 2 } )`
+    - 逗号 (comma), 分号 (semicolon), 冒号 (:) 之前:
+        - 正确示范: `if x == 4: print x, y; x, y = y, x`
+        - 错误示范: `if x == 4 : print x , y ; x , y = y , x`
+    - 然而, 切片语法中, 冒号更像是一个二进制操作符, 因此, 在其两边应使用相同数量的空白字符. 多切片的情况, 也应如此. 例外是省略切片参数的情况, 此时空格省略:
+
+```python
+# 正确示范
+ham[1:9], ham[1:9:3], ham[:9:3], ham[1::3], ham[1:9:]
+ham[lower:upper], ham[lower:upper:], ham[lower::step]
+ham[lower+offset : upper+offset]
+ham[: upper_fn(x) : step_fn(x)], ham[:: step_fn(x)]
+ham[lower + offset : upper + offset]
+```
+
+```python
+# 错误示范
+ham[lower + offset:upper + offset]
+ham[1: 9], ham[1 :9], ham[1:9 :3]
+ham[lower : : upper]
+ham[ : upper]
+```
+
+    - 函数调用, 参数列表的圆括号之前的:
+        - 正确示范: `spam(1)`
+        - 错误示范: `spam (1)`
+    - 索引或切片的方括号之前:
+        - 正确示范: `dct['key'] = lst[index]`
+        - 错误示范: `dct ['key'] = lst [index]`
+    - 为了保持一致, 在赋值操作符 (或其他) 周围使用多余的空格:
+
+```python
+# 正确示范
+x = 1
+y = 2
+long_variable = 3
+```
+
+```python
+# 错误示范
+
+x             = 1
+y             = 2
+long_variable = 3
+```
+
+#### 其他建议
+
+- 避免使用尾空白字符 (trailing whitespace). 它通常是不可见的, 但会造成困扰, 比如反斜杆之后跟了一个空格, 那么新行就不会被视作多行连续的一部分.
+- 始终在下列二进制操作符两边使用一个空格包裹:
+    - 赋值 (=)
+    - 增量赋值 (augmented assignment) (+=, -= 等)
+    - 比较 (==, <, >, !=, <>, <=, >=, in, not in, is, is not)
+    - 布尔 (and, or, not)
+- 如果使用了不同优先级的操作符, 可以考虑在优先级最低的操作符周围使用空白字符. 自己判断, 但不要使用多于 1 的空格, 在一个二进制操作符两边使用数量的操作符
+
+```python
+# 正确示范
+i = i + 1
+submitted += 1
+x = x*2 - 1
+hypot2 = x*x + y*y
+c = (a+b) * (a-b)
+```
+
+```python
+# 错误示范
+i=i+1
+submitted +=1
+x = x * 2 - 1
+hypot2 = x * x + y * y
+c = (a + b) * (a - b)
+```
+
+- 当 `=` 用于关键字参数或默认参数值时, 不用在其两边加空格
+
+```python
+# 正确示范
+def complex(real, imag=0.0):
+    return magic(r=real, i=imag)
+```
+
+```python
+# 错误示范
+def complex(real, imag = 0.0):
+    return magic(r = real, i = imag)
+```
+
+- 函数说明 (Function annotations) 应该使用正常的冒号用法, 始终在 `->` 两边使用空格:
+
+```python
+# 正确示范
+def munge(input: AnyStr): ...
+def munge() -> AnyStr: ...
+```
+
+```python
+# 错误示范
+def munge(input:AnyStr): ...
+def munge()->PosInt: ...
+```
+
+- 当联合使用参数说明 (argument annotation) 和 默认值时, 在 `=` 两边使用空格 (只对同时具备参数说明和默认值的情况有效):
+
+```python
+# 正确示范
+def munge(sep: AnyStr = None): ...
+def munge(input: AnyStr, sep: AnyStr = None, limit=1000): ...
+```
+
+```python
+# 错误示范
+def munge(input: AnyStr=None): ...
+def munge(input: AnyStr, limit = 1000): ...
+```
+
+- 通常不建议使用复合语句 (即多条语句写在同一行):
+
+```python
+# 正确示范
+if foo == 'blah':
+    do_blah_thing()
+do_one()
+do_two()
+do_three()
+```
+
+```pyython
+# 错误示范
+if foo == 'blah': do_blah_thing()
+do_one(); do_two(); do_three()
+```
+
+- 尽管主体很小的时候, 可以将 if/for/while 语句写成一行, 但绝对不要将此用于多条语句. 同样的, 避免折叠长行:
+
+```python
+# 错误示范
+if foo == 'blah': do_blah_thing()
+for x in lst: total += x
+while t < 10: t = delay()
+```
+
+```python
+# 错误示范
+if foo == 'blah': do_blah_thing()
+else: do_non_blah_thing()
+
+try: something()
+finally: cleanup()
+
+do_one(); do_two(); do_three(long, argument,
+                             list, like, this)
+
+if foo == 'blah': one(); two(); three()
+```
