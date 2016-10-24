@@ -14,7 +14,27 @@ def main():
     app = tornado.web.Application(handlers=[(r"/", IndexHandler)])
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(options.port)
-    tornado.ioloop.IOLoop.instance().start(
+    tornado.ioloop.IOLoop.instance().start()
 ```
 
 - `handlers` 参数, 由一个元组组成, 用于匹配 HTTP 请求路径 (不包括查询字符串和碎片) 的 regex 和 RequestHandler 类. 
+
+```python
+app = tornado.web.Application(handlers=[
+    (r"/reverse/(\w+)", ReverseHandler),
+    (r"/wrap", WrapHandler)
+])
+```
+
+- 括号的含义是让 Tornado 保存匹配括号里面表达式的字符串，并将其作为请求方法的一个参数传递给 RequestHandler 类
+
+```python
+class ReverseHandler(tornado.web.RequestHandler):
+    def get(self, input):
+        self.write(input[::-1])
+```
+
+- `get` 方法的参数 `input`, 将包含匹配处理函数正则表达式第一个括号里的字符串。（如果正则表达式中有一系列额外的括号，匹配的字符串将被按照在正则表达式中出现的顺序作为额外的参数传递进来。）
+- RequestHandler 对象的 `get_argument` 方法来捕获请求查询字符串的的参数
+- 从一个传入的HTTP请求中获得信息: 使用 `get_argument` 和传入到 `get` 和 `post` 的参数
+
