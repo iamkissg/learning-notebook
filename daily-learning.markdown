@@ -1030,3 +1030,19 @@ In [15]: a.items()
 Out[15]: [('kissg', 'echo'), ('echo', 'kissg')]
 ```
 
+
+#### 2016-10-21
+
+###### 为服务器设置 ssh 登录
+
+0. 在本机生成公密钥: `ssh-keygen -t rsa -b 4096 -C "enginechen07@gmail.com"`
+    - `-t` 指定算法
+    - `-b` 指定密钥对的长度
+    - `-C` Comments
+1. 将本机的公钥添加到服务器 `$HOME/.ssh/authorized_keys` 文件
+2. 设置 `$HOME/.ssh/authorized_keys` 权限为 `600`
+3. 设置 `$HOME/.ssh` 的权限为 `700`
+
+#### 2016-10-24
+
+- `xlrd`: 自动根据 cell 值判断其 type, 与 Excel 单元格属性无关.
