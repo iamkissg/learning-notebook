@@ -208,3 +208,33 @@ Reference object 是一个 [JSON Reference](https://tools.ietf.org/html/draft-pb
 #### schema object
 
 schema 对象允许对输入输出数据的类型进行定义, 可以是原生数据类型或数组, 也可以是对象. schema 对象是基于 [JSON SchemaSpecification Draft 4](http://json-schema.org/) 的, 使用其预定义的子集. 在该子集的顶部, 有该规范提供的拓展, 为写一个更完整的文档提供了可能
+
+## Tools
+
+- [Swagger Core](http://swagger.io/swagger-core/) - For generating and reading Swagger definitions
+- [Swagger Codegen](http://swagger.io/swagger-codegen/) - Command-line tool for generating both client and server side code from a Swagger definition
+- [Swagger UI](http://swagger.io/swagger-ui/) - Browser based UI for exploring a Swagger defined API
+- [Swagger Editor](http://swagger.io/swagger-editor/) - Browser based editor for authoring Swagger definitions in YAML or JSON format
+- Swagger JS
+- Swagger Node
+- Swagger-Socket
+- Swagger Parser
+
+### Swagger Core
+
+A set of Java libs.
+
+### Swagger Codegen
+
+### Swagger UI
+
+Swagger UI is a dependency-free collection of HTML, Javascript, and CSS assets that dynamically generate beautiful documentation and sandbox from a Swagger-compliant API.
+
+## 通过Swagger进行API设计，与Tony Tam的一次对话
+
+- 为 REST API 创建一个泛型的 JSON 模型, 能够反映出调用者有权限进行哪些操作
+- 代码生成器的输入模型
+- Swagger 的核心思想: `为 API 定义一个一致的, 可预测的模型`
+- 如果没有一种简单而健壮的校验机制, 那么很容易就会写出无效的规范
+- 基于规范的核心目标作出决策, 而不是尝试同时解决所有人的问题, 后者只会使项目变成一个大泥巴球. "如果将所有美丽的颜色混合在一起, 只会得到一个肮脏的颜色". 因此, 对于功能, 必须以一种干净的, 清晰的方式进行设计.
+- 以简便的方式展示 API, 可试用
