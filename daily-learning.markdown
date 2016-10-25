@@ -1046,3 +1046,38 @@ Out[15]: [('kissg', 'echo'), ('echo', 'kissg')]
 #### 2016-10-24
 
 - `xlrd`: 自动根据 cell 值判断其 type, 与 Excel 单元格属性无关.
+
+#### 2016-10-25
+
+###### curl (updating)
+
+- -H - "headers"
+- -X - (HTTP) request method
+- -d, --data - (HTTP) Sends the specified data in a POST request to the HTTP server
+- -k, --insecure - (SSL)  This  option explicitly allows curl to perform "insecure" SSL connections and transfers.
+
+###### Ubuntu 添加删除 PPA
+
+- 添加 PPA: `sudo apt-add-repository ppa:andrei-pozolotin/maven3`
+- 移除 PPA 1: `sudo add-apt-repository --remove ppa:whatever/ppa`
+- 移除 PPA 2: `sudo apt-get install ppa-purge && sudo ppa-purge ppa_name  # ppa_name 带 `ppa:``
+
+###### MIME 管窥
+
+- MIME (Multipurpose Internet Mail Extensions, 多用途互联网邮件扩展).通过标准化电子邮件报文的头部的附加域 (fields) 而实现的; 这些头部的附加域, 描述新的报文类型的内容和组织形式.
+- 版本: `MIME-Version: 1.0` (目前是 1.0)
+- 内容类型: `Content-Type: [type]/[subtype]; parameter`
+
+###### others
+
+- [Ubuntu install MYSQL](http://dev.mysql.com/doc/mysql-apt-repo-quick-guide/en/)
+- [Ubuntu install Docker](https://docs.docker.com/engine/installation/linux/ubuntulinux/)
+- 当前用户重新登录: `su yourself` (temp)
+- shell 重新登录: `exec zsh`
+- GNOME 自带 PDFviewer: evince, 命令也是 `evince pdf_file`
+- Linux, 查看端口占用情况: `netstat –apn` or `netstat –apn | portno`
+- Linux 安装 MAVEN
+    1. 下载二进制包并解压到指定目录
+    2. 设置环境变量:
+        - `export M2_HOME=/home/kissg/Tools/apache-maven-3.3.9`
+        - `export PATH=$M2_HOME/bin:$PATH`
