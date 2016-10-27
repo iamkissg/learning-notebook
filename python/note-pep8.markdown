@@ -176,7 +176,6 @@ import sys
 import os, sys
 ```
 
-<<<<<<< HEAD
 - 形如 `from subprocess import Popen, PIPE` 的导入是可以的
 - 导入总是位于文件的头部, 在模块注释和 docstrings 之后, 模块的全局变量和常量之前
 - 导入应当以下列顺序分组:
@@ -240,13 +239,13 @@ ham[lower : : upper]
 ham[ : upper]
 ```
 
-    - 函数调用, 参数列表的圆括号之前的:
-        - 正确示范: `spam(1)`
-        - 错误示范: `spam (1)`
-    - 索引或切片的方括号之前:
-        - 正确示范: `dct['key'] = lst[index]`
-        - 错误示范: `dct ['key'] = lst [index]`
-    - 为了保持一致, 在赋值操作符 (或其他) 周围使用多余的空格:
+- 函数调用, 参数列表的圆括号之前的:
+    - 正确示范: `spam(1)`
+    - 错误示范: `spam (1)`
+- 索引或切片的方括号之前:
+    - 正确示范: `dct['key'] = lst[index]`
+    - 错误示范: `dct ['key'] = lst [index]`
+- 为了保持一致, 在赋值操作符 (或其他) 周围使用多余的空格:
 
 ```python
 # 正确示范
@@ -372,12 +371,76 @@ do_one(); do_two(); do_three(long, argument,
 
 if foo == 'blah': one(); two(); three()
 ```
-=======
-- 但从一个库导入多个模块是可行的: `from subprocess import Popen, PIPE`
-- 导入应总是位于文件顶部, 在模块注释和 docstrings 之后, 模块内定义的全局变量和常量之前
-- 导入应下列顺序分好组, 每组之间用空行区分
-    1. standard library imports
-    2. related third party imports
-    3. local application/library specific imports
-- 建议使用`绝对导入`, 它们通常可读性更强, 在导入系统配置不正确时表现也会更好 (至少错误消息会更准确)
->>>>>>> 9c24f89f471f22640b0b49c215fbd02a65552a02
+
+## Comments
+
+- 与代码不一致的注释甚至比没有注释更差. 修改代码的时候, 保持更新注释的好习惯
+- 注释应该是完整的句子. 若注释是一个词组或句子, 第一个单词应该首字母大写, 除非是标识符
+- 如果注释很短, 可省略末尾的句号. 块状注释通常由段落组成, 段落由以句号结束的完整的句子组成
+- 在标志结束的句号之后应使用 2 个空格
+- 以英语注释!
+
+#### 块状注释
+
+- 块状注释写在被注释的代码之前, 与代码保持相同的缩进. 每行注释以 `# `开始 (# 还之后跟一个空格)
+- 块状注释的段落间, 由单行 `#.` 分离
+
+#### 行内注释
+
+- 保守地使用行内注释
+- 行内注释与代码之后至少有 2 个空格
+- 行内注释是不必要的. 事实上, 如果代码写得很明显, 它们还会使读者分心
+
+#### Documentation Strings
+
+> Write docstrings for all public modules, functions, classes, and methods. Docstrings are not necessary for non public methods, but you should have a comment that describes what the method does. This comment should appear after the def line.
+
+- [PEP 257](https://www.python.org/dev/peps/pep-0257/)
+- 单行的 docstrings, `""""""` 写在同一行
+- 多行的 docstrings, 以 `"""` 作为尾行结束
+
+## Version Bookkeeping
+
+- 如果使用版本控制, 在模块的 docstrings 之后, 在代码之前, 前后空一行, 著名 `__version__ = "$Revision$"`
+
+## Naming Conventions (约定)
+
+- Python 库的命令约定有点混乱, 因此不必完全保持命名一致 (也不能). 但仍有建议的命名标准. 新的模块与包(包括第三方框架), 应以这些标准编写, 现有的采用不同风格的库, 应更注重内部一致性
+
+### 首要规则
+
+- 名称对于用户是可见的.
+- API 的公共部分应反映使用情况, 而不是实现
+
+#### 命名风格
+
+- 命名风格, 要能清晰地表示其用途. 以下是一些不同的风格:
+    - b (单个小写字母)
+    - B (单个大写字母)
+    - lowercase
+    - lower_case_with_underscores
+    - UPPERCASE
+    - UPPERCASE_CASE_WITH_UNDERSCORES
+    - CapitalizedWords (or CapWords, CamelCase, StudlyCaps)
+    - mixedCase (differs from CapitalizedWords by initial lowercase character)
+    - Capitalized_Words_With_Underscores (丑)
+- 在使用 `CapWords` 使用缩写, 注意: `HTTPServerError` 比 `HttpServerError` 更好
+- 还有一种命名风格是, 使用`短前缀`来表示分组, 这在 Python 中不常见, 但表达了一种完整性. 在 Python 中不常用, 没必要的原因是, 属性或方法通常通过对象来引用 (作为前缀), 函数则以模块名为前缀
+- 使用前导或后缀下划线 (`_`) 也是一种区分:
+    - `_single_leading_underscore` - 弱"内部使用"标识符, `from M import *` 不会导入以单下划线开始的对象
+    - `single_trailing_underscore_` - 用于避免与 Python 关键字的冲突. 例如: `Tkinter.Toplevel(master, class_='ClassName')`
+    - `__double_leading_underscore` - 命名类属性时, 调用名字改编. (在 FooBar 类内部, `__boo` 会变成 `_FooBar__boo`, 之后只能通过 `_FooBar__boo` 访问属性)
+    - `__double_leading_and_trailing_underscore__` - "魔法" 对象或属性 that live in user-controller namespaces
+    - `__import__` 或 `__file__` - 绝不要编写这类名称; 仅在写文档的时候使用
+
+#### 命名规范
+
+##### 应避免的命名
+
+- 为单字符变量命名时, 绝对不要 `l` (小写的 L), `O` (大写的 oh), `I` (大写的 eye).
+
+##### 包与模块名
+
+- 模块应该使用短的, 全小写的命名. 若有助于可读性, 可在模块名中使用下划线.
+- Python 的包
+
