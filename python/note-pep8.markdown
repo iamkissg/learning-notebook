@@ -441,6 +441,107 @@ if foo == 'blah': one(); two(); three()
 
 ##### 包与模块名
 
-- 模块应该使用短的, 全小写的命名. 若有助于可读性, 可在模块名中使用下划线.
-- Python 的包
+- 模块应该使用短的, 全小写的命名. 若有助于可读性, 可在模块名中使用下划线. 包也是同样的道理, 但不要使用下划线
+- 当以 C/C++ 写就的扩展发布的 Python 模块提供了更高层次的接口 (更面向对象), C/C++ 模块需要前导下划线
 
+##### 类名
+
+- 类名使用 `CapWords` 规范
+- 内建名有点不一样, 大多数是单个单词 (或 2 个单词). `CapWords` 规范只用于异常名和内建的常量
+
+##### 异常名
+
+- 异常是类, 类命名规范同样适用. 但要使用 `Error` 的后缀 (如果真的是错误的话)
+
+##### 类型变量 (Type variable) 名
+
+- 正常情况下, 类型变量名应使用 `CapWords`, 并使用短命. 建议使用 `_co` 或 `_contra` 后缀以表明相应的协变或逆变
+
+```python
+from typing import TypeVar
+
+    VT_co = TypeVar('VT_co', covariant=True)
+    KT_contra = TypeVar('KT_contra', contravariant=True)
+```
+
+##### 全局变量名
+
+(假设这些变量只在一个模块内部使用)
+
+- 全局变量的命名规范与函数一样. 
+- 设计成可使用 `from M import *` 的模块, 应使用 `__all__` 机制以防止全局量的导出, 或使用更旧的规范: 全局量使用单下划线前缀 (表明这些全局量是模块非公开的)
+
+##### 函数名
+
+- 函数名应该是小写的, 必要的时候, 单词之间用下划线分离以增加可读性
+- `mixedCase` 只在已经大量使用了该风格的情况下使用 (比如 threading.py), 以保持向后兼容
+
+##### 函数与方法参数
+
+- 确保实例方法的第一个参数总是 `self`; 类方法的第一个参数总是 `cls`
+- 若一个函数参数名与保留字冲突, 通常更好的最好是添加后缀下划线, 而不是缩写或 spelling corruption. 因此 `class_` 比 `clss` 更好. (也许更好的做法是使用代名词 (synonym)  避免这种冲突)
+
+##### 方法名和实例变量
+
+- 方法命名使用函数的命名规范
+- 为非公开方法和实例变量添加前导单下划线
+- 为避免与子类的命名冲突, 使用两个前导下划线, 以调用 Python 的名称扇贝规则. Python 识别带类名的名称: 若类 `Foo` 有属性 `__a`, 就不能通过 `Foo.__a` 访问, 只能通过 `Foo._Foo.__a` 访问
+- 通常, 双前导下划线应只用于避免父类与子类之间的属性命名冲突
+
+###### 常量
+
+- 常量一般定义在模块级别, 以全大写字母和单词间的下划线组成
+
+##### 继承设计
+
+- 一定要考虑的: 一个类方法或实例变量 (统称为"属性 (attributes)") 是否 public or non-public. 如果有疑惑, 选择 non-public. 将 non-public 属性转为 public 比将 public 转为 non-public 更简单
+- Public attributes are those that you expect unrelated clients of your class to use, with your commitment (承诺) to avoid backward incompatible changes. (避免向后不兼容的改变)
+- Non-public attributes are those that are not intended to be used by third parties (不期望被第三方使用); you make no guarantees that non-Public attributes won’t change or even be removed. (不必保证这些属性不会改编或移除)
+- Python 没有 `private` 的概念, 因为没有属性是真正私有的
+- 属性的另一种分类是: 子类 API 的部分 (唤作 "protected"). 一些类设计成需要被继承的, 扩展或修改类的行为. 设计这些类时, 要明确哪些属性是 public, 哪些是 part of the subclass API, 哪些是真正只在基类中使用的
+
+###### Public attributes
+
+- 不需要前导下划线
+- 若公共属性名与保留字冲突, 为其添加后缀单下划线 (特例是, `cls` 是 `class` 的一个更普遍被接受的)
+- 对于简单的公共数据属性, 最好是只暴露属性名, 不需要复杂的方法.
+- Keep in mind that Python provides an easy path to future enhancement, should you find that a simple data attribute needs to grow functional behavior. In that case, use properties to hide functional implementation behind simple data attribute access syntax. (`@property`?)
+    - Properties 仅在新式类 (new-style classes) 有效.
+    - 尽量保持 functional behavior 无副作用, 尽管像缓存这样的副作用通常是好事
+    - 避免在计算消耗型的操作上使用 properties; the attribute notation makes the caller believe that access is (relatively) cheap.
+- 如果类有子类, 又有一些不希望子类使用的属性, 考虑使用前导双下划线 (没有后缀下划线). 如前所述, 这会使用 Python 的名称识别算法, 避免类父类与子类的命名冲突
+    - 要使用名称识别, 使用简单的类名
+    - 名称识别 make certain uses, 例如调试与 `__getattr__()`, 不太方便
+    - 不是所有人都喜欢名称识别, 在避免突发名称冲突的需求和调用者的潜在使用之间找一个平衡
+
+#### Public and internal interfaces
+
+- 任何向后兼容的保证只适用于公共接口. 因此, 使用户能清晰地分辨公共与内部接口很重要
+- 有文档说明的接口被认为是公共的, 除非文档已经显式地表明这些接口是临时的 (provisional) 或内部的.
+- 所有没有文档的接口被当作内部的
+- 为了更好的内省 (introspection), 模块应显式地使用 `__all__` 属性来声明公共接口. 当没有公共 API 时, 为 `__all__` 设置一个空列表
+- 即使 `__all__` 得到了恰当设置, 内部接口 (包, 模块, 类, 函数, 属性或其他名称) 应该使用前导单下划线的前缀
+- 包含命名空间 (包, 模块或类) 的接口也会被当作内部接口
+- 导入的名称应该总是被当作实现细节. 其他模块一定不能依赖于非直接的访问, 除非已经显式地说明, 比如 `os.path` 或包的 `__init__` 模块 (暴露了子模块的功能)
+
+## 编程建议
+
+- 代码应以不影响 (坏的) 其他 Python 的实现的方式写就
+    - 例如不要依赖于 CPython 的字符串原地 (inplace) 连接: `a += b` 或 `a = a + b`. 即使在 CPython 中, 这个优化也是脆弱的. 考虑到性能, 应使用`"".join()` 形式. 这种方式确保了各种不同实现的时间线性叠加
+- 比较单个实例是否 `None`, 使用 `is` 或 `is not`, 永远不要使用相等操作符
+- 仅在 `if x is not None` 的情况下, 使用 `if x`
+- 使用 `is not`, 而不是 `not  ... is`. 功能相同, 但前者可读性更强
+- 要实现排序操作, 最好实现所有的 6 种操作 (__eq__, __ne__, __lt__, __le__, __gt__, __ge__), 而不是依赖其他代码去仅仅实现一个特定的比较. 为了减少劳动量, `funtools.total_ordering()` 装饰器提供了生成遗失的比较方法的工具
+- [PEP 207](https://www.python.org/dev/peps/pep-0207/) indicates that reflexivity rules are assumed by Python. 解释器可能会将 `y > x` 替换为 `x < y`, 将 `y >= x` 替换为 `x <= y`, 也可能将 `x == y` 和 `x != y` 的参数进行交换.
+- `sort()`, `min()` 操作保证使用 `<` 操作; `max()` 使用 `>` 操作符. 然而, 最好的方式还是实现所有 6 种操作.
+- 总是使用 `def` 语句替代直接将 `lambda` 表达式绑定到标识符的赋值语句:
+
+```python
+# 正确示范
+def f(x): return 2*x
+
+# 错误示范
+f = lambda x: 2*x
+```
+
+- 第一种形式意味着函数对象的名称就是 `f`, 而不是通用的 `<lambda>`. 这能更好地回溯与表示. 赋值语句消除了 lambda 表达式对于明确的 def 语句独有的优势. (`lambda` 可以放在更大的表达式里使用)
