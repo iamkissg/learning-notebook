@@ -1082,6 +1082,46 @@ Out[15]: [('kissg', 'echo'), ('echo', 'kissg')]
         - `export M2_HOME=/home/kissg/Tools/apache-maven-3.3.9`
         - `export PATH=$M2_HOME/bin:$PATH`
 
+###### Shadowsokcs server 配置
+
+(以 CentOS 6 为例)
+
+1. 安装工具
+    - yum install epel-release
+    - yum update
+    - yum install python-setuptools m2crypto supervisor
+    - easy_install pip
+    - pip install shadowsocks
+2. `vi /etc/shadowsocks.json`
+
+```json
+{
+  "server":"0.0.0.0",
+  "server_port":8388,
+  "local_port":1080,
+  "password":"yourpassword",
+  "timeout":600,
+  "method":"aes-256-cfb"
+}
+```
+
+3. `vi /etc/supervisord.conf`
+
+```shell
+[program:shadowsocks]
+command=ssserver -c /etc/shadowsocks.json -d start
+autostart=true
+autorestart=true
+user=root
+log_stderr=true
+logfile=/var/log/shadowsocks.log
+```
+
+4. `vi /etc/rc.local`
+    - `service supervisord start`
+
+5. `reboot`
+
 #### 2016-10-27
 
 ###### Python Tips
