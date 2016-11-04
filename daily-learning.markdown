@@ -1129,3 +1129,17 @@ logfile=/var/log/shadowsocks.log
 - `\` 可以用来表示行的连续, 但最好不好用. Python 能智能地识别 open bracket, 逗号分隔的列表, 回车
 - `str` 是不可变的, 当你以为修改了一个字符串, 实际是新建了一个
 - `for item in alist` - `alist` 是一个序列, `dict.items()` 其实是返回了 tuple.
+
+#### 2016-11-01
+
+- git, 先 commit 再 pull, 避免多余的提交.
+
+#### 2016-11-04
+
+- Python, 奇葩组合：
+
+```python
+from operator import is_not
+from functools import partial
+filter(partial(is_not, None), L)
+```
