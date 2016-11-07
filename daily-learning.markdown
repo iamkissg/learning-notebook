@@ -1143,3 +1143,10 @@ from operator import is_not
 from functools import partial
 filter(partial(is_not, None), L)
 ```
+
+#### 2016-11-07
+
+- Python, `codecs` 模块的 `open`, 加强版的 `open`, 可以指定 `coding` 等等
+- Python, `tuple` is hashable，`list` is not hashable
+- Python，`{exp for statement}` 可以是字典推导式也可以是集合推导式, 使用请注意
+- Python, `Vim` 执行当前编辑的 Python 脚本：`:!python`, or 选中代码片段也可执行
