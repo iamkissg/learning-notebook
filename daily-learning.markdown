@@ -1150,3 +1150,27 @@ filter(partial(is_not, None), L)
 - Python, `tuple` is hashable，`list` is not hashable
 - Python，`{exp for statement}` 可以是字典推导式也可以是集合推导式, 使用请注意
 - Python, `Vim` 执行当前编辑的 Python 脚本：`:!python`, or 选中代码片段也可执行
+
+#### 2016-11-08
+
+- JSON, key 只能是字符串
+- Python，`pickle.dump` 的 key 可以是任何对象。通常以 `.p` 文件保存 `pickle.dump()` 的结果
+- Python, popular JSON parsers: `ultrajson`, `json`, `simplejson`, `yajl`
+- Python, `frozenset` - 不可变的 `set`， 具有与 `set` 相同的接口，区别是不可变。
+
+###### How to check if a directory exists and create it if necessary?
+
+[Stackoverflow](http://stackoverflow.com/questions/273192/how-to-check-if-a-directory-exists-and-create-it-if-necessary/14364249#14364249)
+
+```python
+# python2.7
+try: 
+    os.makedirs(path)
+except OSError:
+    if not os.path.isdir(path):
+        raise
+
+# python 3.2+
+os.makedirs(path, exist_ok=True)
+```
+
