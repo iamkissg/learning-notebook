@@ -1154,6 +1154,7 @@ filter(partial(is_not, None), L)
 #### 2016-11-08
 
 - JSON, key 只能是字符串
+    - 将以 tuple 为 key 的 dict 序列化为 json，可以将 tuple 转为 str 先。事实上，ultrajson 就是这么做的： `json.dumps({str(k): v for k, v in data.iteritems()})`
 - Python，`pickle.dump` 的 key 可以是任何对象。通常以 `.p` 文件保存 `pickle.dump()` 的结果
 - Python, popular JSON parsers: `ultrajson`, `json`, `simplejson`, `yajl`
 - Python, `frozenset` - 不可变的 `set`， 具有与 `set` 相同的接口，区别是不可变。
@@ -1174,3 +1175,16 @@ except OSError:
 os.makedirs(path, exist_ok=True)
 ```
 
+#### 2016-11-09
+
+- Python, 路径相关的 `os.path` 函数：
+    - `os.path.dirname()`
+    - `os.path.split()`
+    - `os.path.isdir()`
+    - `os.path.isfile()`
+
+- Pandas, `to_*` 函数，当向 `dir/file` 写入时，若 `dir` 不存在，会报文件/路径不存在错。因此需先创建目录
+- Pandas, `df.sort_index()` 对索引进行排序，`['Q1.3','Q6.1','Q1.2','Q1.1',......]` ==> `['Q1.1','Q1.2','Q1.3',.....'Q6.1',......]`
+- Pandas，`pd.read_excel()` 将会把第一列读为索引，好违和啊- -
+- Pandas，`df.dropna()` - 默认（"any"）将在某行存在空值时，就丢弃该行。`how="all"`，在某行全为空值才丢弃行
+- Pandas.DataFrame，`axis` 表示轴向，`0` - 行，`1` - 列。`level` 用于多层索引的层级
