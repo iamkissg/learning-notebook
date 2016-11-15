@@ -1204,4 +1204,12 @@ os.makedirs(path, exist_ok=True)
 # 13/12/2016 -> Dec. 13, 2016
 ```
 
+#### 2016-11-15
+
+- Python 监控文件更新
+    1. 查看文件修改时间 [stackoverflow 的回答](http://stackoverflow.com/questions/237079/how-to-get-file-creation-modification-date-times-in-python)
+        1. `os.path.getmtime(file)` (os.path.getctime(file) - 获得修改时间）
+        2. `os.stat(file)` - 返回 `(mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime)`
+    2. 计算文件的校验值 [stackoverflow 的回答](http://stackoverflow.com/questions/3431825/generating-an-md5-checksum-of-a-file/3431835#3431835)
+
 
