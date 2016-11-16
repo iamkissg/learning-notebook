@@ -1204,4 +1204,14 @@ os.makedirs(path, exist_ok=True)
 # 13/12/2016 -> Dec. 13, 2016
 ```
 
+#### 2016-11-15
 
+###### Python 虚拟环境
+
+- `virtualenv` - 用于创建隔绝的 Python 环境, 包括一个所有必要的可执行文件的目录
+- 创建虚拟环境: `virtualenv [options] dst_dir`
+- `-p PYTHON_EXE` - 指定 Python 解释器
+- `source bin/activate` - 激活虚拟环境
+- `deactivate` - 退出虚拟环境
+- `pip freeze > requirements.txt` - `pip` 的命令, 将所有安装的包导出到 `requirements.txt`
+- `pip install -r requirements.txt` - `-r` 选项, 指定从 `requirements.txt` 安装依赖包
