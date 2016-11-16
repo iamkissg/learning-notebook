@@ -1206,6 +1206,12 @@ os.makedirs(path, exist_ok=True)
 
 #### 2016-11-15
 
+- Python 监控文件更新
+    1. 查看文件修改时间 [stackoverflow 的回答](http://stackoverflow.com/questions/237079/how-to-get-file-creation-modification-date-times-in-python)
+        1. `os.path.getmtime(file)` (os.path.getctime(file) - 获得修改时间）
+        2. `os.stat(file)` - 返回 `(mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime)`
+    2. 计算文件的校验值 [stackoverflow 的回答](http://stackoverflow.com/questions/3431825/generating-an-md5-checksum-of-a-file/3431835#3431835)
+
 ###### Python 虚拟环境
 
 - `virtualenv` - 用于创建隔绝的 Python 环境, 包括一个所有必要的可执行文件的目录
@@ -1215,3 +1221,17 @@ os.makedirs(path, exist_ok=True)
 - `deactivate` - 退出虚拟环境
 - `pip freeze > requirements.txt` - `pip` 的命令, 将所有安装的包导出到 `requirements.txt`
 - `pip install -r requirements.txt` - `-r` 选项, 指定从 `requirements.txt` 安装依赖包
+
+#### 2016-11-16
+
+- Ubuntu, 启动系统设置: `unity-control-center`
+- Python, `python -m script` 可用于检查代码是否有语法错误
+- Linux，`nmcli` - Network Manager 命令行接口
+    - `nmcli dev wifi list` - 列举可用 wifi
+    - `nmcli dev wifi connect SSID password XXXX` - 连接到 wifi
+- Python，用 `os.path.join()` 函数来组装 path，字符串拼接容易出错
+- `fnmatch.filter(names, pattern)` - same as [n for n in names if fnmatch(n, pattern)], but more efficiently.
+- `os.path.normcase` - Normalize case of pathname.  Has no effect under Posix
+- `os.path.lexists(path)` - Test whether a path exists.  Returns True for broken symbolic links. l for link.
+- `os.path.exists(path)` - Test whether a path exists.  Returns False for broken symbolic links
+
