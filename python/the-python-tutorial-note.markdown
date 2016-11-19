@@ -175,7 +175,7 @@ non_null = string1 or string2 or string3
 
 - 序列的比较按下标, 按字典序比较. 不同类型的 `<`, `>` 比较是合法的, 会使用恰当的比较方法, 因此 `0` 与 `0.0` 是相等的
 
-## Modules
+## Chapter 6 Modules
 
 模块是包含 Python 定义和语句的文件. 在模块内部, 模块名可通过 `__name__` 全局变量获得.
 
@@ -203,7 +203,7 @@ non_null = string1 or string2 or string3
 
 Python 会检查源的修改日期, 以确认是否需要重新编译. 这是一个完全自动的过程.
 
-编译后的模块是平台独立的, 因此可以在不同架构下共享.
+`编译后的模块是平台独立的, 因此可以在不同架构下共享.
 
 两种情况下, Python 不会检查缓存:
 
@@ -226,9 +226,112 @@ Tips:
 
 ### dir()
 
-`dir()` 函数查看模块定义的 name, 返回 a sorted list of strings. 无餐调用时, 返回当前定义的 names (包括变量, 函数, 模块等等). 不会返回内建函数或变量名, 要查看这些 (Python 2 无):
+`dir()` 函数查看模块定义的 name, 返回 a sorted list of strings. 无参调用时, 返回当前定义的 names (包括变量, 函数, 模块等等). 不会返回内建函数或变量名, 要查看这些:
 
 ```python
-import builtins
-dir(builtins)
+dir(__builtin__)
 ```
+
+### 包
+
+- 包是结构化 Python 模块的命名空间的一种方式, 以 `点标记法` 表示. `A.B` 表示包 A 下名为 B 的模块.
+- `__init__.py` 是必需要的, 它让 Python 将目录当作包对待. 最简单的使用是空的 `__init__.py` 文件.
+- `from package import item`, item 可以是子模块/子包 或者包内定义的其他`名称`, 比如函数/类/变量
+- `import` 语句首先检测 `item` 在包内是否有定义; 如果没有, 则假设这是一个模块, 并尝试加载模块; 如果找不到, 抛出 `ImportError` 异常
+- `import item.subitem.subsubitem` 则除了最后的 `subsubitem`, 所有的其他 `item` 必须是包; 但是 `subsubitem` 可以是模块或包, 但不能是函数/类/变量
+- `from item import * ` 会在文件系统 (goes out to filesystem) 的包目录查找子模块, 并全部导入. 导入时间长, 且导入的子模块会产生副作用 (混淆命名空间).
+- 对于 `from item import * `, 包的作者应该构建明晰的索引. `import` 语句的机制: 如果包的 `__init__.py` 定义了 `__all__`, 则遇到 `from item import * ` 时, 将加载 `__all__` 所列的模块名; 否则如果没有 `__all__`, 则`from item import * ` 不会导入 item 下所有的子模块到当前命名空间, Python 解释器只会确保已经导入了 `item`, 然后导入 item 层面上所有的名称.
+- `from package import submodule` 是推荐做法
+
+#### 包内引用
+
+- 模块之间可能需要相互引用. 事实上, `import` 语句首先会查看上层的包, 其次才会查看要导入的模块. 因此, 包内模块间相互引用是很平常的. 如果当前子模块的上层包没有需要导入的模块, 则会再向上级包进行搜索, 最后到顶层包
+- 隐式或显式的相对导入, 都是基于当前模块名的. 主模块名总是 `__main__`
+
+## Chapter 7 Input and Out
+
+- 通过 `repr()` 或 `str()` 函数, 可以将任何值转化为 string: 前者生成解释器可读的内容, 后者生成人可读的. 
+- 字符串和浮点数, 实际上, 有两种不同的表示方式
+- `str.rjust()` - 右对齐. 类似的还有 `str.ljust()`, 和 `str.center()`
+- 对于数字字符串, `str.zfill()` 会在数字前补零, 会智能识别正负号
+- `"{0}".format("kissg")` - 花括号中的数字表示传入 `str.format()` 方法的对象的位置, 也可以不要; 如果 `str.format()` 使用了关键字参数, 则花括号内也可用参数名; 关键字参数和位置参数可以任意组合; `!s` 应用于 str() 或 repr(), 可以在格式化之前对值进行转换; 字段名之后可跟 `:` + 格式说明符 (specfier), 提供对格式化更多的控制;
+- 字典加 `str.format()`:
+
+```python
+
+>>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 8637678}
+>>> print ('Jack: {0[Jack]:d}; Sjoerd: {0[Sjoerd]:d}; '
+...        'Dcab: {0[Dcab]:d}'.format(table))
+Jack: 4098; Sjoerd: 4127; Dcab: 8637678
+
+>>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 8637678}
+>>> print 'Jack: {Jack:d}; Sjoerd: {Sjoerd:d}; Dcab: {Dcab:d}'.format(**table)
+```
+
+- 内建的 `vars()` 函数将以字典的形式泛湖所有的局部变量
+- 旧的格式化字符串方式: `%` 占位替换
+- `open()` 的 `r+` 模式, 可读可写
+- Windows 平台上, Python 对于文本和二进制文件做了区分; 文本文件, 行结束符会被自动转换, 这种对于文件数据的静默修改, 对文本文件是友好的, 对二进制文件会出错. 
+- Unix 平台上, 追加 `b` 是无害的
+- `f.readline()` - 会返回带换行符 (\n) 的字符串. 尾行没有换行符, 因此不带 `\n`.
+- 按行读取文件, 高效简单的方法:
+
+```python
+for line in f:
+    print line,
+```
+
+- `list(f)` or `f.readlines()` - 以 list 的形式返回所有的行. 后者应该说更 Pythonic 吧
+- `f.write(string)` - 对于非 str 的值, 需要转为 str 先
+- `f.tell()` - 返回表示文件对象当前位置的整数. (位置以字节计算, 参考位置是文件头); `f.seek(offset, from_what)` - 修改文件对象的位置, 在参考点 from_what 上加上 offset, from_what: {0: 文件头, 1: 当前位置, 2: 文件尾}, 缺省时为 0
+- `with` 语句和文件对性更搭哦. 任务完成或抛出异常时, 会恰当地关闭文件
+
+#### saving structured data with json
+
+- `f.read()` - only returns strings. 因此字符串-文件的读写很方便, 但数值型就需要多一点处理
+- 当需要保存更多复杂的数据类型, 比如嵌套的列表或字典时, 手动解析与序列化会使工作变得方便一点
+- 将层级数据转换成字符串的过程称为序列化 (serializing)
+- json 只能对列表和字典进行序列化, 各种语言通用; pickle 可以对任意类型的对象进行序列化, 但是只适用于 Python, pickle 默认是不安全的: 其反序列化的数据如果来自不可信的源, 可能会执行任意代码
+
+## Chapter 8 错误与异常
+
+- 运行时检测到的错误称为 `异常`: 可处理的, 不是致命的 (fatal).
+- 大多数异常, 程序是不会自动处理的, 会抛出错误消息
+- [Built-in Exceptions](https://docs.python.org/2/library/exceptions.html#bltin-exceptions)
+- `try ... except ...` 语句, 异常如果是 `except` 的, 执行其下的语句, 否则将抛至 `try` 语句之外, 若外围还是没有相应的 handler, 没有处理的异常会导致执行停止
+- `except ValueError, e:` 是 `except ValueError as e:` 的变形, 有别于 `except (valueError, TypeError):`
+- `except`可以省略异常名, 但是要千万小心. 这种方式很容易使造成真正的程序错误
+
+```python
+try:
+    pass
+except IOError as e:
+    pass
+except ValueError:
+    pass
+except:
+    raise
+```
+
+- `try ... except ... else ...`
+- 异常可能有相应的值, 称为异常参数. 是否有参数以及参数的类型根据异常类型有不同
+- 可以为异常指定变量, 这样变量将绑定到异常实例上, 保存在 `instance.args` 中. 异常实例定义了 `__str__()` 方法, 可以直接打印, 而不必使用 `.args` 引用:
+
+```python
+try:
+    raise Exception("spam", "eggs")
+except Exception as inst:
+    pritn inst
+    print inst.args
+```
+
+- 带参数的异常, 如果未处理, 参数将作为错误消息的最后一部分被打印
+- `raise` 的唯一参数是待抛出的异常, 可以是异常实例或异常类. 其实还可缺省, 这样捕获的异常将再次被抛出
+- 自定义异常类, 需要继承自 `Exception`, 直接或间接的.
+- 异常类通常保持简单, 只提供一些向 handler 提供信息的属性即可.
+- 当创建可以抛出多个不同异常的模块时, 常规的做法是创建一个异常的基类, 然后再根据不同的错误条件创建不同异常子类
+- 大多数异常都以 `Error` 结尾, 以保持与标准异常的一致
+- `finally` 的作用是作为 `clean-up` 行为, 其一定会被执行.
+- 未被捕获异常, 在 `finally` 语句块之后被抛出.
+- `finally` 语句块还被当作 `on the way out` 使用, 当 try 语句被 `break`, `continue`, `return` "耽误"的时候
+- 实际应用中, `finally` 语句块对于释放外部资源有用 (打开文件或网络连接).
