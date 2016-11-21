@@ -1235,3 +1235,7 @@ os.makedirs(path, exist_ok=True)
 - `os.path.lexists(path)` - Test whether a path exists.  Returns True for broken symbolic links. l for link.
 - `os.path.exists(path)` - Test whether a path exists.  Returns False for broken symbolic links
 
+#### 2016-11-21
+
+- `os.listdir` - `ls` in Python, 包括 `.*`, 但不包括 `..` 和 `.`
+
