@@ -1239,3 +1239,10 @@ os.makedirs(path, exist_ok=True)
 
 - `os.listdir` - `ls` in Python, 包括 `.*`, 但不包括 `..` 和 `.`
 
+#### 2016-11-22
+
+- Celery, `received unregistered task`, 一定是指派任务时有误。构造函数的 `include` 属性是模块的列表。
+- Celery，多任务，简单的做法就是 `include` 指定多个任务
+- Celerybeat，任务调度，可配置 `CELERYBEAT_SCHEDULE`
+- Python 之 JSON 格式化：`python -m josn.tool jsonfile` [stackoverflow](http://stackoverflow.com/questions/352098/how-can-i-pretty-print-json/1920585#1920585)
+- JSON, JSON 文本的 MIME 媒体类型是 `application/json`， 默认以 utf-8 编码。[stackoverflow](http://stackoverflow.com/questions/477816/what-is-the-correct-json-content-type/477819#477819), [MIME Types](https://github.com/h5bp/server-configs-nginx/blob/master/mime.types)
