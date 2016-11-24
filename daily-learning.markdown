@@ -1246,3 +1246,26 @@ os.makedirs(path, exist_ok=True)
 - Celerybeat，任务调度，可配置 `CELERYBEAT_SCHEDULE`
 - Python 之 JSON 格式化：`python -m josn.tool jsonfile` [stackoverflow](http://stackoverflow.com/questions/352098/how-can-i-pretty-print-json/1920585#1920585)
 - JSON, JSON 文本的 MIME 媒体类型是 `application/json`， 默认以 utf-8 编码。[stackoverflow](http://stackoverflow.com/questions/477816/what-is-the-correct-json-content-type/477819#477819), [MIME Types](https://github.com/h5bp/server-configs-nginx/blob/master/mime.types)
+
+#### 2016-11-24
+
+- vim - `%` 跳转到匹配的另一端， 比如括号， if 与 endif， /\* 与 \*/ 等
+- Python `from __future__ import absolute_import` - 自定义模块名与第三方或标准库同名时， 解决冲突.
+
+> Bla
+
+- Scala, List
+    - head, last - 返回头尾元素
+    - tail, init - 返回除头尾元素以外的元素的列表
+    - drop - 移除到 n 指定的索引
+    - ::: - 作为方法调用时, 将参数 List 加到调用者 List 之前:
+
+```scala
+scala> List(1) ::: List(2)
+res18: List[Int] = List(1, 2)
+
+scala> List(1).:::(List(2))
+res19: List[Int] = List(2, 1)
+```
+
+- vim, `highlight MatchParen xxx term=reverse cterm=bold ctermfg=13 gui=bold guifg=#b2b2a0 guibg=#2e2e2e` - 自定义匹配的风格
