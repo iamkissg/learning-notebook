@@ -1257,8 +1257,11 @@ os.makedirs(path, exist_ok=True)
 - Scala, List
     - head, last - 返回头尾元素
     - tail, init - 返回除头尾元素以外的元素的列表
-    - drop - 移除到 n 指定的索引
+    - drop (dropRight) - 移除到 n 指定的索引. Selects all elements except first n ones.
+    - dropWhile - 从 List 头开始, 删除满足条件的元素, 直到条件不成立
+    - :: - 将一个元素追加到 List 头
     - ::: - 作为方法调用时, 将参数 List 加到调用者 List 之前:
+    - span - 根据条件将 List 拆分成前后两部分. 等价于 (c takeWhile c, c dropWhile p), 但更高效
 
 ```scala
 scala> List(1) ::: List(2)
@@ -1269,3 +1272,6 @@ res19: List[Int] = List(2, 1)
 ```
 
 - vim, `highlight MatchParen xxx term=reverse cterm=bold ctermfg=13 gui=bold guifg=#b2b2a0 guibg=#2e2e2e` - 自定义匹配的风格
+
+#### 2016-11-25
+
