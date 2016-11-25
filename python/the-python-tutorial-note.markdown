@@ -430,3 +430,109 @@ except Exception as inst:
 - 名称转化机制大多数情况下被设计用于避免冲突. 有时也可以用于处理"私有"的问题
 - 传给 `exec`, `eval()`, `execfile` 的代码不会将调用类的类名作为当前类; 类似于 `global` 语句, 其效果限于一起被字节编码的代码.
 - 以上限制, 对于 `getattr()`, `setattr()`, `delattr()` 同样适用. 直接引用 `__dict__` 也一样.
+
+### Odds and Ends
+
+- 抽象数据类型 - 仿真, 类 XX 对象
+- `raise` 的 两种格式:
+    1. `raise Class, instance` - instance 必须是 Class 或其子类的实例
+    2. `raise instace` - raise instance.__class__, instance 的简写
+- 多 `except` 语句, 逐层向外抛, 逐层捕获
+- 错误消息的格式: `异常类名: str(异常实例)`
+
+### Iterators and generators
+
+- `for` 语句对容器对象调用 `iter()`, 并返回一个 `iterator obj`, 该对象定义了 `next()` 方法用于一次返回一个元素. 当容器没有元素时, `next()` 会抛出 `StopIteration` 异常 作为 `for` 循环的结束
+- 定义 `iterator`, 需要定义一个 `__iter__` 方法, 该方法利用 `next()` 返回一个对象.
+- 若类定义了 `next()`, 则 `__iter__()` 返回 `self` 即可.
+
+```python
+class Reverse:
+    """Iterator for looping over a sequence backwards."""
+    def __init__(self, data):
+        self.data = data
+        self.index = len(data)
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if self.index == 0:
+            raise StopIteration
+        self.index = self.index - 1
+        return self.data[self.index]
+```
+
+- `generator` 是 iterator 的优雅实现方式, 像写函数一样, 使用 `yield` 语句返回数据.
+- generator 自动实现了 `__iter__()` 和 `next()`, 并且会自动保存局部变量和执行状态, 并自动抛出 `StopIteration` 终止 generator.
+- 每次调用 `next()`, generator 从上一次暂停点恢复.
+- `generator exp` 相比完整的 generator 更紧凑, 但没那么通用; 与列表推导式相比, 内存的使用更合理
+
+## Chapter 10 Brief Tour of the Standard Library
+
+### 操作系统接口
+
+- `os` 模块提供了大量与操作系统交互的函数
+    - `os.getcwd()` - # Return the current working directory
+    - `os.chdir(path)`
+    - `os.system(cmd)` - Execute the command (a string) in a subshell
+- `dir`, `help()`
+- `shutil` - 提供了文件和目录管理的更高层接口. (Utility functions for copying and archiving files and directory trees)
+
+### 文件通配符
+
+- `glob` 提供了使用通配符从目录获取匹配的文件列表的函数
+
+### 命令行参数
+
+- 命令行的参数保存在 `sys` 模块的 `argv` 属性中, 以列表保存.
+- `getopt` 模块使用 Unix `getopt()` 的惯例处理 `sys.argv`.
+- `argparse` 模块提供了更强大灵活的命令行处理机制
+
+### 错误输出重定向与程序终止
+
+- `sys` 模块提供了 `stdin`, `stdout`, `stderr`.
+- `stderr` 对于发送警告饿错误消息有帮助, 即使 `stdout` 被重定向了.
+- 最直接终止脚本的方式: `sys.exit()`
+
+### 字符模式匹配
+
+- `re` 模块提供了正则表达式工具, 用于复杂的匹配或操作, 以及优化操作.
+- 简单的操作, 使用字符串方法即可
+
+### 数学
+
+- `math` 模块提供了对底层 C 库函数的访问, 以提供对浮点数学的支持
+- `random` 模块提供了随机选择的工具
+
+### 访问 Internet
+
+- `urllib2` 用于从 URLs 解析数据
+- `smtplib` 用于发送邮件
+
+### 日期与时间
+
+- `datetime` 模块同时提供了简单和复杂的用于日期和时间操作的类, 以及日期与时间的算术运算. 该模块的核心是输出格式化与操纵. 提供时区信息
+
+### 数据压缩
+
+- 相关的模块有 `zlib`, `gzip`, `bz2`, `zipfile`, `tarfile`
+
+### 性能检测
+
+- `timeit`
+- `profile`, `pstats` 模块提供了鉴别大型代码块关键部分的功能.
+
+### 质量控制
+
+- `doctest` 模块提供了扫描模块, 并验证程序的 docstrings
+- `unittest` 允许在分离的文件中写更多复杂的测试用例
+
+### 自带电池
+
+- `xmlrpclib` 和 `SimpleXMLRPCServer` 模块使远程进程调用变得简单. 无论模块名为何, 也不需要处理 XML 的知识
+- `email` 是管理 Email 消息的库, 提供了创建或解码复杂消息结构的完整工具集, 也可以用于协议头的编码
+- `stmplib` 和 `poplib` 收发邮件.
+- `xml.dom`, `xml.sax` 提供了对解析 xml 的支持.
+- `csv` 提供了对 csv 文件的直接读写
+- `gettext`, `locale`, `codecs` 提供了国际支持
