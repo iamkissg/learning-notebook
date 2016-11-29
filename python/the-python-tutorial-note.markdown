@@ -476,6 +476,7 @@ class Reverse:
     - `os.getcwd()` - # Return the current working directory
     - `os.chdir(path)`
     - `os.system(cmd)` - Execute the command (a string) in a subshell
+## Chapter 10 Brief Tour of the Standard Library
 - `dir`, `help()`
 - `shutil` - 提供了文件和目录管理的更高层接口. (Utility functions for copying and archiving files and directory trees)
 
@@ -536,3 +537,7 @@ class Reverse:
 - `xml.dom`, `xml.sax` 提供了对解析 xml 的支持.
 - `csv` 提供了对 csv 文件的直接读写
 - `gettext`, `locale`, `codecs` 提供了国际支持
+
+## Chapter 11 Brief Tour of the Standard Library 2
+
+
