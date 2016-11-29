@@ -1,0 +1,2 @@
+- Akka is an actor-based message-driven runtime for managing concurrency (同步), elasticity (弹性) and resilience (恢复力, 弹力) on the JVM with support for both Java and Scala.
+- Akka 中, 服务之间的通信使用消息原语 (primitive) 来优化 CPU 的利用 (utilization), 低延迟 (low latency), 高吞吐量 (high throughput), 可伸缩性 (scalability).
