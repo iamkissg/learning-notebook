@@ -540,4 +540,83 @@ class Reverse:
 
 ## Chapter 11 Brief Tour of the Standard Library 2
 
+### 输出格式化
 
+- `repr` 模块提供了另一个版本的 `repr()`, 用于自定义展示大型或深度嵌套的容器
+- `pprint` 模块提供了更精致的打印控制
+- `textwrap` 模块对于给定的屏幕宽度, 格式化段落
+- `locale` 模块以特定的数据格式访问数据库
+
+### 模板
+
+- `string` 模块包含了一个通用 `Template` 类, 允许用户自定义应用. 使用 `$` 作为占位符, 调用 `substitute` 进行替换, 该方法在数目不匹配等情况下会抛出 `KeyError` 异常, 更安全的写法是 `safe_substitute()`, 在填充不足时, 原样输出.
+- 模板的一个用途是, 批量处理
+
+### 二进制数据记录展示
+
+- `struct` 模块提供了 `pack()` 和 `unpack()` 函数用于可变长度二进制记录的格式化.
+- 压缩时, `H`, `I` 分别表示 2 个, 4 个字节无符号数.
+- `<` 表示标准尺寸, 字符编码顺序是小端
+
+### 多线程
+
+- 多线程是将顺序无关的多个任务解耦的技术.
+- 多线程可以提高应用的响应速度. 一个用例是, 当一个线程在做计算时, 进行 IO
+- `threading` 模块提供了高级的多线程操作
+- 多线程应用的主要挑战是`合作进程间的数据或其他资源共享`. `threading` 模块提供了一些同步原子操作, 包括锁, 事件, 条件变量, 信号量
+- 尽管多线程工具很强大, 但极小的设计错误都会导致巨大的问题. 因此, 一个更好的方式可能是`合作的任务集中在一个线程对资源进行访问, 使用 Queue 模块来发送消息请求资源的访问`
+- 使用 `Queue.Queue` 对象作为进程间通信与合作的应用易于设计, 且具有更好的可读性可靠性
+
+### 日志
+
+- `logging` 模块提供了全功能灵活的日志系统.
+- info 和 debug 消息默认是禁用的, 并且其输出是到标准错误. 其他的输出还包括通过 email, 数据报, sockets, 或 HTTP 服务器的路由消息.
+- 日志系统可直接通过代码进行配置, 也可以加载配置文件
+
+### 弱引用
+
+- Python 自动管理内存: 对对象最后的引用被移除之后, 对象从内存中被删除, 释放内存
+- 有时候可能有主要的需求: 跟踪对象, 只要它们被使用了. 但是跟踪对象需要创建一条引用, 从而使得对象一直存在. `weakref` 模块提供了跟踪对象但不创建引用的方法: 当对象不再被需要的时候, 将自动从 weakref table 中删除, 并由 weakref 对象触发一个回调. 典型的应用包括缓存创建消耗大的对象:
+
+```python
+
+>>>
+>>> import weakref, gc
+>>> class A:
+...     def __init__(self, value):
+...         self.value = value
+...     def __repr__(self):
+...         return str(self.value)
+...
+>>> a = A(10)                   # create a reference
+>>> d = weakref.WeakValueDictionary()
+>>> d['primary'] = a            # does not create a reference
+>>> d['primary']                # fetch the object if it is still alive
+10
+>>> del a                       # remove the one reference
+>>> gc.collect()                # run garbage collection right away
+0
+>>> d['primary']                # entry was automatically removed
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+    d['primary']                # entry was automatically removed
+  File "C:/python26/lib/weakref.py", line 46, in __getitem__
+    o = self.data[key]()
+KeyError: 'primary'
+```
+
+### 与 List 配合的工具
+
+- `array` 模块提供 `array()` 对象, 类似于 list, 只存储同治数据, 更紧凑
+- `collections` 模块提供了 `deque()` 对象, 也类似于 list, 但从左侧 append 或 end 更高效, 但是对于中间的查找更慢. 该对象适合用于实现队列, 以及广度优先搜索树
+- `bisect` 模块提供了对有序 list 更好的操作
+- `heapq` 模块提供了用于实现基于常规 list 的堆的函数: 最小的值总是被存放在位置 0. 这对于需要重复访问最小的元素, 但是又不必对整个 list 进行排序的应用很有帮助
+
+### 十进制浮点算术
+
+- `demical` 模块提供了 `Decimal` 数据类型, 与内建的 `float` (二进制浮点)相比的优点是:
+    - 金融应用与其他需要更精确十进制表示的应用
+    - 精度控制
+    - 舍入控制, 以满足法律法规要求
+    - 跟踪重要的小数位
+    - 手动匹配结果
