@@ -1273,5 +1273,16 @@ res19: List[Int] = List(2, 1)
 
 - vim, `highlight MatchParen xxx term=reverse cterm=bold ctermfg=13 gui=bold guifg=#b2b2a0 guibg=#2e2e2e` - 自定义匹配的风格
 
-#### 2016-11-25
+#### 2016-11-30
+
+- Scala for statement
+    - `for (i <- collections) func` (用 `;` 分隔, 对多个集合进行多重循环遍历, n\*m\*..)
+    - 带守卫的语法 `for (i <- collections conditions)`
+    - `for yield`
+- Scala - `yield` 是推导式的一部分. Scala 的 `for 推导式` 是组合了 `foreach`, `map`, `flatMap`, `filter` 或 `withFilter` 的语法糖, 实际上 `for 表达式` 会转译成依次调用以上方法.
+    - `for(x <- c1; y <- c2; z <-c3) {...}` -> `c1.foreach(x => c2.foreach(y => c3.foreach(z => {...})))`
+    - `for(x <- c1; y <- c2; z <- c3) yield {...}` -> `c1.flatMap(x => c2.flatMap(y => c3.map(z => {...})))`
+    - `for(x <- c; if cond) yield {...}` -> `c.withFilter(x => cond).map(x => {...})`
+    - `for (i <- n to m)` - [n, m]
+    -  `for (i <- n util m)` - [n, m)
 
