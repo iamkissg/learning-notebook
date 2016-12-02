@@ -50,8 +50,6 @@ def capitalizeAll(args: String*) = {
 
 - 构造函数不是特殊的方法，是除了类的方法定义之外的代码
 - Scala 是高度面向表达式的：大多数都是表达式而非指令。
-- [函数 vs. 方法](difference scala function method)
-- [A Tour of Scala](http://www.scala-lang.org/old/node/125)
 - 如果子类和父类实际上没有区别，类型别名应优先于继承
 
 #### 继承
@@ -74,7 +72,7 @@ def capitalizeAll(args: String*) = {
 - 使用泛型键值的缓存
 
 ```scala
-tarit Cache[K, V]{
+trait Cache[K, V]{
     def get(key: K): V
     def put(key: K, value: V)
     def delete(key: K)
@@ -114,7 +112,7 @@ object addOne extends Function1[Int, Int]{
 - apply 语法糖有助于统一对象和函数式编程的二重性。可以传递类，并当作函数使用。
 - 函数本质上是类的实例
 - 在类中定义的方法是方法而不是函数。
-- 在 repl 中独立定义的方法是 Function* 的实例
+- 在 repl 中独立定义的方法是 Function\* 的实例
 - 类可以扩展 Function，这样类的实例可以使用 () 调用 `class AddOne extends Function1[Int, Int]`，更快捷的方式：`class AddOne extends (Int => Int)`
 
 #### 包
@@ -225,7 +223,7 @@ def g(s: String) = "g(" + s + ")"
 val fComposes = f _ compose g _  // 将得到 f(g(x))
 ```
 
-- `andThen` - 先调用第一个函数，再调用第二个函数。`val fAndThenG = f _ andThen g _` 将得到 `g(y(x))`
+- `andThen` - 先调用第一个函数，再调用第二个函数。`val fAndThenG = f _ andThen g _` 将得到 `g(f(x))`
 
 #### 柯里化 vs 偏应用
 
@@ -301,3 +299,31 @@ res1: Boolean = false
 - 有时候并不关心是否能够命名一个类型变量: `def count[A](l: List[A]) = l.size`
 - 但使用通配符量化可能会使结果难以理解: `def drop1(l: List[_]) = l.tail`
 - 但可以为通配符变量应用边界: `def hashcodes(l: Seq[_ <: AnyRef]) = l map (_.hashCode)`
+
+### 视界 ("类型类")
+
+- 一个视界指定一个类型可以被“看作是”另一个类型。这对对象的只读操作是很有用的。
+- 视界，就像类型边界，要求对给定的类型存在这样一个函数, 可以使用 `<%` 指定类型限制
+- `class Container[A <% Int] { def addIt(x: A) = 123 + x  }` - 表示 A 必须"可被视"为 Int, 即可以不是 Int, 但可以隐式转换为 Int 使用
+
+### 其他类型限制
+
+- Scala 的 math 库对适当类型 T 定义了一个隐含的 `Numeric[T]`, 可以像这样使用: `sum[B >: A](implicit num: Numeric[B]): B`
+- 在没有设定陌生的对象为 Numeric 的时候, 方法可能会要求某种特定类型的"证据", 有下列类型-关系运算符:
+    - `A=:=B` - A 必须和 B 相等
+    - A <:< B - A 必须是 B 的子类
+    - A <%< B - A 必须可以被看做是 B
+
+- Scala 标准库中，视图主要用于实现集合的通用函数, 例如 min 函数的实现:
+
+```scala
+def min[B >: A](implicit cmp: Ordering[B]): A = {
+  if (isEmpty)
+    throw new UnsupportedOperationException("empty.min")
+
+  reduceLeft((x, y) => if (cmp.lteq(x, y)) x else y)
+
+}
+```
+
+- 上述方法的优点是: 集合中的元素并不必须实现 Ordered 特质, 但 Ordered 的使用仍然可以执行静态类型检查。

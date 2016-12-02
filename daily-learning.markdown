@@ -1284,5 +1284,21 @@ res19: List[Int] = List(2, 1)
     - `for(x <- c1; y <- c2; z <- c3) yield {...}` -> `c1.flatMap(x => c2.flatMap(y => c3.map(z => {...})))`
     - `for(x <- c; if cond) yield {...}` -> `c.withFilter(x => cond).map(x => {...})`
     - `for (i <- n to m)` - [n, m]
-    -  `for (i <- n util m)` - [n, m)
 
+#### 2016-12-01
+
+> F5 or Control + R = Reload the current page
+Control + Shift + R or Control + F5 or Shift + F5 = Reload your current page, ignoring cached content
+
+#### 2016-12-02
+
+- `Reverse Proxy` - 反向代理, 是一种代理服务器, 根据客户端的请求, 从后端的服务器上获取资源, 再返回给客户端. 前向代理作为一个媒介将资源返回给相关联的客户端, 而反向代理是在服务器端作为代理使用. Web 服务器通常都会使用反向代理, acting as shields (防护) for application frameworks with weaker HTTP capabilities.
+- In the broadest sense a gateway is a filter somewhere in your web stack which filters your API traffic in someway.
+- Implement an API gateway that is the single entry point for all clients. The API gateway handles requests in one of two ways. Some requests are simply proxied/routed to the appropriate service. It handles other requests by fanning out to multiple services.
+- Typically the types of functions the gateway may provide may include:
+    - `access control` (filtering traffic so only authenticated/authorized traffic gets through)
+    - `rate limiting` (restricting how much traffic can be sent by each client of the API)
+    - `analytics/metrics capture and logging` (tracking what's going on on the API)
+    - `security filtering` (checking the content on incoming messages for attacks)
+    - `redirection/traffic routing` (sending traffic to different endpoints in your own infrastructure depending on the sender or the request)
+- An event-driven/reactive approach is best if it must scale to scale to handle high loads. On the JVM, NIO-based libraries such as Netty, Spring Reactor, etc. make sense.

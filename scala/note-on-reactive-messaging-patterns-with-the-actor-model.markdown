@@ -123,3 +123,86 @@ case calculateRisk: CalculateRisk =>
 - ActorSystem 可以跨节点. 不必为每个节点上的 ActorSystem 取不同的名字, 因此 actor 的`ActorPath` 包括了主机名和 ActorSystem 名
 - 综上, actor 在位置上是透明的, 就好象所有 actor 都位于一个超大的 JVM 上一样.
 - JVM 不一定跑在不同物理机上, 其实也可以跑在一台物理机上分离的虚拟服务器上
+- 使用网络通信的好处是, 可以跨多个服务器节点. 但也引入了网络的问题: 带宽, 延迟等
+- actor 之间发送的消息本身必须经过序列化
+- Akka 默认使用 Java 的序列化机制, 但是性能和 size 都不佳. 可通过配置文件指定序列化工具 (推荐 Protocol Buffers 或 Kryo Serialization), 并取消 Java 自带的. 配置如下:
+
+```
+# application.conf for ActorSystem: RiskRover
+akka {
+      actor {
+            serializers {
+      proto = "akka.remote.serialization.ProtobufSerializer"
+      kryo = "com.romix.akka.serialization.kryo.KryoSerializer"
+      ...
+    
+        }
+            serialization-bindings {
+      "java.io.Serializable" = none
+      ...
+    
+        }
+            kryo {
+      type = "graph"
+      idstrategy = "incremental"
+      serializer-pool-size = 16
+      buffer-size = 4096
+      max-buffer-size = -1
+      ...
+    
+        }
+  
+    }
+}
+```
+
+- 要在单台 JVM 上对 ActorSystem 实现 Akka 远程, 最小配置如下:
+
+```
+# application.conf for ActorSystem: RiskRover
+akka {
+  ...
+      actor {
+    # default is: "akka.actor.LocalActorRefProvider"
+
+    provider = "akka.remote.RemoteActorRefProvider"
+    ...
+    }
+
+  remote {
+    # actors at: akka.tcp://RiskRover@hounddog:2552/user
+
+    enabled-transports = ["akka.remote.netty.tcp"]
+    netty.tcp {
+      hostname = "hounddog"
+      port = 2552
+    
+    }
+  }
+}
+```
+
+- Akka 默认使用 `LocalActorRefProvider`, 但要在不同 JVM 上引用 actor, 需要使用 `RemoteActorRefProvider`.
+- 远程创建: 本地 actor 可以创建远程子 actor, 这是一直减负的方式
+- 远程查询: 本地 actor 可以查询远程 actor, 即使不是远程 actor 的 owner 或 supervisor. 类似于 c-s 模式, 但不同是可以相互通信
+- 使用配置文件是 cleanest 和最抽象的创建远程 actor 的方式. 以下, deploymnt 表达式的意思是: 如果创建了 actor, 并命名为 `riskManager1`, 那么将其创建到 RiskyBussiness@bassethound:2552 的系统上.
+
+```
+# application.conf for ActorSystem: RiskRover
+akka {
+  ...
+  actor {
+    provider = "akka.remote.RemoteActorRefProvider"
+    ...
+    deployment {
+          /riskManager1 {
+        remote = "akka.tcp://RiskyBusiness@bassethound:2552"
+      }
+    }
+  }
+}
+```
+
+- `RemoteRefProvider` 告知 `RiskyBusiness` 系统创建一个 actor 在远程系统上. 创建完成后, 远程 actor 部署在特殊的以 `/remote` 开头的路径上, 与 `/user` 同级
+- 为使远程工作正常, 远程子 actor 的类型在两个系统上都必须可用. 并且, 消息必须是可压缩的
+- 尽管成功创建了 actor, 也发送了消息, 但部分远程通信还是会丢失. 因此需要收到消息的 actor 能够回应, 普通以 `ActorRef` 命名发送 actor, 远程时用 `RemoteActorRef`. 
