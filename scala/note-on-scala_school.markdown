@@ -327,3 +327,193 @@ def min[B >: A](implicit cmp: Ordering[B]): A = {
 ```
 
 - 上述方法的优点是: 集合中的元素并不必须实现 Ordered 特质, 但 Ordered 的使用仍然可以执行静态类型检查。
+
+### More collections
+
+- `JavaConverters` 包在 Java 和 Scala 集合类型之间进行转换
+- Scala 鼓励不变性, 但不惩罚可变性.
+
+### Concurrency in Scala
+
+- `Runnable` 接口只有一个没有返回值的方法
+- `Callable` 与之类似，除了它有一个返回值
+- Scala 并发是建立在 Java 并发模型基础上的,在 Sun JVM 上，对 IO 密集的任务，可以在一台机器运行成千上万个线程
+- 一个线程需要一个 `Runnable`, 必须调用线程的 `start` 方法来运行 `Runnable`
+
+```scala
+val hello = new Thread(new Runnable {
+    def run(){
+        println("Hello world.")
+    }
+})
+
+hello.start
+
+// another demo
+class Handler(socket: Socket) extends Runnable{
+    ...
+
+    def run() { ...  }
+}
+```
+
+- 通过 `Executors` 对象的静态方法得到一个 `ExecutorService` 对象, 如线程池
+    - `val pool: ExecutorService = Executors.newFixedThreadPool(poolSize)`
+- `Future` 代表异步计算, 将计算包装在 `Future` 中, 当需要结果时, 调用一个阻塞的 `get()` 方法获得.
+- 一个 `Executor` 返回一个 `Future`. 一个 `FutureTask` 是一个 Runnable 实现, 被设计为 `Executor` 运行
+
+```scala
+val future = new FutureTask[String](new Callable[String](){
+  def call(): String = {
+    searcher.search(target)
+  }
+})
+executor.execute(future)
+
+val blockingResult = Await.result(future)
+```
+
+- 线程安全
+    - 同步 - 互斥锁 (mutex) 提供所有权语义. 同步是 JVM 中使用互斥锁最常见的方式. 在 JVM 中, 可以同步任何不为 null 的实例
+    - volatile - 与同步基本相同, 但允许空值. `synchronized` 允许更细粒度的锁, `volatile` 对每次访问同步
+    - AtomicReference - 低级别的并发原语.
+
+```scala
+// synchronized
+class Person(var name: String) {
+    def set(changedName: String) {
+        this.synchronized {
+      name = changedName
+        }
+    }
+}
+
+// volatile
+class Person(@volatile var name: String) {
+    def set(changedName: String) {
+    name = changedName
+    }
+}
+
+// AtomicReference
+import java.util.concurrent.atomic.AtomicReference
+
+class Person(val name: AtomicReference[String]) {
+    def set(changedName: String) {
+    name.set(changedName)
+    }
+}
+```
+
+- AtomicReference 是最昂贵的, 因为必须去通过方法调度 (method dispatch) 来访问值。
+- volatile 和 synchronized 是建立在 Java 的内置监视器基础上的。如果没有资源争用，监视器的成本很小。由于 synchronized 允许进行更细粒度的控制权，从而会有更少的争夺，所以 synchronized 往往是最好的选择。
+- 当进入同步点，访问 volatile 引用，或去掉 AtomicReferences 引用时，Java 会强制处理器刷新其缓存线从而提供了一致的数据视图。
+- `CountDownLatch` 是一个简单的多线程互相通信的机制。这是一个优秀的单元测试。比方说，你正在做一些异步工作，并要确保功能完成。函数只需要 `倒数计数（countDown）` 并在测试中 `等待（await）` 就可以了。
+- AtomicInter 和 AtomicLong
+- `ReadWriteLocks` - 读写锁, 拥有读线程和写线程的锁控制. 当写线程获取锁的时候读线程只能等待
+- 粒度控制 - 一定要试图在互斥锁以外做尽可能多的耗时的工作。如果不存在资源争夺，锁开销就会很小。如果在锁代码块里面做的工作越少，争夺就会越少。
+- 这都行! `def this() = this(new mutable.HashMap[String, User] with SynchronizedMap[String, User])`
+- SynchronizedMap
+- Java 的 ConcurrentHashMap, 线程安全, 通过 `JavaConverters` 获得其 Scala 语义
+- 异步计算的一个常见模式是将消费者和生产者分离, 让它们只能通过 `Queue` 沟通
+- 并发实例:
+
+```scala
+import java.util.concurrent.{BlockingQueue, LinkedBlockingQueue}
+
+// Concrete producer
+class Producer[T](path: String, queue: BlockingQueue[T]) extends Runnable {
+  def run() {
+    Source.fromFile(path, "utf-8").getLines.foreach { line =>
+      queue.put(line)
+    }
+  }
+}
+
+// Abstract consumer
+abstract class Consumer[T](queue: BlockingQueue[T]) extends Runnable {
+  def run() {
+    while (true) {
+      val item = queue.take()
+      consume(item)
+    }
+  }
+
+  def consume(x: T)
+}
+
+val queue = new LinkedBlockingQueue[String]()
+
+// One thread for the producer
+val producer = new Producer[String]("users.txt", q)
+new Thread(producer).start()
+
+trait UserMaker {
+  def makeUser(line: String) = line.split(",") match {
+    case Array(name, userid) => User(name, userid.trim().toInt)
+  }
+}
+
+class IndexerConsumer(index: InvertedIndex, queue: BlockingQueue[String]) extends Consumer[String](queue) with UserMaker {
+  def consume(t: String) = index.add(makeUser(t))
+}
+
+// Let's pretend we have 8 cores on this machine.
+val cores = 8
+val pool = Executors.newFixedThreadPool(cores)
+
+// Submit one consumer per core.
+for (i <- i to cores) {
+  pool.submit(new IndexerConsumer[String](index, q))
+}
+```
+
+- 在实际代码中使用 `Future` 时，你通常不会调用 `get`，而是使用回调函数。`get` 仅仅是方便在REPL修修补补
+- 如果定义一个异步 API，传入一个请求值，API 应该返回一个包装在 `Future` 中的响应。
+- 有一个 Future 并且想在异步 API 使用其值, 使用 flatMap: 接受一个Future和一个异步函数，并返回另一个Future. 给定一个 `Future` 成功的值，函数 f 提供下一个 Future. 当输入的 Future 成功完成，flatMap 自动调用f。只有当这两个 Future 都已完成，此操作所代表的 Future 才算完成。
+- 如果要在 `Future` 中应用一个同步函数，可以使用 map:
+
+```scala
+class RawCredentials(u: String, pw: String){
+  val username = u
+  val password = pw
+}
+
+class Credentials(u: String, pw: String){
+  val username = u
+  val password = pw
+}
+
+def normalize(raw: RawCredentials) = {
+  new Credentials(raw.username.toLowerCase(), raw.password)
+}
+
+val praw = new Promise[RawCredentials]
+val fcred = praw map normalize // apply normalize to future
+Await.result(fcred)  // 有问题
+praw.setValue(new RawCredentials("Florence", "nightingale"))
+Await.result(fcred).username
+```
+
+- Scala 可以用 for 表达式快捷地调用 flatMap
+- Future 提供了一些`并发组合子`。一般来说，他们都是将 Future 的一个序列转换成包含一个序列的 Future，只是方式略微不同。这是很好的，因为它（本质上）可以把几个 Future 封装成一个单一的 Future。
+    - `collect` - 参数是具有相同类型 Future 的一个集合, 返回一个 Future, 其类型是包含类型值的一个序列. 当所有的 Future 都成功完成或者当中任何一个失败，都会使这个 Future 完成。返回序列的顺序和传入序列的顺序相对应。
+
+```scala
+val f2 = Future.value(2)
+val f3 = Future.value(3)
+val f23 = Future.collect(Seq(f2, f3))
+val f5 = f23 map (_.sum)
+Await.result(f5)
+// 5
+```
+
+    - `join` - 参数是混合类型的 Future 序列, 返回一个 Future[Unit]. 当所有的相关Future完成时（无论他们是否失败）该Future完成。其作用是标识一组异构操作完成
+
+```scala
+val ready = Future.join(Seq(f2, f3))  // Future[Unit]
+Await.result(ready)  // doesn't ret value, but futures are done
+```
+
+    - `select` - 当传入的 Future 序列的第一个 Future 完成的时候，select 会返回一个 Future. 然后将完成的 Future 和其他未完成的 Future 一起放在 Seq 中返回 (不会做任何事情来取消剩余的 Future.)
+

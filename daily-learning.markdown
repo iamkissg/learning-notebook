@@ -1302,3 +1302,11 @@ Control + Shift + R or Control + F5 or Shift + F5 = Reload your current page, ig
     - `security filtering` (checking the content on incoming messages for attacks)
     - `redirection/traffic routing` (sending traffic to different endpoints in your own infrastructure depending on the sender or the request)
 - An event-driven/reactive approach is best if it must scale to scale to handle high loads. On the JVM, NIO-based libraries such as Netty, Spring Reactor, etc. make sense.
+
+#### 2016-12-05
+
+- Scala, `->`, 不是特殊语法, 返回元组的方法. `"a" -> 2` 只是 `"a".->(2)` 的语法糖
+- Actor is a synchronous object which processes all received messages successively. The multithreading model come out from the concept that everything that is outside an Actor is asynchronous and processed in different threads. It is much better to use an Actor as an object with a state, since there is no concurrency within an Actor. All communication with an Actor must be done by sending messages to it.
+- If there is no state in an `Actor`, then it is much better to use a simple `Future` or something related which is focused on a stateless behavior.
+- A web crawler is usually a part of a web search engine.
+- Scala, 格式化字符串, `s"$name balabala"`
