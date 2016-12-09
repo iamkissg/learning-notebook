@@ -1341,3 +1341,11 @@ control + shift + r or control + f5 or shift + f5 = reload your current page, ig
     - passwd kissg
     - yum install sudo && visudo
 - 反向路由, 重定向会反映在 URL 上.
+
+#### 2016-12-08
+
+- Scala - 不同范畴的容器总是不相等的; 在同一范畴下的容器是相等的，当且仅当它们具有相同的元素 (对于序列, 元素和顺序都要相同)
+
+#### 2016-12-09
+
+- NoSQL means different things in different contexts, and interestingly it's not really about SQL.
