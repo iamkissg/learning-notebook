@@ -1334,7 +1334,46 @@ control + shift + r or control + f5 or shift + f5 = reload your current page, ig
 - Microservice - It's usually responsible for processing only one type of data. They rarely use high level of abstraction over databases, networking, and other components. It all makes them easier to understand and easier to reuse in multiple projects.
 - Akka - One of the great features of akka-http is response marshalling.
 
+#### 2016-12-07
+
+- CentOS, 添加用户, 并加入 sudo group:
+    - useradd kissg
+    - passwd kissg
+    - yum install sudo && visudo
+- 反向路由, 重定向会反映在 URL 上.
+
+#### 2016-12-08
+
+- Scala - 不同范畴的容器总是不相等的; 在同一范畴下的容器是相等的，当且仅当它们具有相同的元素 (对于序列, 元素和顺序都要相同)
+
+#### 2016-12-09
+
+- NoSQL means different things in different contexts, and interestingly it's not really about SQL.
+
+#### 2016-12-15
+
+- `git mv` - Move or rename a file, a directory, or a symlink
+- `git log --graph` - 可查看分支情况
+- 偏应用函数与默认值的不能共存 - When you use partial application to generate a function, you lose the ability to call the default. A method is a static thing, so the compiler knows where to look up the default value; a function can be passed around into different contexts, so the compiler will not in general have the information it needs to be able to apply the default parameter.
+
+##### [Scala apply 解读](http://stackoverflow.com/questions/9737352/what-is-the-apply-function-in-scala/9738862#9738862)
+
+> 程序员说: 调用 f 函数, 传入 x 作为参数.
+数学家说: 将函数 f 应用于 x.
+`apply` 是 Scala 融合 OO 特性和函数式编程特性的手段.
+函数是对象, a function that takes an Int parameter and returns an Int will have OO type of `Function1[Int,Int]`.
+every object can be treated as a function, provided it has the apply method
+将对象视为函数有许多用例, 最常见的就是工厂模式.
+
+#### 2016-12-16
+
+- Slick, A Database object usually manages a thread pool and a connection pool. You should always shut it down properly when it is no longer needed (unless the JVM process terminates anyway).
+- Sick, use of `===` instead of `==` for comparing two values for equality and `=!=` instead of `!=` for inequality.
+- Scala, 常量存到 `object` 中.
+- Slick, Note that map and all other combinators which run user code (e.g. flatMap, cleanup, filter) take an implicit `ExecutionContext` on which to run this code. Slick uses its own ExecutionContext internally for running blocking database I/O but it always maintains a clean separation and prevents you from running non-I/O code on it.
+
 #### 2016-12-18
 
 - EPEL - Extra Packages for Enterprise Linux
 - `useradd kissg` - Linux 添加新用户; `usermode -a -G sudo kissg` - 将用户添加到对应的用户组;
+
