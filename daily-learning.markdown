@@ -1333,3 +1333,8 @@ control + shift + r or control + f5 or shift + f5 = reload your current page, ig
 - DSL - Domain-specific language, in contrast to a general-purpose language (GPL)
 - Microservice - It's usually responsible for processing only one type of data. They rarely use high level of abstraction over databases, networking, and other components. It all makes them easier to understand and easier to reuse in multiple projects.
 - Akka - One of the great features of akka-http is response marshalling.
+
+#### 2016-12-18
+
+- EPEL - Extra Packages for Enterprise Linux
+- `useradd kissg` - Linux 添加新用户; `usermode -a -G sudo kissg` - 将用户添加到对应的用户组;
