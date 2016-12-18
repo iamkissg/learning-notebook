@@ -1377,3 +1377,52 @@ every object can be treated as a function, provided it has the apply method
 - EPEL - Extra Packages for Enterprise Linux
 - `useradd kissg` - Linux 添加新用户; `usermode -a -G sudo kissg` - 将用户添加到对应的用户组;
 
+###### Google 搜索技巧 (感谢[小土刀](http://wdxtub.com/2016/03/26/google-tip/))
+
+- `+` - 强制搜索, Google 会忽略和过滤一些词
+- `-` - 减去, 与关键词搭配时, 中间无空格
+- `~` - 同义词
+- `*` - 通配符
+- `**`, `^` - 指数, 感觉没什么卵用
+- `" "` - 不拆分
+- `|`, `OR` - 或
+- `..` 数字范围, `1994..2016`
+- `define:` - 查找解释
+- `ext:`, `filetype:` - 文件类型. 目前限定于:
+    - Adobe Acrobat PDF (.pdf)
+    - Adobe Postscript (.ps)
+    - Autodesk DWF (.dwf)
+    - Google地球 KML (.kml)
+    - Google地球 KMZ (.kmz)
+    - Lotus 1-2-3（wk1、wk2、wk3、wk4、wk5、wki、wks、wku）
+    - Lotus WordPro (.lwp)
+    - MacWrite (.mw)
+    - Microsoft Excel (.xls)
+    - Microsoft Powerpoint (.ppt)
+    - Microsoft Word (.doc)
+    - Microsoft Works（wks、wps、wdb）
+    - Microsoft Write (.wri)
+    - Rich Text Format富文本格式 (.rtf)
+    - Shockwave Flash (.swf)
+    - 纯文本（ans、txt）
+- `intitle:` - 限定网页标题包含关键字 (多个关键字: `allintitle`)
+- `inurl:` - 限定 URL 包含关键字 (`allinurl`)
+- `inanchor:` - 限定搜索页面链接锚包含关键字 (`allinanchor`)
+- `intext:` - 限定搜索正文文本包含关键字
+- `site:` - 指定网页内搜索
+- `link:` - 搜索链接向某网站的页面
+- `related:` - 搜索类似网页
+- `cache:` - 搜索某网页在 Google 缓存中的版本
+- `info:` - 综合查询某网页的信息. 显示上述四个命令
+- `图片搜索`
+    - 文件类型支持: `jpg`, `gif`, `png`, `bmp`
+    - `imagesize:` - 限定搜索尺寸
+    - URL 参数:
+        - `&imgtype=news` - 资讯
+        - `&imgtype=face` - 脸部特写
+        - `&imgtype=clipart` - 剪贴画
+        - `&imgtype=lineart` - 素描
+        - `&imgtype=photo` - 照片
+        - `&imgc=gray` - 黑白照片
+        - `&imgc=mono` - 灰阶照片
+        - `&imgc=color` - 全彩照片
