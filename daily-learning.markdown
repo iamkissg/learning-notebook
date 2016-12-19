@@ -1426,3 +1426,21 @@ every object can be treated as a function, provided it has the apply method
         - `&imgc=gray` - 黑白照片
         - `&imgc=mono` - 灰阶照片
         - `&imgc=color` - 全彩照片
+
+#### 2016-12-19
+
+- Scalatra, `ScalatraBootstrap.scala` is the Scalatra bootstrap config file, and it's where you should do most of your app configuration work. (`配置`) `ScalatraBootstrap` the class which gets executed when the web application is started
+- Integrating a persistence library, 持久化集成基本套路:
+    - Start a connection pool at application start
+        - (Scala)
+            - make `PersistenceInit` trait
+            - run init code when app starts up: add `PersistenceInit` trait to `ScalatraBootStrap` and call initialization code in `init` method.
+    - Clean up the connection pool when your application stops
+    - Provide a way for your controllers to access the connection pool
+        - (Scala)
+            - details are specific to each libraries.
+            - make a `PersistenceSupport` trait which can be mixed into controllers, the trait provides a handle to connection for datastore.
+            - a common pattern - open a database connection on each request, close it after the request finishes.
+    - Write your application!
+- Unix, get timestamp: `date +%s` or `date -d "datetime" +%s`
+- Unix, md5 hash of a string in shell - `echo -n "seKUMdXuytClsQWYG1tcQa1x1482139190" | md5sum`, `-n` 是必须的, 去掉换行
