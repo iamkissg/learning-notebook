@@ -1444,3 +1444,27 @@ every object can be treated as a function, provided it has the apply method
     - Write your application!
 - Unix, get timestamp: `date +%s` or `date -d "datetime" +%s`
 - Unix, md5 hash of a string in shell - `echo -n "seKUMdXuytClsQWYG1tcQa1x1482139190" | md5sum`, `-n` 是必须的, 去掉换行
+
+#### 2016-12-20
+
+- Scala, 定义
+    - val x = loop // 马上执行
+    - def x = loop // 别名
+- 线性表: 数组, 链表, 栈, 队列
+    - 数组 - 连续区域, 访问开销极低, 插入与删除需要移动元素
+    - 链表 - 头节点的特殊性
+    - 栈 - 数组实现与链表实现
+- 贪婪算法 - 局部最优.
+- 分治法 - 子问题与原始问题相同, 只是规模更小. 分解 - 解决 - 合并
+- 动态规划 - 多阶段决策过程转化为一系列单阶段决策问题, 利用各接段之间的递推关系, 逐个确定每个阶段的最优决策
+- Python, 检查包的位置: `python -c 'import os; import inspect; import tensorflow; print(os.path.dirname(inspect.getfile(tensorflow)))'`
+- 安装多模块包 - python setup.py install
+- Web API 的作用: 让应用程序访问后端系统和数据
+- RNNs are particularly useful for learning sequential data like music.
+- [How do API gateways work](http://stackoverflow.com/questions/11331386/how-do-api-gateways-work/11335822#11335822)
+- 尾递归
+- [Hook](http://whatis.techtarget.com/definition/hook): In programming, a hook is a place and usually an interface provided in packaged code that allows a programmer to insert customized programming. For example, a programmer might want to provide code that analyzed how often a particular logic path was taken within a program. Or a progammer might want to insert an additional capability. Typically, hooks are provided for a stated purpose and are documented for the programmer. Some writers use hook to also mean the program that gets inserted.
+- DDD vs OOD:
+    - DDD 的意义是明确业务领域。而通过 Akka 实现 Actor 模型是描述某个领域模型的最佳方式之一，它不仅能够表现出明确性，并且也可以避免不必要的架构上的困难，以及无意间（或有意识地！）造成的复杂性
+    - OOD, 与对象内部如何实现相比，对象之间的消息传递是一种更重要得多的关注点
+- Scala/Java, String2Hexdigest simplest method: `import org.apache.commons.codec.digest.DigestUtils.md5Hex; md5Hex("String")`
