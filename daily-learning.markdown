@@ -1468,3 +1468,7 @@ every object can be treated as a function, provided it has the apply method
     - DDD 的意义是明确业务领域。而通过 Akka 实现 Actor 模型是描述某个领域模型的最佳方式之一，它不仅能够表现出明确性，并且也可以避免不必要的架构上的困难，以及无意间（或有意识地！）造成的复杂性
     - OOD, 与对象内部如何实现相比，对象之间的消息传递是一种更重要得多的关注点
 - Scala/Java, String2Hexdigest simplest method: `import org.apache.commons.codec.digest.DigestUtils.md5Hex; md5Hex("String")`
+
+#### 2016-12-22
+
+- Git 冲突时, 用 `git mergetool` 启动手动混合. ("both modified")
