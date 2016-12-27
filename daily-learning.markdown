@@ -1472,3 +1472,8 @@ every object can be treated as a function, provided it has the apply method
 #### 2016-12-22
 
 - Git 冲突时, 用 `git mergetool` 启动手动混合. ("both modified")
+
+#### 2016-12-27
+
+- Scala, `in seq` 操作: `Seq.contains()`
+- Mysql, 创建 utf-8 支持数据库: `create database linkTestDB  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
