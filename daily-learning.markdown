@@ -1477,3 +1477,17 @@ every object can be treated as a function, provided it has the apply method
 
 - Scala, `in seq` 操作: `Seq.contains()`
 - Mysql, 创建 utf-8 支持数据库: `create database linkTestDB  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
+
+#### 2016-12-28
+
+- Scala, `try .. catch .. ` 也是一个作用域
+- Scala, `Option` 的正确打开方式:
+
+```optionInstance match {
+    case Some(name) => ..
+    case None =>
+}
+```
+
+- Scala, 慎用 null(Using the Scala Option, Some, and None idiom (instead of Java null)), Option.get
+- Scala, `Try, Success, Failure` 使用
