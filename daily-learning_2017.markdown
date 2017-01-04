@@ -42,3 +42,7 @@ def jsonStrToMap(jsonStr: String): Map[String, Any] = {
 ```scala
 val fileName = uri.drop(uri.lastIndexOf("/") + 1)
 ```
+
+## 2017-01-04
+
+- MySQL, 查看表结构: `desc tableName;`
