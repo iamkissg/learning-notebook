@@ -94,3 +94,48 @@ val fileName = uri.drop(uri.lastIndexOf("/") + 1)
 - Scala, Map's add, update or delete:
     - add/update: Map + ("Echo" -> "Engine")
     - delete: Map - ("Engine" -> "Shadow")
+
+## 2017-01-21
+
+- Scala, 列表生成式 `yield` 前后都是可以用 if 语句的:
+
+```scala
+val example = for(i <- List(1, 2, 3, 4, 5, 6, 7, 8, 9) if (i % 2 == 0)) yield if (i == 2) "It's 2!" else i
+```
+
+- Scala, 向上和向下取整: `math.floor(number)`, `math.ceil(number)`
+- Scala, 集合的基本使用. 交并差: `&`, `|`, `--`. 添加/删除元素: `+`, `-`, 设计到多个元素时, 用元组来封装.
+- Scala 的非 Set 类型的序列, `distinct` 可以用于去重, 并保持去重后类型不变
+- Scala, 可以借助元组实现多值赋值: `- Scala, 可以借助元组实现多值赋值:
+
+```scala
+scala> val (a, b, c) = (1, 2, 3)
+a: Int = 1
+b: Int = 2
+c: Int = 3
+```
+
+- Scala, 序列拆分:
+    - `partition`: 将序列按是否满足某条件分成两部分
+    - `span`: 按先后顺序对序列的元素进行验证, 满足条件的最长的子序列为一个序列, 从第一个不满足条件的元素开始都为一个序列, 即使后续元素仍旧满足条件.
+
+```scala
+scala> List(1,2,3,4).partition(x => x % 2 == 0)
+res0: (List[Int], List[Int]) = (List(2, 4),List(1, 3))
+scala> Seq(1,2,3,4).span(x => x % 2 == 0)
+res0: (Seq[Int], Seq[Int]) = (List(),List(1, 2, 3, 4))
+```
+- Scala, 生成随机数/字符串
+    - 随机整数: `scala.util.Random.nextInt` or `scala.util.Random.nextInt(maximum value)`
+    - 随机 0.0 到 1.0 的浮点数: `scala.util.Random.nextDouble`
+    - 设置随机种子: `scala.util.Random.setSeed(balabala)`
+    - 随机可打印的字符: `scala.util.Random.nextPrintableChar`
+    - 随机字符串: `scala.util.Random.alphanumeric.take(10).mkString`
+    - [更多例子](http://alvinalexander.com/scala/creating-random-strings-in-scala)
+- Scala, 一个奇怪的方法, 不清楚用在什么地方: `tuple.productIterator.toList`
+- Scala, 异常处理小技巧: if 的一个分支计算值, 另一个抛出异常. 整个 if 表达式的类型就是实际计算值的分支的类型.
+- Scala, try-catch-finally 语句, 最好避免从 finally 子句中返回值, 而将 finally 当作确保某些副作用, 如关闭打开的文件, 数据库连接等
+- 可用于密码的非字母数字符号: ` !"#$%&'()\*+,-./:;<=>?@[\\]^\_\`{|}~`
+- Python, 生成随机字符串: `''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(N))`
+- Java, 组装路径: `Path path = Paths.get("foo", "bar", "baz.txt")` (import java.nio.file.{Path, Paths})
+- Scala, Seq 被转成 String 后,没有简单地办法可以将 String 逆转回 Seq. 在 toString 过程中丢失了一部分信息. 只能手动解析反转
