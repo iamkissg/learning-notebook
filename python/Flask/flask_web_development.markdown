@@ -1,5 +1,7 @@
 # Flask Web 开发
 
+## Chapter 1 & Chapter 2
+
 - Python, 修饰器是 Python 语言的标准特性，可以使用不同的方式修改函数的行为。惯常用法是使用修饰器`把函数注册为事件的处理程序`。
 - Flask，`@app.route(/user/<int:id>)` 尖括号中为 URL 的动态部分，此处，`int` 表示只匹配路由中使用 int 的动态部分。还有 `float`，`path`，其中 `path` 也是字符串，但不把斜杆视作分隔符，而当作动态片段的一部分
 - Flask，Web 服务器启动后，会进入轮询，等待并处理请求（我以为是类似中断的方式呢）
@@ -23,6 +25,34 @@ app.url_map  # 查看 Flask 程序的 URL 映射
 - `重定向` 的特殊响应类型，没有页面文档，仅告诉浏览器一个新地址用以加载新页面。`return redirect("http://kissg.me")` 或 `return make_response("", 302, {"Location": "http://kissg.me"})`
 - `abort` - 生成特殊的响应，用于处理错误。不会把控制权交还给调用它的函数，而是抛出异常把控制权交给 Web 服务器。
 - 专为 Flask 开发的扩展都暴漏在 flask.ext 命名空间下
+
+## Chapter 3
+
+- 访问数据库添加用户，生成响应并返回给浏览器。这两个过程分别称为`业务逻辑`和`表现逻辑`。
+- 默认情况下，Flask 在程序文件夹中的 `templates` 子文件夹中寻找模板。
+- Jinja2 使用 `{{ xx }}` 作为占位符，告诉模板引擎这个位置的值从渲染模板时使用的数据中获取
+- Jinja2 能识别所有类型的变量,甚至是一些复杂的类型,例如列表、字典和对象
+- 模板可以使用`过滤器`修改变量，格式如 `{{ name | capitalize }}`
+- `safe` 过滤器，在渲染时不转亦。默认情况下,出于安全考虑,Jinja2 会转义所有变量。
+- 除了 `if` 和 `for`，Jinja2 还支持`宏(macro)`，宏类似于 Python 代码中的函数。为了重复使用宏,可以将其保存在单独的文件中,然后在需要使用的模板中导入
+- 需要在多处重复使用的模板代码片段可以写入单独的文件,再包含在所有模板中,以避免重复。另一种复用代码的方式是`模板继承`
+- Bootstrap 是客户端框架,因此不会直接涉及服务器。服务器需要做的只是提供引用了 Bootstrap 层叠样 式表(CSS) 和 JavaScript 文件 的 HTML 响应, 并在 HTML、CSS 和JavaScript 代码中实例化所需组件
+- 最常见的错误代码有两个:404,`客户端请求未知页面或路由`时显示;500,`有未处理的异常`时显示。
+- 返回的渲染后的模板，是 `response` 的 body
+- 错误处理函数也返回响应，并返回与错误对应的数字状态码
+
+```html
+{% macro render_comment(comment) %}
+<li>{{ comment }}</li>
+{% endmacro %}
+<ul>
+{% for comment in comments %}
+{{ render_comment(comment) }}
+{% endfor % }
+</ul>
+```
+
+## Chapter 14
 - REST 的 6 个特征
     - C-S - 客户端与服务器之间必须有明确的界限
     - 无状态 - 客户端发出的请求中必须包含所有必要的信息。服务器不能在两次请求之间保存客户端的任何状态
