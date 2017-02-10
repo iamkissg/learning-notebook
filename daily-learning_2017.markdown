@@ -139,3 +139,17 @@ res0: (Seq[Int], Seq[Int]) = (List(),List(1, 2, 3, 4))
 - Python, 生成随机字符串: `''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(N))`
 - Java, 组装路径: `Path path = Paths.get("foo", "bar", "baz.txt")` (import java.nio.file.{Path, Paths})
 - Scala, Seq 被转成 String 后,没有简单地办法可以将 String 逆转回 Seq. 在 toString 过程中丢失了一部分信息. 只能手动解析反转
+
+## 2017-01-24
+
+- Python, 四舍五入有问题. 五是舍去的.
+
+```python
+In [1]: round(2.675, 2)
+Out[1]: 2.67
+```
+
+## 2017-02-10
+
+- Unix OS （Windows 不知），文件名不能代表文件的，inode 才是！
+- Google, `isbn:图书编号` 搜书
