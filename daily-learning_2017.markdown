@@ -153,3 +153,17 @@ Out[1]: 2.67
 
 - Unix OS （Windows 不知），文件名不能代表文件的，inode 才是！
 - Google, `isbn:图书编号` 搜书
+
+## 2017-02-13
+
+- Python, 查看未使用的端口
+
+```python
+import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind(('', 0))
+addr = s.getsockname()
+print addr[1]
+s.close()
+```
