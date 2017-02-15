@@ -167,3 +167,12 @@ addr = s.getsockname()
 print addr[1]
 s.close()
 ```
+
+## 2017-02-15
+
+- Flask, abort` 第二个默认参数，用于指定返回的错误信息
+- Flask，`request.get_json` - 获得请求的主体，并转成 JSON 格式
+- Flask, `Flask-RESTful` 嵌套验证，参考[这个](http://stackoverflow.com/questions/19234737/nested-validation-with-the-flask-restful-requestparser/27091966#27091966)
+- Flask，`request.query_string` - 返回 URL 中的查询字符串
+- Flask，`request.url` - 返回 URL 中的 URL，不含查询字符串
+- Flask，`request.args.get("params")` - 获得查询字符串的单个参数值。`request.args` 是查询字符串参数的字典
