@@ -40,6 +40,9 @@ app.url_map  # 查看 Flask 程序的 URL 映射
 - 最常见的错误代码有两个:404,`客户端请求未知页面或路由`时显示;500,`有未处理的异常`时显示。
 - 返回的渲染后的模板，是 `response` 的 body
 - 错误处理函数也返回响应，并返回与错误对应的数字状态码
+- 生成连接程序内不同路由的链接时,使用相对地址就足够了。如果要生成在浏览器之外使用的链接,则必须使用绝对地址。
+- `url_for()` - 生成动态地址时, 将动态部分作为关键字参数传入；任何额外参数添加到查询字符串
+- 日期本地化 - 在服务器上只使用 UTC 时间，把时间单位发送给 Web 浏览器,转换成当地时间,然后渲染
 
 ```html
 {% macro render_comment(comment) %}
@@ -53,6 +56,30 @@ app.url_map  # 查看 Flask 程序的 URL 映射
 ```
 
 ## Chapter 14
+
+- `Flask-RESTful` 提供了 `Resource` 基类，它定义了对于给定的一个 URL 的一个或多个 HTTP 方法的路由
+- `add_resource` 函数通过使用一个给定的 `endpoint` 将路由注册到框架上。最好显式地给出 `endpoint`
+- `flask_restful.reqparse.RequestParser` 使用类似 `ArgParse`，它默认搜索 `request.values` 域，因此字段位置有时候需要设置，如字段来自 `request.json`，则添加参数 `location=json`
+- `Flask-RESTful` 会自动将数据转成 JSON
+- `Flask-RESTful` 的 `Resource` 类继承自 Flask 的 `MethodView` 类，可以通过定义 `decorators` 类变量添加装饰器
+- `Flask-RESTful` ＋`Blueprints`:
+
+```python
+from flask import Flask, Blueprint
+from flask_restful import Api, Resource, url_for
+
+app = Flask(__name__)
+api_bp = Blueprint('api', __name__)
+api = Api(api_bp)
+
+class TodoItem(Resource):
+    def get(self, id):
+        return {'task': 'Say "Hello, World!"'}
+
+api.add_resource(TodoItem, '/todos/<int:id>')
+app.register_blueprint(api_bp)
+```
+
 - REST 的 6 个特征
     - C-S - 客户端与服务器之间必须有明确的界限
     - 无状态 - 客户端发出的请求中必须包含所有必要的信息。服务器不能在两次请求之间保存客户端的任何状态
