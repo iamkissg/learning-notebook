@@ -176,3 +176,23 @@ s.close()
 - Flask，`request.query_string` - 返回 URL 中的查询字符串
 - Flask，`request.url` - 返回 URL 中的 URL，不含查询字符串
 - Flask，`request.args.get("params")` - 获得查询字符串的单个参数值。`request.args` 是查询字符串参数的字典
+
+## 2017-02-22
+
+- Python, 删除字典的元素
+
+```python
+def removekey(d, key):
+    r = dict(d)  # make a shallow copy
+    del r[key]
+    return r
+```
+
+- Python, 移除值为空的字典元素
+
+
+```python
+{k: v for k, v in d.items() if v is not None}  # 若使用条件 `if v`，会去除 0 或 ""，False 等
+```
+
+- Python, 一个好像挺好用的库：`boltons`
