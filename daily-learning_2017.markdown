@@ -196,3 +196,40 @@ def removekey(d, key):
 ```
 
 - Python, 一个好像挺好用的库：`boltons`
+
+## 2017-02-23
+
+- Python, 从 URL 中提取文件名，简单点还是：`url.split("/")[-1]`
+    - 或者 `os.path.basename(urlparse.urlsplit("https://visualhunt.com/photos/xl/8/camera-journal-travel.jpg").path)`
+- Python, 简单逻辑的 Switch 语句代替方法：
+
+```python
+var = {
+    1: string.letters,
+    2: string.digits,
+    3: string.letters + string.digits,
+    4: string.punctuation,
+    5: string.letters + string.punctuation,
+    6: string.letters + string.digits + string.punctuation,
+}.get(key, default_value)
+```
+
+- Python, 下载的最简单方式：
+
+```import urllib
+
+urllib.urlretrieve(url, file)
+```
+
+- Python, SQLAlchemy 更新数据库记录：
+
+```python
+obj.attr = new attribute
+db.session.commit()
+```
+
+- Python, SQLAlchemy 检查是否有查询到值：
+
+```python
+Model.query.filter_by(expression).first()
+```
