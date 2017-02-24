@@ -233,3 +233,9 @@ db.session.commit()
 ```python
 Model.query.filter_by(expression).first()
 ```
+
+## 2017-02-24
+
+- Python, 在 `with` 语句中执行 `return`，相当于最后有一个 `finally` 子句
+- Python，Pillon, 直接从数据流中打开文件：`img = Image.open(io.BytesIO(content))`
+- Python, 获得文件大小，`os.stat(somefile).st_size`, 返回字节数
