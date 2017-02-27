@@ -239,3 +239,8 @@ Model.query.filter_by(expression).first()
 - Python, 在 `with` 语句中执行 `return`，相当于最后有一个 `finally` 子句
 - Python，Pillon, 直接从数据流中打开文件：`img = Image.open(io.BytesIO(content))`
 - Python, 获得文件大小，`os.stat(somefile).st_size`, 返回字节数
+
+## 2017-02-27
+
+- PostMan, 使用 `PostMan` 上传文件时，不要设置 `Content-Type`。`PostMan` 会自动根据上传的文件设置头部
+- Flask, `request.stream` 读取二进制流数据；`request.files` 是客户端上传的文件的字典，`key` 为文件名，`value` 为文件
