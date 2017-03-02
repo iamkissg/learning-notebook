@@ -17,17 +17,17 @@
 app.url_map  # 查看 Flask 程序的 URL 映射
 ```
 
-- 请求钩子 - 和视图函数之间共享数据一般使用上下文全局变量 g
+- 请求钩子 - 请求钩子函数和视图函数之间共享数据一般使用上下文全局变量 g
     - `before_first_request`：注册一个函数，在处理第一个请求之前运行。
     - `before_request`：注册一个函数，在每次请求之前运行。
     - `after_request`：注册一个函数，如果没有未处理的异常抛出，在每次请求之后运行。
     - `teardown_request`：注册一个函数，即使有未处理的异常抛出，也在每次请求之后运行。
 - `重定向` 的特殊响应类型，没有页面文档，仅告诉浏览器一个新地址用以加载新页面。`return redirect("http://kissg.me")` 或 `return make_response("", 302, {"Location": "http://kissg.me"})`
 - `abort` - 生成特殊的响应，用于处理错误。不会把控制权交还给调用它的函数，而是抛出异常把控制权交给 Web 服务器。
-- 专为 Flask 开发的扩展都暴漏在 flask.ext 命名空间下
 
 ## Chapter 3
 
+- Flask 提供的 `render_template` 函数把 Jinja2 模板引擎集成到了程序中。 `render_template` 函数的第一个参数是模板的文件名。随后的参数都是`键值对`,表示模板中变量对应的`真实值`。
 - 访问数据库添加用户，生成响应并返回给浏览器。这两个过程分别称为`业务逻辑`和`表现逻辑`。
 - 默认情况下，Flask 在程序文件夹中的 `templates` 子文件夹中寻找模板。
 - Jinja2 使用 `{{ xx }}` 作为占位符，告诉模板引擎这个位置的值从渲染模板时使用的数据中获取
@@ -54,6 +54,39 @@ app.url_map  # 查看 Flask 程序的 URL 映射
 {% endfor % }
 </ul>
 ```
+## Chapter 4
+
+- `request.form` 能获取 POST 提交的表达
+- 跨站请求伪造(CSRF), 恶意网站把请求发送到被攻击者已登录的其他网站时就会引发 CSRF 攻击
+- `SECRET_KEY` 配置变量是通用密钥,可在 Flask 和多个第三方扩展中使用
+- 使用 Flask-WTF 时,`每个 Web 表单都由一个继承自 Form 的类表示`。这个类定义表单中的一组字段,`每个字段都用对象表示`。字段对象可附属一个或多个验证函数。验证函数用来验证用户提交的输入值是否符合要求。
+
+![Flask-WTF](flask-wtf-support.png)
+
+- 刷新页面时浏览器会重新发送之前已经发送过的最后一个请求, 如果这个请求是一个包含表单数据的 POST 请求,刷新页面后会再次提交表单. 基于这个原因,最好别让 Web 程序把 POST 请求作为浏览器发送的最后一个请求
+    - 解决方法: 将 `重定向` 作为 POST 请求的响应, 而不用常规响应. 重定向是一种特殊的响应,响应内容是 URL,而不是包含 HTML 代码的字符串。浏览器收到这种响应时,会向重定向的 URL 发起 GET 请求,显示页面的内容。由于最后一个请求是 GET 请求, 刷新命令能正常使 (`POST / Redict / GET`)
+- 上述方法会带来另一个问题: 程序处理 POST 请求时,使用 form.name.data 获取用户输入的名字,可是一旦这个请求结束,数据也就丢失了。因为这个 POST 请求使用重定向处理,所以程序需要保存输入的名字,这样重定向后的请求才能获得并使用这个名字,从而构成真正的响应
+- 程序可以把数据存储在用户`会话`中,在请求之间`记住`数据。用户会话是一种`私有存储`,存在于每个连接到服务器的客户端中
+- 默认情况下,用户会话保存在客户端 cookie 中,使用设置的 `SECRET_KEY` 进行加密签名
+- 请求完成后,有时需要让用户知道状态发生了变化, 可以用确认消息. 警告或错误提醒.
+- `flask.flash()` 在发给客户端的下一个响应中显示一个消息
+- 仅调用 flash() 函数不能把消息显示出来, 需要使用模板来渲染这些消息. Flask 将 `get_flashed_messages()` 函数开放给了模板, 用来获取并渲染消息
+
+## Chapter 5
+
+- 关系性数据库, 使用结构化查询语言
+- 选择数据库框架时, 要考虑的:
+    - 易用性
+    - 性能
+    - 可移植性
+    - 框架集成度
+- Flask-SQLAlchemy, 使用 URL 指定数据库
+- 程序使用的数据库 URL 必须保存到 Flask 配置对象的 SQLALCHEMY_DATABASE_URI 键中
+
+![SQLAlchemy Support](SQLAlchemy support.png)
+
+- `relationship` 代表了关系的面向对象视角. 第一个参数表明关系的另一端是哪个 Model, 若 Model 未定义, 使用字符串指定; `backref` 参数为另一端 Model 添加一个属性, 从而定义反向关系.
+- 大多数情况下, db.relationship() 都能自行找到关系中的外键,但有时却无法决定把哪一列作为外键
 
 ## Chapter 14
 
@@ -64,8 +97,6 @@ app.url_map  # 查看 Flask 程序的 URL 映射
 - `Flask-RESTful` 的 `Resource` 类继承自 Flask 的 `MethodView` 类，可以通过定义 `decorators` 类变量添加装饰器
 - `Flask-RESTful` ＋`Blueprints`:
 
-```python
-from flask import Flask, Blueprint
 from flask_restful import Api, Resource, url_for
 
 app = Flask(__name__)
@@ -98,6 +129,5 @@ app.register_blueprint(api_bp)
     - Flask 用 蓝图（blueprints） 的概念来在一个应用中或跨应用制作应用组件和支持通用的模式
     - 一个 Blueprint 对象与 Flask 应用对象的工作方式很像，但它确实不是一个应用，而是一个描述如何构建或扩展应用的 蓝图 。Flask uses a concept of blueprints for making application components and supporting common patterns within an application or across applications.
 - 为所有客户端生成适当响应的一种方法是，在错误处理程序中根据客户端请求的格式改写响应，这种技术称为`内容协商`。
-- 在 REST
 - Web 服务中使用 cookie 有点不现实,因为 Web 浏览器之外的客户端很难提供对 cookie 的支持
 
