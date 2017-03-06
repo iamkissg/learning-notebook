@@ -244,3 +244,7 @@ Model.query.filter_by(expression).first()
 
 - PostMan, 使用 `PostMan` 上传文件时，不要设置 `Content-Type`。`PostMan` 会自动根据上传的文件设置头部
 - Flask, `request.stream` 读取二进制流数据；`request.files` 是客户端上传的文件的字典，`key` 为文件名，`value` 为文件
+
+## 2017-03-06
+
+- Fcitx, `fcitx-diagnose` - 查看哪里 fcitx 输入法配置哪里出问题了
