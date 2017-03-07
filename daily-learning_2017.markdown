@@ -248,3 +248,8 @@ Model.query.filter_by(expression).first()
 ## 2017-03-06
 
 - Fcitx, `fcitx-diagnose` - 查看哪里 fcitx 输入法配置哪里出问题了
+
+## 2017-03-07
+
+- Python, concatenate dicts: `d1.update(d0)`. [More](http://stackoverflow.com/questions/1781571/how-to-concatenate-two-dictionaries-to-create-a-new-one-in-python/1784128#1784128)
+- Flask, `current_app` -> 类 `werkzeug.local.LocalProxy` 的实例, 是程序上下文; `current_app._get_current_object()` 返回的才是类 `flask.app.Flask` 的实例, 即应用程序本身.
