@@ -1,0 +1,22 @@
+- Concrete Mathematics: A Foundation for Computer Science
+
+- style: `\documentclass[]{}`
+- fucntion package: `\usepackage{}`
+- personal conmand: `\newcommand{}`(define your own symbol, abbreviation, etc)
+- environment: `\newtheorem{}`
+- `\begin{document}` ... `\end{document}`
+- `\title{}` .. `\author{}` .. `\date{}` .. `\makefile`
+- `\begin{abstract}
+- `\section{}`
+- `\subsection{}`
+- `\begin{thebibliography}` ... `\end{thebibliography}`
+- package:
+ - math: amsmath, amsfonts, 
+ - graphics
+- `\mbox{words}` - insert words into a `$..$`
+- `\begin{equation*}` - 星号，不会自动编号
+- `clr` - 中间，左，右对齐
+- `Matlab`: print -depsc -tiff -r400 filename.eps
+- `\begin{table}`
+- `\label{}`
+- `\ref{} `
