@@ -1,0 +1,70 @@
+## 数据分析
+
+- why time series
+    - to forecast based on current data
+    - to see the relationship between current data and past data
+- time series & ML
+    - time series - 一个东西随时间的变化
+    - ML - 不同事物之间的联系
+
+- standard method to do time series
+    1. plot
+    2. transform to get stationary (静止的)) time series
+    3. fit a model to staionary time series
+    4. carry on diagnostic (诊断) checks
+    5. generate forecast to the model
+    6. invert transformation
+
+- what is stationary
+    - 事物之间的关系不受时间的影响 (do not change when shifted in time)
+- test for stationary
+    - ADF test
+        - dickey-fuller: 统计量,
+        - Lag order: 时间段之间的差, 即数据与多少天之前的数据的比较
+        - p-values: < 5 %, 可认为是 stationary
+- key components in time series:
+    - mean model: ARIMA
+    - Volatility model: GARCH
+- autocorelation -
+
+- Test for autocorelation:
+    - ACF test
+    - Ljung box test
+        - 假设: No autocorealtion
+        - p-values: 小, 有
+    - PACF test
+
+- Adjusted to Sticker (股票) - 对股票价的调整
+
+
+## 计算机基础
+
+- 为什么你应该学点编程
+    - 跨领域思考的能力 + 多维竞争力
+- 你以前的学习方法都是错的
+    - 低效的勤奋带来的愉悦感
+    - 自己在应付自己
+- 你将从Musk身上学到的一个启发是，他把人类当作计算机，当然不是字面意思，而是在本质上做类比。一个人的硬件是他的身躯和大脑，他的软件是他学习思考的方式、他的三观、他的习惯以及他的个性。对于Musk来说，学习就像是“把数据和算法下载进大脑”的过程。当他还坐在教室里听老师照本宣科时，最不爽的事之一便是“龟速的下载速度”——直到今天，他的大部分知识都来源于自学。
+- 时间的变化不是绝对的
+-整体学习策略
+    - 概念: 任何知识都不会单独存在, 它总是与方方面面的知识联系在一起的. 整体性学习, 让你在学习导数时, 想到的不是公式, 而是汽车的速度表和里程表. `将信息编织到自己的`知识网络`中, 而不是给自己加上机械记忆的负担`
+    - 思维模型: 视野. 地球模型
+    - 具体步骤: 获取 - 理解 - 扩展 (横向/纵向) - 纠错 - 应用 - 测试 (每一步都需要)
+
+- `自律`
+- 寻找志同道合的小伙伴
+- 理论学习
+- 找老师
+- 即使客观原因, 被迫打断, 也不要放弃
+- 养成习惯
+
+- 如何学习编程
+    - `刻意练习 + 10000 小时`
+    - `兴趣`
+    - 写代码
+    - 和别人探讨
+    - 计算机科学的计算机
+    - Standardization (filename, coding style)
+- what to learn
+    - 编程语言的认识和分析
+    -Learn one, and learn in deep
