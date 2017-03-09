@@ -257,3 +257,7 @@ Model.query.filter_by(expression).first()
 ## 2017-03-08
 
 - Linux, `chown [OPTION]... [OWNER][:[GROUP]] FILE`, `-R` - recursive
+
+## 2017-03-09
+
+- Proxychains-ng - ng is short for new generation
