@@ -145,6 +145,21 @@ app.url_map  # 查看 Flask 程序的 URL 映射
 - 手动添加数据库记录浪费时间而且很麻烦,所以最好能使用自动化方案. 有很多生成虚拟数据的 Python 包, 比如 `PorgeryPy`, `faker`
 - 严格来讲, 项目的 `requirements.txt` 应只包含真正的依赖. 对于开发过程中使用的包, 如 `faker`, 用 `requirements` 目录来区分保存生产环境的依赖和开发环境的依赖
 - `requirements.txt` 使用 `-r` 参数来导入其他文本的内容. 应用软件识别 `-r`
+- Flask-SQLAlchemy 的 `paginate()` 方法, 返回页查询
+- `paginate()` 方法的返回值是一个 `Pagination` 类对象. 可用于在模板中生成分页链接,因此将其作为参数传入了模板
+- Jinja2 宏的参数列表中不用加入 `**kwargs` 即可接收关键字参数
+- Jinja2 宏类似于函数
+- 富文本支持
+    - PageDown - 使用 JavaScript 实现的客户端 Markdown 到 HTML 的转换程序。
+    - Flask-PageDown - 为 Flask 包装的 PageDown,把 PageDown 集成到 Flask-WTF 表单中。
+    - Markdown - 使用 Python 实现的服务器端 Markdown 到 HTML 的转换程序。
+    - Bleach - 使用 Python 实现的 HTML 清理器。
+- Flask-PageDown 扩展定义了一个 PageDownField 类,这个类和 WTForms 中的 TextAreaField 接口一致 (`接口一致的重要性`)
+- Markdown 格式的文本, 在 POST 时只发送纯文本, 页面中显示的 HTML 预览会被丢掉。和表单一起发送生成的 HTML 预览有安全隐患,因为攻击者轻易就能修改 HTML 代码,让其和 Markdown 源不匹配,然后再提交表单。
+- 在服务器上使用 `Markdown` 将提交的表单 (纯文本) 转换成 HTML, 再用 `Bleach` 进行清理, 确保只包含几个允许使用的 HTNL 标签.
+- 把 Markdown 格式的博客文章转换成 HTML 的过程可以在 `_posts.html` 模板中完成,但这么做效率不高,因为每次渲染页面时都要转换一次。为了避免重复工作,可在创建博客文章时做一次性转换。转换后的博客文章 HTML 代码缓存在 Post 模型的一个新字段中,在模板中可以直接调用。文章的 Markdown 源文本还要保存在数据库中,以防需要编辑。
+- 每篇文章都要有一个专页,使用唯一的 URL 引用
+- 与博客文章相关的最后一个功能是文字编辑器,它允许用户编辑自己的文章。博客文章编辑器显示在单独的页面中。在这个页面的上部会显示文章的当前版本,以供参考
 
 ## Chapter 14
 
