@@ -261,3 +261,8 @@ Model.query.filter_by(expression).first()
 ## 2017-03-09
 
 - Proxychains-ng - ng is short for new generation
+
+## 2017-03-13
+
+- Vim, `source .vimrc` 是 Vim 的指令, 应该在 Vim 内执行, 而不是 Shell
+
