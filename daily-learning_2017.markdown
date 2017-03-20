@@ -266,3 +266,6 @@ Model.query.filter_by(expression).first()
 
 - Vim, `source .vimrc` 是 Vim 的指令, 应该在 Vim 内执行, 而不是 Shell
 
+## 2017-03-20
+
+- Python, 权重随机: `numpy.random.choice()`, 参数 `p` 用于设置权值.
