@@ -269,3 +269,26 @@ Model.query.filter_by(expression).first()
 ## 2017-03-20
 
 - Python, 权重随机: `numpy.random.choice()`, 参数 `p` 用于设置权值.
+
+## 2017-03-21
+
+- 文件去重, 核对 `MD5` 值 (其他如 `sha1` 都可以咯)
+
+## 2017-03-22
+
+- Python, `os.path.expanduser("~")` - 获得当前用户的家目录
+- Python, 当前目录的父目录
+    1. `dirname(dirname())`
+    2. `os.path.join()` 中用一个 `../`
+- Python, 当前脚本的绝对路径 - `os.path.abspath(__file__)`
+- Python, 当前工作目录 - `os.getcwd()`
+- Python, flat list - `[item for sublist in l for item in sublist]`
+    - 如上所示, 嵌套的列表推导式使用是: `[somgthing for 外 for 内]`
+- Python, `glob` 忽略大小写 - `glob.iglob('*.[xX][lL][sS]')` (方括号)
+- Python, `glob.glob` 和 `glob.iglob`, 后者返回一个迭代器
+- Python, `from __future__ import divisioo` - 使 `/` 成为浮点除法
+- Matplotlib, 在 `Jupyter notebook` 中使用 `plt.rcParams['figure.figsize'] = (12, 9)` 放大图表
+- Matplotlib, `plt.rcParams['font.sans-serif'] = ['SimHei']` 指定默认字体, 以解决中文显示问题
+- Matplotlib, 画图函数的 `color` 设置颜色, 可以是 `skyblue`, 还可以是一个颜色列表; 或者 `set_color()`
+- Matplotlib, `plt.grid()` - 显示网格. 参数 `axis` 可以设置 `x`, `y`, 或 `both`
+- Matplotlib, 坐标轴不连续, `plt.set_xlim()`
