@@ -296,3 +296,18 @@ Model.query.filter_by(expression).first()
 - Matplotlib, 画图函数的 `color` 设置颜色, 可以是 `skyblue`, 还可以是一个颜色列表; 或者 `set_color()`
 - Matplotlib, `plt.grid()` - 显示网格. 参数 `axis` 可以设置 `x`, `y`, 或 `both`
 - Matplotlib, 坐标轴不连续, `plt.set_xlim()`
+
+## 2017-03-23
+
+- use `jack server` instead of default
+
+```shell
+pulseaudio --kill
+jack_control start
+jack_control exit
+pulseaudio --start
+```
+
+- Shell, `sudo usermod -a -G groupName userName` - add user to existing group. `the user will need to logout and log back in.`
+- how to use fluidsynth - `fluidsynth -a audio-driver /usr/share/sounds/sf2/FluidR3_GM.sf2 midi_file`
+- 
