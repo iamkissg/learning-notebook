@@ -266,3 +266,6 @@ Model.query.filter_by(expression).first()
 
 - Vim, `source .vimrc` 是 Vim 的指令, 应该在 Vim 内执行, 而不是 Shell
 
+## 2017-03-14
+
+- `_arguments:450: _vim_files: function definition file not found`, 自动补全的问题. `rm ~/.zcompdump*`.  
