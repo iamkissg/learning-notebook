@@ -1,5 +1,25 @@
 ## XSLT - Extensible Stylesheet Language Transformations
 
+- XML 被设计成
+    - 内容与表现分离
+    - 计算机程序间数据交换的格式
+    - 人类可读写
+- 使用 XSLT 转换 XML
+    1. 将 XML 数据转成树结构
+    2. 数据结构转换：输入树结构 -> 输出树结构
+    3. 格式化数据
+- 转换过程是基于模板规则的, a template rule = template pattern + template body
+- An XSL processors `parses` an XML source and tries to find a `matching template rule`. If it does, instructions inside matching template are `evaluated`.
+- Processing always starts with the template match="/" . This instruction means: process all children of the current node, including text nodes.
+- 如果一个节点的模板存在，不会调用默认的处理。如果要包含后代节点，需要显式地请求它们的模板
+- `|` 匹配多个节点，`*` 匹配所有节点
+- `//` - 选择文档中所有指定类型的节点
+- 使用模板的 `mode`，可以对一个元素处理多次
+- 使用模板的 `priority`，设置优先级
+- `@` 获得属性，属性也是 XML 的一个节点，处理与普通节点一样
+- `tagName[@attribute]` 选择具有某属性的节点，`tagName[not(@attribute)]` 选择不具有某属性的节点
+- `call-template` - 调用定义的模板
+- `轴(axis)` - 很重要，"孩子，后代，父亲，祖先，兄弟。。。"
 - XSL 样式表本身也是一个 XML 文档，因此它总是由 XML 声明起始
 - XSLT 是描述性的
 - 基础处理范例是模式匹配。模板的规则不会列出命令性的动作序列，只定义了如何处理匹配到的节点
@@ -12,7 +32,8 @@
 - 当 XML 文件没有包含对 XSL 文件的引用时，其可使用多个不同的 XSL 样式表来进行转换。
 - `<xsl:template>` 元素用于构建模板。`match` 属性用于关俩 XML 元素和模板。
     - `<xsl:template match="/">` - <xsl:template> 元素定义了一个模板。而 match="/" 属性则把此模板与 XML 源文档的根相联系。
-- `<xsl:value-of>` 元素用于提取某个选定节点的值，并把值添加到转换的输出流中。`select` 属性的值是一个 XPath 表达式
+- `<xsl:value-of>` 元素用于提取某个选定节点的值，并把值添加到转换的输出流中。`select` 属性的值是一个 XPath 表达式. (`此模式，元素的内容被使用之后，将不能进行更多的处理`)
+- `<xsl:apply-templates>` - 此模式，将对选择的元素进行更多的处理
 - `<xsl:for-each> `元素可用于选取指定的节点集中的每个 XML 元素。也有 `select` 属性。在 `<xsl:for-each>` 元素中添加一个选择属性的判别式，可以过滤从 XML 文件输出和的结果。操作符：`=`, `!=`, `&lt;`, `&gt;`
     - `<xsl:for-each select="catalog/cd[artist='Bob Dylan']">`
 - `<xsl:sort>` 元素用于对结果进行排序。
@@ -40,3 +61,4 @@
 !(XPath axis)[xpath_axis.png]
 
 - 步(`step`) -  `轴名称::节点测试[谓语]`
+
