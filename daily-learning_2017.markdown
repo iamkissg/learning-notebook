@@ -292,3 +292,7 @@ Model.query.filter_by(expression).first()
 - Matplotlib, 画图函数的 `color` 设置颜色, 可以是 `skyblue`, 还可以是一个颜色列表; 或者 `set_color()`
 - Matplotlib, `plt.grid()` - 显示网格. 参数 `axis` 可以设置 `x`, `y`, 或 `both`
 - Matplotlib, 坐标轴不连续, `plt.set_xlim()`
+
+## 2017-03-24
+
+- Python, `OrderedDict` - 会删重复 `key`
