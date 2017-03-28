@@ -314,3 +314,73 @@ pulseaudio --start
 ## 2017-03-24
 
 - Python, `OrderedDict` - 会删重复 `key`
+
+## 2017-03-27
+
+- Python, convert list of tuples to multiple lists: `zip(*[(1, 2), (3, 4), (5, 6)])`, or `map(list, zip(*[(1, 2), (3, 4), (5, 6)]))`
+- Matplotlib, Plot bar graph using a dict:
+
+```python
+import matplotlib.pyplot as plt
+
+D = {u'Label1':26, u'Label2': 17, u'Label3':30}
+
+plt.bar(range(len(D)), D.values(), align='center')
+plt.xticks(range(len(D)), D.keys())  # use xticks
+
+plt.show()
+```
+
+- Python, 浮点数与分数的相互转换 -`fractions`
+
+```python
+>>> str(Fration(0.25))
+"1/4"
+```
+
+- Python, sort by multiple attributes, `key` 可以是一个返回 tuple 的函数: `s = sorted(s, key = lambda x: (x[1], x[2]))` or `s = sorted(s, key = operator.itemgetter(1, 2))`
+- Python, check if a float value is a whole number: `float.is_integer()`
+- Python, about `zip`. In **Python 2**, `zip` returns a `list` of tuples. `itertools.izip` return iterator instead of list, `itertools.izip_longest` 顾名思义. In **Python 3**, `zip` return a iterator.
+- Python, determine if an obj is iterable: `isinstance(obj, collections.Iterable)`
+
+```python
+# General pythonic approach to determine if an obj is iterable
+
+# Pythonic programming style that determines an object's type by inspection
+# of its method or attribute signature rather than by explicit relationship
+# to some type object ("If it looks like a duck and quacks like a duck,
+# it must be a duck.") By emphasizing interfaces rather than specific types,
+# well-designed code improves its flexibility by allowing polymorphic substitution.
+# Duck-typing avoids tests using type() or isinstance(). Instead, it typically employs
+# the EAFP (Easier to Ask Forgiveness than Permission) style of programming.
+
+try:
+   _ = (e for e in my_object)
+except TypeError:
+   print my_object, 'is not iterable'
+```
+
+- Python, check list monotonicity (单调性)
+
+```python
+# Pythonic approach
+def strictly_increasing(L):
+    return all(x<y for x, y in zip(L, L[1:]))
+
+def strictly_decreasing(L):
+    return all(x>y for x, y in zip(L, L[1:]))
+
+def non_increasing(L):
+    return all(x>=y for x, y in zip(L, L[1:]))
+
+def non_decreasing(L):
+    return all(x<=y for x, y in zip(L, L[1:]))
+```
+
+- Python, `collections.Sequence` - key attribute: `__new__`, `__init__`, `__getitem__`, `__len__`; Python, `collections.Set` - key attribute: `__contains__`, `__iter__`, `__len__`. So 序列和集合有不同!
+
+## 2017-03-28
+
+- 生成字体索引信息 - `sudo mkfontscale && sudo mkfontdir`; 更新字体缓存 - `sudo fc-cache`
+- Ubunt, 字体文件保存在 `/usr/share/fonts` 下
+
