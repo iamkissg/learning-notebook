@@ -384,3 +384,31 @@ def non_decreasing(L):
 - 生成字体索引信息 - `sudo mkfontscale && sudo mkfontdir`; 更新字体缓存 - `sudo fc-cache`
 - Ubunt, 字体文件保存在 `/usr/share/fonts` 下
 
+## 2017-03-29
+
+- Python, `import` with `try except`
+
+> Importing a module that does not exist will raise an `ImportError` exception. You can use this to define multiple levels of functionality based on which modules are available at run-time, or to support multiple platforms
+
+- Linux, `/etc/fstab` 包含了静态文件系统信息，定义了存储设备和分区整合到整个系统的方式。`mount` 命令会读取这个文件，确定设备和分区的挂载选项
+- Linux, `stat any_file` - information of file, including block sizemount
+- Python, `del lst[:]` - empty list.
+- Python, `lst[:] = []` does not empty the list, just creates a new object and binds it to the variable
+- Python, `dict.update` 会覆盖同名键值对
+- Linux, `df - report file system disk space usage`
+- Python, pythonic merge two dicts (user will cover default):
+
+```python
+# 1.
+context = {**default, **user}  # Python 3.5 以上可用
+
+# 2.
+context = default.copy()
+context.update(user)
+```
+
+- Python, 写程序时，用户自定义配置可以覆盖默认配置，如上所示。又如 `awesome-python3-app` 的配置
+
+## 2017-03-30
+
+- Linux, `setxkbmap -layout us -option ctrl:nocaps`
