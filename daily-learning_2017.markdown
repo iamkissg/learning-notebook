@@ -412,3 +412,7 @@ context.update(user)
 ## 2017-03-30
 
 - Linux, `setxkbmap -layout us -option ctrl:nocaps`
+
+## 2017-04-03
+
+- Python, 文件移动：`os.rename()` 或 `shutil.move`. 我用过 `shutil.move` 就是 shell 下 `mv` 的封装吧
