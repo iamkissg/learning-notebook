@@ -416,3 +416,8 @@ context.update(user)
 ## 2017-04-03
 
 - Python, 文件移动：`os.rename()` 或 `shutil.move`. 我用过 `shutil.move` 就是 shell 下 `mv` 的封装吧
+
+## 2017-04-18
+
+- Python, `webbrower` - Unix 下可使用多种默认查看器打开多种类型文件，包括：PDF，png，txt等
+
