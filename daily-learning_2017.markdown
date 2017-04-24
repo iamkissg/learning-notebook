@@ -421,3 +421,14 @@ context.update(user)
 
 - Python, `webbrower` - Unix 下可使用多种默认查看器打开多种类型文件，包括：PDF，png，txt等
 
+## 2017-04-24
+
+- Pandas, 移除包含某关键字的行：`df[~df["column"].isin(list of key words)]`
+- Python, 多个连续空格的替换：`re.sub(' +', ' ', string)`
+- Pandas，遍历所有的单元：
+
+```python
+for column_name, column in df.items():
+    for k, v in column.items():
+       # do something
+```
