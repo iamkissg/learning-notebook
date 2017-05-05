@@ -432,3 +432,18 @@ for column_name, column in df.items():
     for k, v in column.items():
        # do something
 ```
+
+## 2017-04-25
+
+> 在处理数据之前, 很关键的一点是, 空缺值的处理. 一定要先处理了空缺值, 再进行后续的处理!
+
+## 2017-04-26
+
+- Python2, `d[key]` 比`d.get(key)` 高效一倍
+- Python2, 列表推导式比 `map(func, seq)` 高效一倍
+
+## 2017-05-05
+
+- Python 2.x, `map(None, seq1, seq2, seq3, ...)` 能实现 `itertools.iziplongest(seq1, seq2, seq3, ..., fillvalue=None)`
+- Python, 排列: `itertools.permutations`, 组合: `itertools.combinations`
+- Pandas, `df.head(n)` 前 n 个; `df.nlargest(n)` 值最大的 n 个, 降序排序, `series.argmax()` 返回最大值的索引
