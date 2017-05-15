@@ -268,7 +268,7 @@ Model.query.filter_by(expression).first()
 
 ## 2017-03-14
 
-- `_arguments:450: _vim_files: function definition file not found`, 自动补全的问题. `rm ~/.zcompdump*`.  
+- `_arguments:450: _vim_files: function definition file not found`, 自动补全的问题. `rm ~/.zcompdump*`.
 
 ## 2017-03-20
 
@@ -447,3 +447,89 @@ for column_name, column in df.items():
 - Python 2.x, `map(None, seq1, seq2, seq3, ...)` 能实现 `itertools.iziplongest(seq1, seq2, seq3, ..., fillvalue=None)`
 - Python, 排列: `itertools.permutations`, 组合: `itertools.combinations`
 - Pandas, `df.head(n)` 前 n 个; `df.nlargest(n)` 值最大的 n 个, 降序排序, `series.argmax()` 返回最大值的索引
+
+## 2017-05-15
+
+- Scala, [提前初始化](http://stackoverflow.com/a/4716273/5337323):
+
+```scala
+abstract class X {
+    val name: String
+    val size = name.size
+
+}
+
+// 提前初始化, 将先给变量 name 赋值, 后执行父类的类体, 为 size 赋值
+class Y extends {
+    val name = "class Y"
+
+} with X
+
+// 此时, 将优先执行父类 X 的类体, 但是由于变量 name 不存在, 为 size 赋值将出错
+class Z extends X {
+    val name = "class Z"
+}
+```
+
+- Scala, Symbol 类型
+    - 该类型的对象是被拘禁的(interned), 任意的同名symbols都指向同一个Symbol对象，避免了因冗余而造成的内存开销
+    - symbols对象之间可以使用操作符`==`快速地进行相等性比较，常数时间内便可以完成，而字符串的equals方法需要逐个字符比较两个字符串，执行时间取决于两个字符串的长度，速度很慢
+- Scala, 多重赋值: `val (myVar1, myVar2) = Pair(40, "Foo")`
+- Scala, 方法的参数是不可变的
+- Scala, `继承`将继承父类所有非私有的成员 (只有主构造器的能够向父类构造器传递参数)
+- Scala, 主构造器: `从类定义开始, 横跨整个类体的非字段和方法, 都是主构造器` (辅助构造器通过关键字 `this` 定义)
+- Scala, 隐式类 - 只能在别的 trait / class / object 内定义; 构造函数只能有一个非隐式参数; 在同一作用域内, 不能有任何方法, 成员或对象与隐式类同名
+- Scala, 访问修饰符
+    - 私有成员: 只在类或包含成员定义的对象中可见, 即使是该类的外部类也无法访问;
+    - 保护成员: 只在成员定义的类的子类中可访问, 即使在相同的包中, 也无法访问;
+    - 公有对象: 默认, 可无限制访问
+    - 访问修饰符可通过限定符进行扩充;
+
+```scala
+package society {
+    package professional {
+        class Executive {
+            private[professional] var workDetails = null
+            private[society] var friends = null
+            private[this] var secrets = null
+            // workDetails 可被封闭包 professional 内的任意类访问
+            // friends 可被封闭包 society 内的任意类访问
+            // screts 只能被实例方法内的隐式对象访问
+
+            def help(another : Executive) {
+                println(another.workDetails)
+                println(another.secrets) //ERROR
+            }
+        }
+    }
+}
+```
+
+- Scala, 函数名可包含如 `+`, `++` 等字符.
+- Scala, 没有方法体的方法被隐式转化为*抽象*的
+- Scala, `传名`调用函数(与之相对的是, `传值调用`), `name: => type`, 不计算参数表达式而直接应用到函数内部. 优点在于, 对于不用计算参数表达式的情况, 效率更高; 但也可能重复计算值, 效率更低了:
+
+```scala
+def useOrNotUse(x: Int, y: => Int) = {
+    flag match{
+        case true => x
+        case false => x + y
+    }
+}
+```
+
+- Scala, 允许用户指明函数的最后一个参数可能是可重复的 (repeated), 即在参数类型后追加 `*`:
+
+```scala
+def printStrings( args:String*  ) = {
+    var i : Int = 0;
+    for( arg <- args  ){
+        println("Arg value[" + i + "] = " + arg );
+        i = i + 1;
+    }
+}
+
+printStrings("Hello", "Scala", "Python");
+```
+
+- Scala, 函数支持默认参数
