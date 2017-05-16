@@ -533,3 +533,100 @@ printStrings("Hello", "Scala", "Python");
 ```
 
 - Scala, 函数支持默认参数
+
+## 20170516
+
+- Scala, 函数调用的说法更近于数学的说法: `将函数应用于参数`, 如果缺少参数, 函数将偏应用于当前参数, 得到一个新的函数.
+- Scala, 函数参数默认按顺序赋值, 使用命名参数, 可以以任意顺序传递参数.
+- Scala, 递归对于纯函数式编程相当重要
+- Scala, 匿名函数: `(参数) => 函数体`
+- Scala, 柯里化: 将多参函数转换为函数链, 每个函数仅有一个参数. 比如 `def strcat(s1: String)(s2: String) = s1 + s2`
+- Scala, 闭包: 函数, 但是返回值取决于一个或多个声明于函数之外的变量
+
+```scala
+val factor = 3
+
+// facotr 不是一个正式的参数, 其声明在函数体外, 但封闭域中使用.
+// 每次函数调用时, 函数引用 factor, 并读取其当前值
+val multiplier = (i:Int) => i * factor
+```
+
+- Scala, `String` 类型同 Java, Python 一样是不可变的. 若要频繁地修改 String, 使用 `String Builder`
+- 用去获取对象信息的方法称为访问器方法 `accessor method`.
+- Scala. `String Interpolation` - 将变量引用直接嵌入到转义字符串中.
+    - s String Interpolator: 直接转义. `val name = "James"; println(s"Hello, $name")`; `println(s “1 + 1 = ${1 + 1}”) //output: 1 + 1 = 2`
+    - f Interpolator: 创建格式化字符串, 与 C 语言的 `printf` 相似. 后缀标明变量类型与格式. 如 `f"$name%s is $height%2.2f meters tall"`
+    - raw Interpolator: 与 s Interpolator 相似, 但不会转义字符.
+- Scala, `array` 是存储同类型元素的固定大小的序列集合. `var z:Array[String] = new Array[String](3)` or `var z = new Array[String](3)`. 访问是 `()`, 而不是 Python 的 `[]`
+- Scala, `lazy` 集合的元素不会消耗内存, 直到被访问. 不可变的集合可能包含可变的元素
+- Scala, 特质 `trait` 包含了字段和方法定义, 常用于通过指定支持的方法签名来定义对象类型. 特质允许部分实现,未实现的函数可由继承特质的类实现.
+- Scala, `obj.isInstanceOf[type]` - 检查对象是否某类型; `obj.asInstanceOf[type]` - 获取对象 obj 的类型并精确转化为 type 类型
+- Scala, 值类 `value class` 是通过继承 `AnyVal` 类来避免运行时对象分配的机制. 其仅有一个被用作运行时底层表示的公有 `val` 参数, 可以带 `def` 定义, 但不能再定义额外的 val, var, 内嵌的 trait, class 或 object. 值类只能继承 universal traits, 其自身不能被继承.(所谓 universal trait 就是继承自 Any, 只有 def 成员, 且不作任何初始化工作的 trait)
+- Scala, 模式匹配是除了函数值和闭包之外, 最广泛使用的功能. `=>` 分离了模式与对应的表达式;
+- Scala, 定义样本类的 `case` 关键字与模式匹配中的 case 表达式相关:
+    1. 编译器自动将样本类的构造参数转换成不可变字段
+    2. 编译器自动实现为样本类实现 `equals`, `hashCode` 和  `toString` 方法
+    3. 样本类可以留空类体
+- Scala, 对字符串调用 `r()` 方法, 会隐式地将 String 转换成 RichString, 并调用方法获得 Regex 实例. 或 new Regex(String) 创建正则表达式实例
+- Scala, `try .. catch` 的 `catch` 代码块可使用模式匹配来分类处理异常
+- Scala, 提取器 `extractor` 是带 `unapply` 方法的对象. `unapply` 方法的目的是匹配一个值, 然后拆分它. `extractor` 对像通常会定义一个 `apply` 的双重方法.
+- Scala, 可以对 object 和 class 同时定义 `apply`. 编译器将自动调用 `apply` 方法
+- Scala, 使用 `match` 语句比较 `extractor` 对象时, `unapply` 方法将自动执行
+
+```Scala
+object Demo {
+    def main(args: Array[String]) {
+        val x = Demo(5)
+        println(x)
+
+        x match {
+            case Demo(num) => println(x+" is bigger two times than "+num)
+            //unapply is invoked
+            case _ => println("i cannot calculate")
+        }
+    }
+    def apply(x: Int) = x*2
+    def unapply(z: Int): Option[Int] = if (z%2==0) Some(z/2) else None
+}
+
+// 10
+// 10 is bigger two times than 5
+```
+
+- VNC, Debian 系启动 VNC daemon: `service vncserver-x11-serviced start`; Debain 系开机自启: `update-rc.d vncserver-x11-serviced defaults`
+- Server, `localhost != 127.0.0.1`
+- Twirl, 模板可生成任何基于文本的格式; 模板将被编译成标准的 Scala 函数: `views/Application/index.scala.html` 模板文件会生成 `views.html.Application.index` 类, 并拥有 `apply()` 方法.
+- Twirl, 模板像一个函数, 需要参数, 且参数必须声明在模板文件的顶部, 可以指定默认值;
+- Twirl, 迭代: `@for(p <- products) { ... }`; 选择分支 `@if(condition) { ... } else { ... }`
+- Twirl, 声明可复用的代码块:
+
+```scala
+@display(product: Product) = {
+  @product.name ($@product.price)
+
+}
+
+@title(text: String) = @{
+  text.split(' ').map(_.capitalize).mkString(" ")
+
+}
+```
+
+- Twirl, 以 `implicit` 关键字打头的名称, 将被标记为隐式的. 如 `@implicitFieldConstructor = @{ MyFieldConstructor() }`
+- Twirl, 声明可复用的值, 用 `defining` 关键字:
+
+```scala
+@defining(user.firstName + " " + user.lastName) { fullName =>
+  <div>Hello @fullName</div>
+ }
+```
+
+- Twirl, 导入语句写在模板开头, 在参数之后; 若要绝对解析, 使用 `root` 前缀, 如 `@import _root_.company.product.core._`
+- Twirl, 若有公用的导入需要在所有模板中导入, 可以在 `build.sbt` 中声明: `TwirlKeys.templateImports += "org.abc.backend._"`
+- Twirl, 注释: `@* *@`.
+- Twirl, 默认情况下, 动态内容将依据模板的类型被转义, 若要输出原生的片段, 用 `@type()` 包裹内容即可:
+
+```scala<p>
+  @Html(article.content)
+</p>
+```
