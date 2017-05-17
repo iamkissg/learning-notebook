@@ -630,3 +630,11 @@ object Demo {
   @Html(article.content)
 </p>
 ```
+
+## 20170517
+
+- Twirl, Reverse routing and fingerprinting for public assets: `@routes.Assets.versioned(path, file)`
+- Twirl, 向模板添加 CSRF:
+    1. @()(implicit request: play.api.mvc.RequestHeader) [Help](http://stackoverflow.com/questions/27920546/how-to-pass-request-header-from-main-view-to-partial-view-in-play-framework)
+    2. @helper.form(action = com.chinapex.prism.controllers.routes.HomeController.index(), 'class -> "form-signin", 'id -> "login-form")
+    3. @helper.CSRF.formField
