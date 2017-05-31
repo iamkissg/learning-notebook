@@ -638,3 +638,98 @@ object Demo {
     1. @()(implicit request: play.api.mvc.RequestHeader) [Help](http://stackoverflow.com/questions/27920546/how-to-pass-request-header-from-main-view-to-partial-view-in-play-framework)
     2. @helper.form(action = com.chinapex.prism.controllers.routes.HomeController.index(), 'class -> "form-signin", 'id -> "login-form")
     3. @helper.CSRF.formField
+
+## 20170523
+
+- AJAX - 添加请求头部：
+
+```javascript
+$.ajax({
+    url: 'foo/bar',
+    headers: { 'x-my-custom-header': 'some value'  }
+});
+
+// OR
+$.ajaxSetup({
+    headers: { 'x-my-custom-header': 'some value'  }
+});
+```
+
+- Django - (虽然我没用过 Django) Django AJAX CSRF 认证:
+
+```python
+<form>
+    {% csrf_token %}
+</form>
+
+# AJAX
+# 将 csrf token 作 post 的数据
+$.ajaxSetup({
+    data: {csrfmiddlewaretoken: '{{ csrf_token  }}' },
+});
+```
+
+- 关于 [csrf token with ajax](https://stackoverflow.com/questions/9089909/do-i-need-a-csrf-token-for-jquery-ajax)
+- JQuery - name selector: `$("[name='obj name']")`
+- Play - Scala CSRF AJAX 认证:
+
+```scala
+<form>
+    @helper.CSRF.formField
+</form>
+
+// AJAX
+$.ajax({
+
+    ...
+    headers: {"Csrf-Token": $('[name="csrfToken"]').val()},
+    ...
+}),
+```
+
+- Play - I18N, 使用正则表达式 `[a-zA-Z0-9.-_]` 匹配字符, 因此, 无法匹配中文. 一个办法是, 自己继承 I18N 模块重写. 为不改变 Play 提供的一些功能, 使用继承!
+
+## 20170524
+
+- Matplotlib - `plt.tight_layout()` - 可以使子图的布局更好看, 太紧凑的子图会伸展开
+- Matplotlib - `plt.xticks(range)` - 可设置 X 轴刻度
+- Matplotlib - `fig.savefig(bbox_inches="tight")` - 对于子图图例无法显示完全的情况, 可以完整地显示图例
+- Matplotlib - `ax.plot(label=somename)` - 指定的 label 可用作图例的名称
+- Regex - 绝大部分 CJK 字符范围: [\u4e00-\u9fa5]
+
+## 20170526
+
+- Scala - 当使用 `case` 为变量赋值时，若多个 case 的返回值不一样。变量的类型将隐式向上转型:
+
+```scala
+scala> val s = 1 match {
+     | case 1 => true
+     | case 0 => 1
+     |
+}
+s: AnyVal = true
+
+//
+scala> val s: Int = 1 match {
+     | case 1 => true
+     | case 0 => 1
+     |
+}
+<console>:12: error: type mismatch;
+ found   : Boolean(true)
+ required: Int
+       case 1 => true
+                 ^
+```
+
+- Scala, 对于 `Option` 类型的变量，实在要用 case 去匹配的话，以 `Some(String)` 为例：
+
+```scala
+val s = objOfOption[String] match {
+  case Some(s) => s
+  case None => ""
+}
+```
+
+- Scala - `AnyVal` 其实就是无类型. 同 Java 的 `Object`, Python 的 `Object`
+- Python - 启动 Web 服务之后，也可以断点！在要打断点的地方加上：`import pdb; pdb.set_trace()`
