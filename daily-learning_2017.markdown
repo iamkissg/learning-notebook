@@ -749,3 +749,18 @@ val s = objOfOption[String] match {
 
 - PLAY －`evolution` 跟踪和安排数据库 schema 变化，从创表到删表，一手包办，但如果在此之外创建了表，需要手动更正。需要手动在 `conf/evolutions/{db name}` 下创建 SQL 文件。开发模式下，在每个请求之前都会检查数据库结构状态；生产模式下，在启动应用时检查数据库结构状态。
 - PLAY - `${?enviroment variable name}`，以这种方式引用系统环境变量值
+
+## 20170602
+
+- MYSQL - 时间戳以 UTC 时间存储
+－MYSQL - 创建数据表时：`timestamp not null default current_timestamp on update current_timestamp`, 将自动更新时间属性
+－PLAY －`sbt "run -Dconfig.resource=application.engine.conf"` 以 application.engine.conf 为配置文件启动应用
+－MYSQL －`select UTC_TIMESTAMP()` 返回当前 UTC 时间戳
+- MYSQL - `sudo /etc/init.d/mysql start/stop/restart` - 启动/关闭/重启
+- Slick －`coffees.map(c => (c.name, c.supID, c.price)) += ("Colombian_Decaf", 101, 8.99)` - 其他字段将使用默认值，前提是，有默认值
+- Scala －当类存在伴生对象时，`(Person.apply _)`，Person 指向伴生对象，此时括号的整体指代 Person 类
+- Linux - `timedatectl status` 查看系统时间信息,包括本地时间、UTC 时间、时区等
+- Linux - `sudo timedatectl set-timezone UTC/CST` 修改时区
+- Linux - `timedatectl list-timezones` 列出所有时区
+- MYSQL - `alter table table_name modify column some_col info` 修改属性列
+- MYSQL - `describe [db_name.]table_name;` 查看表结构
