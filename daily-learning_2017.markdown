@@ -764,3 +764,28 @@ val s = objOfOption[String] match {
 - Linux - `timedatectl list-timezones` 列出所有时区
 - MYSQL - `alter table table_name modify column some_col info` 修改属性列
 - MYSQL - `describe [db_name.]table_name;` 查看表结构
+
+## 20170605
+
+- MYSQl - MySQL converts TIMESTAMP values from the current time zone to UTC for storage, and back from UTC to the current time zone for retrieval. MYSQL 这不是搞事吗?
+- MYSQL - 时间戳都是以 UTC 存储，但展示的时候，是根据当前设置的 `time_zone` 来展示的。如下, 分别是 `time_zone` 设置为 CST 与 UTC 时的值. 但是以下 `user_id=3` 的记录，是错误的
+
+```mysql
+mysql> select * from account_token;
++--------------------------------------+---------------------+---------+
+| token                                | created             | user_id |
++--------------------------------------+---------------------+---------+
+| a106f7dc-5871-4a8a-a89e-93ebe5151266 | 2017-06-05 16:32:25 |       3 |
+| f73edb0f-b35f-4b72-859b-b0cf04a871cf | 2017-06-05 16:00:14 |       9 |
+| f7d4f3461e0b4a7592892f57a0e0df61     | 2017-06-05 14:13:49 |       2 |
++--------------------------------------+---------------------+---------+
+
+mysql> select * from account_token;
++--------------------------------------+---------------------+---------+
+| token                                | created             | user_id |
++--------------------------------------+---------------------+---------+
+| a106f7dc-5871-4a8a-a89e-93ebe5151266 | 2017-06-05 10:32:25 |       3 |
+| f73edb0f-b35f-4b72-859b-b0cf04a871cf | 2017-06-05 10:00:14 |       9 |
+| f7d4f3461e0b4a7592892f57a0e0df61     | 2017-06-05 08:13:49 |       2 |
++--------------------------------------+---------------------+---------+
+```
