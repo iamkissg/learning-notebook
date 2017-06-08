@@ -789,3 +789,34 @@ mysql> select * from account_token;
 | f7d4f3461e0b4a7592892f57a0e0df61     | 2017-06-05 08:13:49 |       2 |
 +--------------------------------------+---------------------+---------+
 ```
+
+## 20170608
+
+- SQL - `JOIN`，[参考链接1](https://www.codeproject.com/Articles/33052/Visual-Representation-of-SQL-Joins), [so](https://stackoverflow.com/questions/38549/what-is-the-difference-between-inner-join-and-outer-join)
+
+```MYSQL
+SELECT u.*
+FROM rooms AS u
+JOIN facilities_r AS fu
+ON fu.id_uc = u.id_uc AND (fu.id_fu='4' OR fu.id_fu='3')
+WHERE vizibility='1'
+GROUP BY id_uc
+ORDER BY u_premium desc, id_uc desc
+```
+
+> inner join - 像两张表的交集；full outer join - 像两张表的并集；left join - 保留左边表的全部行；right join - 保留右边表的全部行
+
+- LAN - 查看局域网 ip 地址： `ifconfig` - `eth0` －`inet`
+- SLICK - for 表达式实现 inner join, [看这里](http://slick.lightbend.com/doc/3.0.0/sql-to-slick.html?highlight=join#implicit-inner-joins)：
+
+```scala
+(for(p <- people;
+     a <- addresses if p.addressId === a.id
+ ) yield (p.name, a.city)
+).result
+```
+
+- Scala - 两种方式不用 `new` 关键字创建对象 [参考文章](http://alvinalexander.com/scala/how-to-create-scala-object-instances-without-new-apply-case-class)
+    1. 创建类的伴生对象，在伴生对象中定义 `apply` 方法。可以在伴生对象中创建多个 `apply` 方法，不同参数
+    2. 使用 `case class`. `case class` 会在其伴生对象中生成一个 `apply` 方法。
+- MYSQL - 时间戳常用于跟踪记录的变化，每次记录有更新，时间戳值也需要更新；`datetime` 用于存储指定的时间 [参考文章](https://stackoverflow.com/questions/409286/should-i-use-field-datetime-or-timestamp/409305#409305)
