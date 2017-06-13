@@ -820,3 +820,7 @@ ORDER BY u_premium desc, id_uc desc
     1. 创建类的伴生对象，在伴生对象中定义 `apply` 方法。可以在伴生对象中创建多个 `apply` 方法，不同参数
     2. 使用 `case class`. `case class` 会在其伴生对象中生成一个 `apply` 方法。
 - MYSQL - 时间戳常用于跟踪记录的变化，每次记录有更新，时间戳值也需要更新；`datetime` 用于存储指定的时间 [参考文章](https://stackoverflow.com/questions/409286/should-i-use-field-datetime-or-timestamp/409305#409305)
+
+## 20170613
+
+- Python, 类变量的初始化在类实例化之前，且仅初始化一次
