@@ -824,3 +824,12 @@ ORDER BY u_premium desc, id_uc desc
 ## 20170613
 
 - Python, 类变量的初始化在类实例化之前，且仅初始化一次
+
+## 20170614
+
+- Pycharm - 有时候犯傻，本地模块都识别不了。解决办法：`File > Invalidate Caches / Restart > Invalidate and Restart`
+- Pycharm - 对 web 应用进行 debug：`Run > Edit Configurations > 设置启动脚本与参数 > Debug ... > 选择模式启动`
+
+## 20170626
+
+- Java - Timestamp to Date, without time info -> `dateformat.parse(dateformat.format(ts))`
