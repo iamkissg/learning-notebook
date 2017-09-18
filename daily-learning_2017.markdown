@@ -268,7 +268,7 @@ Model.query.filter_by(expression).first()
 
 ## 2017-03-14
 
-- `_arguments:450: _vim_files: function definition file not found`, 自动补全的问题. `rm ~/.zcompdump*`.  
+- `_arguments:450: _vim_files: function definition file not found`, 自动补全的问题. `rm ~/.zcompdump*`.
 
 ## 2017-03-20
 
@@ -432,6 +432,407 @@ for column_name, column in df.items():
     for k, v in column.items():
        # do something
 ```
+
+## 2017-04-25
+
+> 在处理数据之前, 很关键的一点是, 空缺值的处理. 一定要先处理了空缺值, 再进行后续的处理!
+
+## 2017-04-26
+
+- Python2, `d[key]` 比`d.get(key)` 高效一倍
+- Python2, 列表推导式比 `map(func, seq)` 高效一倍
+
+## 2017-05-05
+
+- Python 2.x, `map(None, seq1, seq2, seq3, ...)` 能实现 `itertools.iziplongest(seq1, seq2, seq3, ..., fillvalue=None)`
+- Python, 排列: `itertools.permutations`, 组合: `itertools.combinations`
+- Pandas, `df.head(n)` 前 n 个; `df.nlargest(n)` 值最大的 n 个, 降序排序, `series.argmax()` 返回最大值的索引
+
+## 2017-05-15
+
+- Scala, [提前初始化](http://stackoverflow.com/a/4716273/5337323):
+
+```scala
+abstract class X {
+    val name: String
+    val size = name.size
+
+}
+
+// 提前初始化, 将先给变量 name 赋值, 后执行父类的类体, 为 size 赋值
+class Y extends {
+    val name = "class Y"
+
+} with X
+
+// 此时, 将优先执行父类 X 的类体, 但是由于变量 name 不存在, 为 size 赋值将出错
+class Z extends X {
+    val name = "class Z"
+}
+```
+
+- Scala, Symbol 类型
+    - 该类型的对象是被拘禁的(interned), 任意的同名symbols都指向同一个Symbol对象，避免了因冗余而造成的内存开销
+    - symbols对象之间可以使用操作符`==`快速地进行相等性比较，常数时间内便可以完成，而字符串的equals方法需要逐个字符比较两个字符串，执行时间取决于两个字符串的长度，速度很慢
+- Scala, 多重赋值: `val (myVar1, myVar2) = Pair(40, "Foo")`
+- Scala, 方法的参数是不可变的
+- Scala, `继承`将继承父类所有非私有的成员 (只有主构造器的能够向父类构造器传递参数)
+- Scala, 主构造器: `从类定义开始, 横跨整个类体的非字段和方法, 都是主构造器` (辅助构造器通过关键字 `this` 定义)
+- Scala, 隐式类 - 只能在别的 trait / class / object 内定义; 构造函数只能有一个非隐式参数; 在同一作用域内, 不能有任何方法, 成员或对象与隐式类同名
+- Scala, 访问修饰符
+    - 私有成员: 只在类或包含成员定义的对象中可见, 即使是该类的外部类也无法访问;
+    - 保护成员: 只在成员定义的类的子类中可访问, 即使在相同的包中, 也无法访问;
+    - 公有对象: 默认, 可无限制访问
+    - 访问修饰符可通过限定符进行扩充;
+
+```scala
+package society {
+    package professional {
+        class Executive {
+            private[professional] var workDetails = null
+            private[society] var friends = null
+            private[this] var secrets = null
+            // workDetails 可被封闭包 professional 内的任意类访问
+            // friends 可被封闭包 society 内的任意类访问
+            // screts 只能被实例方法内的隐式对象访问
+
+            def help(another : Executive) {
+                println(another.workDetails)
+                println(another.secrets) //ERROR
+            }
+        }
+    }
+}
+```
+
+- Scala, 函数名可包含如 `+`, `++` 等字符.
+- Scala, 没有方法体的方法被隐式转化为*抽象*的
+- Scala, `传名`调用函数(与之相对的是, `传值调用`), `name: => type`, 不计算参数表达式而直接应用到函数内部. 优点在于, 对于不用计算参数表达式的情况, 效率更高; 但也可能重复计算值, 效率更低了:
+
+```scala
+def useOrNotUse(x: Int, y: => Int) = {
+    flag match{
+        case true => x
+        case false => x + y
+    }
+}
+```
+
+- Scala, 允许用户指明函数的最后一个参数可能是可重复的 (repeated), 即在参数类型后追加 `*`:
+
+```scala
+def printStrings( args:String*  ) = {
+    var i : Int = 0;
+    for( arg <- args  ){
+        println("Arg value[" + i + "] = " + arg );
+        i = i + 1;
+    }
+}
+
+printStrings("Hello", "Scala", "Python");
+```
+
+- Scala, 函数支持默认参数
+
+## 20170516
+
+- Scala, 函数调用的说法更近于数学的说法: `将函数应用于参数`, 如果缺少参数, 函数将偏应用于当前参数, 得到一个新的函数.
+- Scala, 函数参数默认按顺序赋值, 使用命名参数, 可以以任意顺序传递参数.
+- Scala, 递归对于纯函数式编程相当重要
+- Scala, 匿名函数: `(参数) => 函数体`
+- Scala, 柯里化: 将多参函数转换为函数链, 每个函数仅有一个参数. 比如 `def strcat(s1: String)(s2: String) = s1 + s2`
+- Scala, 闭包: 函数, 但是返回值取决于一个或多个声明于函数之外的变量
+
+```scala
+val factor = 3
+
+// facotr 不是一个正式的参数, 其声明在函数体外, 但封闭域中使用.
+// 每次函数调用时, 函数引用 factor, 并读取其当前值
+val multiplier = (i:Int) => i * factor
+```
+
+- Scala, `String` 类型同 Java, Python 一样是不可变的. 若要频繁地修改 String, 使用 `String Builder`
+- 用去获取对象信息的方法称为访问器方法 `accessor method`.
+- Scala. `String Interpolation` - 将变量引用直接嵌入到转义字符串中.
+    - s String Interpolator: 直接转义. `val name = "James"; println(s"Hello, $name")`; `println(s “1 + 1 = ${1 + 1}”) //output: 1 + 1 = 2`
+    - f Interpolator: 创建格式化字符串, 与 C 语言的 `printf` 相似. 后缀标明变量类型与格式. 如 `f"$name%s is $height%2.2f meters tall"`
+    - raw Interpolator: 与 s Interpolator 相似, 但不会转义字符.
+- Scala, `array` 是存储同类型元素的固定大小的序列集合. `var z:Array[String] = new Array[String](3)` or `var z = new Array[String](3)`. 访问是 `()`, 而不是 Python 的 `[]`
+- Scala, `lazy` 集合的元素不会消耗内存, 直到被访问. 不可变的集合可能包含可变的元素
+- Scala, 特质 `trait` 包含了字段和方法定义, 常用于通过指定支持的方法签名来定义对象类型. 特质允许部分实现,未实现的函数可由继承特质的类实现.
+- Scala, `obj.isInstanceOf[type]` - 检查对象是否某类型; `obj.asInstanceOf[type]` - 获取对象 obj 的类型并精确转化为 type 类型
+- Scala, 值类 `value class` 是通过继承 `AnyVal` 类来避免运行时对象分配的机制. 其仅有一个被用作运行时底层表示的公有 `val` 参数, 可以带 `def` 定义, 但不能再定义额外的 val, var, 内嵌的 trait, class 或 object. 值类只能继承 universal traits, 其自身不能被继承.(所谓 universal trait 就是继承自 Any, 只有 def 成员, 且不作任何初始化工作的 trait)
+- Scala, 模式匹配是除了函数值和闭包之外, 最广泛使用的功能. `=>` 分离了模式与对应的表达式;
+- Scala, 定义样本类的 `case` 关键字与模式匹配中的 case 表达式相关:
+    1. 编译器自动将样本类的构造参数转换成不可变字段
+    2. 编译器自动实现为样本类实现 `equals`, `hashCode` 和  `toString` 方法
+    3. 样本类可以留空类体
+- Scala, 对字符串调用 `r()` 方法, 会隐式地将 String 转换成 RichString, 并调用方法获得 Regex 实例. 或 new Regex(String) 创建正则表达式实例
+- Scala, `try .. catch` 的 `catch` 代码块可使用模式匹配来分类处理异常
+- Scala, 提取器 `extractor` 是带 `unapply` 方法的对象. `unapply` 方法的目的是匹配一个值, 然后拆分它. `extractor` 对像通常会定义一个 `apply` 的双重方法.
+- Scala, 可以对 object 和 class 同时定义 `apply`. 编译器将自动调用 `apply` 方法
+- Scala, 使用 `match` 语句比较 `extractor` 对象时, `unapply` 方法将自动执行
+
+```Scala
+object Demo {
+    def main(args: Array[String]) {
+        val x = Demo(5)
+        println(x)
+
+        x match {
+            case Demo(num) => println(x+" is bigger two times than "+num)
+            //unapply is invoked
+            case _ => println("i cannot calculate")
+        }
+    }
+    def apply(x: Int) = x*2
+    def unapply(z: Int): Option[Int] = if (z%2==0) Some(z/2) else None
+}
+
+// 10
+// 10 is bigger two times than 5
+```
+
+- VNC, Debian 系启动 VNC daemon: `service vncserver-x11-serviced start`; Debain 系开机自启: `update-rc.d vncserver-x11-serviced defaults`
+- Server, `localhost != 127.0.0.1`
+- Twirl, 模板可生成任何基于文本的格式; 模板将被编译成标准的 Scala 函数: `views/Application/index.scala.html` 模板文件会生成 `views.html.Application.index` 类, 并拥有 `apply()` 方法.
+- Twirl, 模板像一个函数, 需要参数, 且参数必须声明在模板文件的顶部, 可以指定默认值;
+- Twirl, 迭代: `@for(p <- products) { ... }`; 选择分支 `@if(condition) { ... } else { ... }`
+- Twirl, 声明可复用的代码块:
+
+```scala
+@display(product: Product) = {
+  @product.name ($@product.price)
+
+}
+
+@title(text: String) = @{
+  text.split(' ').map(_.capitalize).mkString(" ")
+
+}
+```
+
+- Twirl, 以 `implicit` 关键字打头的名称, 将被标记为隐式的. 如 `@implicitFieldConstructor = @{ MyFieldConstructor() }`
+- Twirl, 声明可复用的值, 用 `defining` 关键字:
+
+```scala
+@defining(user.firstName + " " + user.lastName) { fullName =>
+  <div>Hello @fullName</div>
+ }
+```
+
+- Twirl, 导入语句写在模板开头, 在参数之后; 若要绝对解析, 使用 `root` 前缀, 如 `@import _root_.company.product.core._`
+- Twirl, 若有公用的导入需要在所有模板中导入, 可以在 `build.sbt` 中声明: `TwirlKeys.templateImports += "org.abc.backend._"`
+- Twirl, 注释: `@* *@`.
+- Twirl, 默认情况下, 动态内容将依据模板的类型被转义, 若要输出原生的片段, 用 `@type()` 包裹内容即可:
+
+```scala<p>
+  @Html(article.content)
+</p>
+```
+
+## 20170517
+
+- Twirl, Reverse routing and fingerprinting for public assets: `@routes.Assets.versioned(path, file)`
+- Twirl, 向模板添加 CSRF:
+    1. @()(implicit request: play.api.mvc.RequestHeader) [Help](http://stackoverflow.com/questions/27920546/how-to-pass-request-header-from-main-view-to-partial-view-in-play-framework)
+    2. @helper.form(action = com.chinapex.prism.controllers.routes.HomeController.index(), 'class -> "form-signin", 'id -> "login-form")
+    3. @helper.CSRF.formField
+
+## 20170523
+
+- AJAX - 添加请求头部：
+
+```javascript
+$.ajax({
+    url: 'foo/bar',
+    headers: { 'x-my-custom-header': 'some value'  }
+});
+
+// OR
+$.ajaxSetup({
+    headers: { 'x-my-custom-header': 'some value'  }
+});
+```
+
+- Django - (虽然我没用过 Django) Django AJAX CSRF 认证:
+
+```python
+<form>
+    {% csrf_token %}
+</form>
+
+# AJAX
+# 将 csrf token 作 post 的数据
+$.ajaxSetup({
+    data: {csrfmiddlewaretoken: '{{ csrf_token  }}' },
+});
+```
+
+- 关于 [csrf token with ajax](https://stackoverflow.com/questions/9089909/do-i-need-a-csrf-token-for-jquery-ajax)
+- JQuery - name selector: `$("[name='obj name']")`
+- Play - Scala CSRF AJAX 认证:
+
+```scala
+<form>
+    @helper.CSRF.formField
+</form>
+
+// AJAX
+$.ajax({
+
+    ...
+    headers: {"Csrf-Token": $('[name="csrfToken"]').val()},
+    ...
+}),
+```
+
+- Play - I18N, 使用正则表达式 `[a-zA-Z0-9.-_]` 匹配字符, 因此, 无法匹配中文. 一个办法是, 自己继承 I18N 模块重写. 为不改变 Play 提供的一些功能, 使用继承!
+
+## 20170524
+
+- Matplotlib - `plt.tight_layout()` - 可以使子图的布局更好看, 太紧凑的子图会伸展开
+- Matplotlib - `plt.xticks(range)` - 可设置 X 轴刻度
+- Matplotlib - `fig.savefig(bbox_inches="tight")` - 对于子图图例无法显示完全的情况, 可以完整地显示图例
+- Matplotlib - `ax.plot(label=somename)` - 指定的 label 可用作图例的名称
+- Regex - 绝大部分 CJK 字符范围: [\u4e00-\u9fa5]
+
+## 20170526
+
+- Scala - 当使用 `case` 为变量赋值时，若多个 case 的返回值不一样。变量的类型将隐式向上转型:
+
+```scala
+scala> val s = 1 match {
+     | case 1 => true
+     | case 0 => 1
+     |
+}
+s: AnyVal = true
+
+//
+scala> val s: Int = 1 match {
+     | case 1 => true
+     | case 0 => 1
+     |
+}
+<console>:12: error: type mismatch;
+ found   : Boolean(true)
+ required: Int
+       case 1 => true
+                 ^
+```
+
+- Scala, 对于 `Option` 类型的变量，实在要用 case 去匹配的话，以 `Some(String)` 为例：
+
+```scala
+val s = objOfOption[String] match {
+  case Some(s) => s
+  case None => ""
+}
+```
+
+- Scala - `AnyVal` 其实就是无类型. 同 Java 的 `Object`, Python 的 `Object`
+- Python - 启动 Web 服务之后，也可以断点！在要打断点的地方加上：`import pdb; pdb.set_trace()`
+
+## 20170531
+
+- Scala －`lazy` 延迟初始化，直到第一次需要引用成员时，才去初始化成员
+- `滚动日志文件` －当日志文件达到指定大小上限时，新建日志文件，并对原来的日志文件按编号重命名
+- Logback - 日志级别：TRACE < DEBUG < INFO < WARN < ERROR。默认级别为 DEBUG。[博客](http://veryyoung.me/blog/2015/09/10/logback-log-lerver.html)
+    1. ERROR：发生了严重的错误，必须马上处理。这种级别的错误是任何系统都无法容忍的。比如：空指针异常，数据库不可用，关键路径的用例无法继续执行。
+    2. WARN：还会继续执行后面的流程，但应该引起重视。其实在这里我希望有两种级别：一个是存在解决方案的明显的问题（比如，”当前数据不可用，使用缓存数据”），另一个是潜在的问题和建议比如“程序运行在开发模式下”或者“管理控制台的密码不够安全”）。应用程序可以容忍这些信息，不过它们应该被检查及修复。
+    3. INFO:消息在粗粒度级别上突出强调应用程序的运行过程。最好能打印些人类可读的信息，需要谨慎对待，不可随便。
+    4. DEBUG：开发人员调试程序的时候需要的关注的事情。
+    5. TRACE：更为详尽的信息，只是开发阶段使用。在产品上线之后的一小段时间内你可能还需要关注下这些信息，不过这些日志记录只是临时性的，最终应该关掉。DEBUG和TRACE的区别很难区分，不过如果你加了一行日志，在开发测试完后又删了它的话，这条日志就应该是TRACE级别的。
+
+## 20170601
+
+- PLAY －`evolution` 跟踪和安排数据库 schema 变化，从创表到删表，一手包办，但如果在此之外创建了表，需要手动更正。需要手动在 `conf/evolutions/{db name}` 下创建 SQL 文件。开发模式下，在每个请求之前都会检查数据库结构状态；生产模式下，在启动应用时检查数据库结构状态。
+- PLAY - `${?enviroment variable name}`，以这种方式引用系统环境变量值
+
+## 20170602
+
+- MYSQL - 时间戳以 UTC 时间存储
+－MYSQL - 创建数据表时：`timestamp not null default current_timestamp on update current_timestamp`, 将自动更新时间属性
+－PLAY －`sbt "run -Dconfig.resource=application.engine.conf"` 以 application.engine.conf 为配置文件启动应用
+－MYSQL －`select UTC_TIMESTAMP()` 返回当前 UTC 时间戳
+- MYSQL - `sudo /etc/init.d/mysql start/stop/restart` - 启动/关闭/重启
+- Slick －`coffees.map(c => (c.name, c.supID, c.price)) += ("Colombian_Decaf", 101, 8.99)` - 其他字段将使用默认值，前提是，有默认值
+- Scala －当类存在伴生对象时，`(Person.apply _)`，Person 指向伴生对象，此时括号的整体指代 Person 类
+- Linux - `timedatectl status` 查看系统时间信息,包括本地时间、UTC 时间、时区等
+- Linux - `sudo timedatectl set-timezone UTC/CST` 修改时区
+- Linux - `timedatectl list-timezones` 列出所有时区
+- MYSQL - `alter table table_name modify column some_col info` 修改属性列
+- MYSQL - `describe [db_name.]table_name;` 查看表结构
+
+## 20170605
+
+- MYSQl - MySQL converts TIMESTAMP values from the current time zone to UTC for storage, and back from UTC to the current time zone for retrieval. MYSQL 这不是搞事吗?
+- MYSQL - 时间戳都是以 UTC 存储，但展示的时候，是根据当前设置的 `time_zone` 来展示的。如下, 分别是 `time_zone` 设置为 CST 与 UTC 时的值. 但是以下 `user_id=3` 的记录，是错误的
+
+```mysql
+mysql> select * from account_token;
++--------------------------------------+---------------------+---------+
+| token                                | created             | user_id |
++--------------------------------------+---------------------+---------+
+| a106f7dc-5871-4a8a-a89e-93ebe5151266 | 2017-06-05 16:32:25 |       3 |
+| f73edb0f-b35f-4b72-859b-b0cf04a871cf | 2017-06-05 16:00:14 |       9 |
+| f7d4f3461e0b4a7592892f57a0e0df61     | 2017-06-05 14:13:49 |       2 |
++--------------------------------------+---------------------+---------+
+
+mysql> select * from account_token;
++--------------------------------------+---------------------+---------+
+| token                                | created             | user_id |
++--------------------------------------+---------------------+---------+
+| a106f7dc-5871-4a8a-a89e-93ebe5151266 | 2017-06-05 10:32:25 |       3 |
+| f73edb0f-b35f-4b72-859b-b0cf04a871cf | 2017-06-05 10:00:14 |       9 |
+| f7d4f3461e0b4a7592892f57a0e0df61     | 2017-06-05 08:13:49 |       2 |
++--------------------------------------+---------------------+---------+
+```
+
+## 20170608
+
+- SQL - `JOIN`，[参考链接1](https://www.codeproject.com/Articles/33052/Visual-Representation-of-SQL-Joins), [so](https://stackoverflow.com/questions/38549/what-is-the-difference-between-inner-join-and-outer-join)
+
+```MYSQL
+SELECT u.*
+FROM rooms AS u
+JOIN facilities_r AS fu
+ON fu.id_uc = u.id_uc AND (fu.id_fu='4' OR fu.id_fu='3')
+WHERE vizibility='1'
+GROUP BY id_uc
+ORDER BY u_premium desc, id_uc desc
+```
+
+> inner join - 像两张表的交集；full outer join - 像两张表的并集；left join - 保留左边表的全部行；right join - 保留右边表的全部行
+
+- LAN - 查看局域网 ip 地址： `ifconfig` - `eth0` －`inet`
+- SLICK - for 表达式实现 inner join, [看这里](http://slick.lightbend.com/doc/3.0.0/sql-to-slick.html?highlight=join#implicit-inner-joins)：
+
+```scala
+(for(p <- people;
+     a <- addresses if p.addressId === a.id
+ ) yield (p.name, a.city)
+).result
+```
+
+- Scala - 两种方式不用 `new` 关键字创建对象 [参考文章](http://alvinalexander.com/scala/how-to-create-scala-object-instances-without-new-apply-case-class)
+    1. 创建类的伴生对象，在伴生对象中定义 `apply` 方法。可以在伴生对象中创建多个 `apply` 方法，不同参数
+    2. 使用 `case class`. `case class` 会在其伴生对象中生成一个 `apply` 方法。
+- MYSQL - 时间戳常用于跟踪记录的变化，每次记录有更新，时间戳值也需要更新；`datetime` 用于存储指定的时间 [参考文章](https://stackoverflow.com/questions/409286/should-i-use-field-datetime-or-timestamp/409305#409305)
+
+## 20170613
+
+- Python, 类变量的初始化在类实例化之前，且仅初始化一次
+
+## 20170614
+
+- Pycharm - 有时候犯傻，本地模块都识别不了。解决办法：`File > Invalidate Caches / Restart > Invalidate and Restart`
+- Pycharm - 对 web 应用进行 debug：`Run > Edit Configurations > 设置启动脚本与参数 > Debug ... > 选择模式启动`
+
+## 20170626
+
+- Java - Timestamp to Date, without time info -> `dateformat.parse(dateformat.format(ts))`
 
 ## 2017-09-18
 
