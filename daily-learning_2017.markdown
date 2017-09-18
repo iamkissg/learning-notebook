@@ -432,3 +432,39 @@ for column_name, column in df.items():
     for k, v in column.items():
        # do something
 ```
+
+## 2017-09-18
+
+* 几种以图片方式展示数组的方法:
+    - PIL + Numpy, `from PIL import Image; img = Image.fromarray(data, "RGB"); img.show()`
+    - Matplolib, `plt.imshow(data, interpolation="nearest"); plt.show()`
+    - Scipy,
+        1. `from scipy.misc import toimage; toimage(data).show()`
+        2. `from scipy.misc import imshow; imshow(data)`
+    - remark: Scipy 实际就是用了 PIL 工具; Matplotlib 画出来的更好看; PIL 更接近原始照片
+* pandas, `df["some_column"]` 与 `df[["some_column"]]` 效果不一样. 前者返回一个 `Series` 对象; 后者返回 `DataFrame` 对象. 但是类似于切片, `df[["a", "b"]] 得到的是一个副本`
+
+```ipython
+In[47]: a = {"a": 1}
+In[48]: d1 = pd.DataFrame(list(a), columns=["a"])
+In[49]: d1["a"]
+Out[49]: 
+0    a
+Name: a, dtype: object
+In[50]: d1[["a"]]
+Out[50]: 
+   a
+0  a
+In[51]: type(d1["a"])
+Out[51]: pandas.core.series.Series
+In[52]: type(d1[["a"]])
+Out[52]: pandas.core.frame.DataFrame
+```
+
+* Pandas, 将指定格式的字符串列转为 Datetime 类型: `some_column = pd.to_datetime(some_column, format="%Y-%m-%d %H:%M:%S")`. 此时得到的列的每个元素, 有 `date()` 和 `time()` 方法, 获得 `date` 和 `time` 的属性.
+* Pandas, `series_element.str` 可以从对象中抽取出字符串.
+* Pandas, dict2DataFrame: `pd.DataFrame(d.items())`
+* sklearn, `RandomForestClassifier` 输出 Top N 个分类结果, 先返回预测概率: `p = predict_proba(x)`; 然后通过 `idx = np.argsort(p, axis=1)[:, -N:][:, ::-1]` 返回排序好的索引; 之后再同上索引取值即可.
+* Pandas, `for idx, row in df.iterrows():` 按行遍历 DataFrame
+* Pickle, `dump` 与 `load` 的对象都是二进制文件, 所以要带 `d`
+* Pandas, df.append() 返回拼接后的对象, 并不是原地操作.
