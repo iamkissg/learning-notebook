@@ -869,3 +869,45 @@ Out[52]: pandas.core.frame.DataFrame
 * Pandas, `for idx, row in df.iterrows():` 按行遍历 DataFrame
 * Pickle, `dump` 与 `load` 的对象都是二进制文件, 所以要带 `d`
 * Pandas, df.append() 返回拼接后的对象, 并不是原地操作.
+
+## 20170920
+
+* Python, 运行时检查 Python 版本:
+
+```python
+In [1]: import sys
+
+In [2]: sys.version
+Out[2]: '3.5.2 (default, Nov 17 2016, 17:05:23) \n[GCC 5.4.0 20160609]'
+
+In [3]: sys.version_info
+Out[3]: sys.version_info(major=3, minor=5, micro=2, releaselevel='final', serial=0)
+```
+
+## 20170925
+
+* NumPy, 快速将一维数组 (N,) 转为一维列向量 (N, 1) 或一维行向量 (1, N) 的方法: arr[:, None] or arr[None, :]
+
+```python
+In [1]: import numpy as np
+
+In [2]: a = np.arange(100)
+
+In [3]: a.shape
+Out[3]: (100,)
+
+In [4]: a[:, None].shape
+Out[4]: (100, 1)
+
+In [5]: a[None, :].shape
+Out[5]: (1, 100)
+```
+
+## 201709230
+
+* Pandas, `df.merge` 可用于进行一些数据融合的操作, 选项很多, 包括实现集合交运算一样的计算. 最简单的 `df1.merge(df2)`
+* Pandas, dataframe 可以用 `df.values` 返回 NumPy 数组, series 则可用 `s.as_matrix`
+
+## 20171003
+
+* Pandas, `pandas.get_dummies` 将类别变量转为类似 one-hot 型的变量. 一列就变成了好几列. 比如二值的性别变量 (male 与 female), get_dummies 之后就得到了 female 与 male 两列
