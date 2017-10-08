@@ -911,3 +911,28 @@ Out[5]: (1, 100)
 ## 20171003
 
 * Pandas, `pandas.get_dummies` 将类别变量转为类似 one-hot 型的变量. 一列就变成了好几列. 比如二值的性别变量 (male 与 female), get_dummies 之后就得到了 female 与 male 两列
+
+## 20171007
+
+* Numpy, `np.triu_indices` 可以快速生成矩阵上三角的坐标, 从而得到矩阵上三角的元素.
+
+## 20171008
+
+* Numpy, `numpy.tile` 可以将行向量复制 N 次, 从而得到矩阵:
+
+```python
+>>> np.tile(np.array([1,2,3]), (3, 1))
+array([[1, 2, 3],
+       [1, 2, 3],
+       [1, 2, 3]])
+>>> np.tile(np.array([[1,2,3]]).transpose(), (1, 3))
+array([[1, 1, 1],
+       [2, 2, 2],
+       [3, 3, 3]])
+```
+
+* Pandas, `pd.merge` 的几种混合方式:
+    - `inner` - 使用两个 df 的 key 的交集
+    - `outer` - 使用两个 df 的 key 的并集
+    - `left` - 使用左边 df 的 key
+    - `right` - 使用右边 df 的key
