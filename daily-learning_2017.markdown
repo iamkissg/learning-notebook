@@ -936,3 +936,34 @@ array([[1, 1, 1],
     - `outer` - 使用两个 df 的 key 的并集
     - `left` - 使用左边 df 的 key
     - `right` - 使用右边 df 的key
+
+## 20171106
+
+* pytorch, `torch.optim.lr_scheduler` 提供了多种 learning rate 衰减方案, 比原来通过 weight_decay 衰减更丰富. 使用方法是:
+
+```python
+optimizer = optim.SGD(...)
+scheduler = optim.lr_scheduler(optimizer, gamma=decay_factor)  # gamma 作为衰减因子, 有时候可能是 1/decay_factor, 根据公式与实现代码自己协调
+
+for i in epochs:
+    scheduler.step()  # will update optimizer's learning rate
+    train...
+    validate...
+```
+
+* GAN, `D(G(z))` 是假样本被判定为真的概率, 那么`1-D(G(Z))`表示的就是假样本被判定为假的概率, 因此我们要最小化 `1-D(G(z))`, 反之就是最大化`D(G(z))`. GAN 原始值函数的含义就是, 样本来自真实数据分布被判定为真的概率对数的期望+样本来自生成数据分布被判定为假的概率对数的期望, 换言之就是 D 做出正确判断的期望. 所以, 训练 D 的目标就是提高值函数的结果, G 的目标就是减小值函数的结果.
+
+## 20171221
+
+* Broadcasting - describes how numpy treats arrays with different shapes during arithmetic operations. Subject to certain constraints, the smaller array is “broadcast” across the larger array so that they have compatible shapes. Broadcasting provides a means of vectorizing array operations so that looping occurs in C instead of Python. NumPy is smart enough to use the original scalar value without actually making copies, so that broadcasting operations are as memory and computationally efficient as possible. When operating on two arrays, NumPy compares their shapes element-wise. It starts with the trailing dimensions, and works its way forward. Two dimensions are compatible when 1) they are equal, or 2) one of them is 1.
+* Broadcasting provides a convenient way of taking the outer product (or any other outer operation) of two arrays. (see beblow)
+
+```python
+>>> a = np.array([0.0, 10.0, 20.0, 30.0])
+>>> b = np.array([1.0, 2.0, 3.0])
+>>> a[:, np.newaxis] + b  # newaxis index operator inserts a new axis into a, making it 2 dimensional 4x1 array.
+array([[  1.,   2.,   3. ],
+       [ 11.,  12.,  13. ],
+       [ 21.,  22.,  23. ],
+       [ 31.,  32.,  33. ]])
+```
