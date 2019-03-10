@@ -1,0 +1,21 @@
+# ﻿How (and why) to create a good validation set
+
+- What is a "validation set"
+  - 机器学习的终极目标是, 在新的数据上泛化好
+  - 数据集划分的目的
+    - 训练集用于训练模型
+    - 验证集用于选择模型
+    - 测试集给予反馈
+  - 验证集和测试集的关键在于: 它们应能代表未来的新数据.
+- When is a random subset not good enough?
+  - 对于时间序列问题
+    - 随机选择数据作为验证集, 太容易, 但也完全不具有代表性 (因为同时看到了过去和未来的数据). 
+    - 正确的做法是, 以最后一段连续时间的数据作为验证集
+  - 思考未来需要预测的数据是怎样的, 可能和训练数据完全不同 (更真实的情况)
+    - 如果数据可以按人物(比如同一个人的不同姿态)分类, 同一个人的数据应该只用作训练或验证
+    - 当不清楚测试数据是否会完全不同时, 需要主动去发现训练集与测试集的关系
+- The dangers of cross-validation
+  - 对现实问题不具有实用性, 因为以上所有原因
+  - 交叉验证只对可以随机选择验证集的情况适用
+- Kaggle’s “training set” = your training + validation sets
+- Kaggle 将测试数据分成 public 和 private, 因此你能看到 public leaderboard 的分数只是预测结果的一个子集. 这就导致了, 你可能只是对 public leaderboard 过拟合了. 对于这一点, 可以通过查看在自己的验证集上表现相似的模型在 public leaderboard 的分数有怎样的不同.
