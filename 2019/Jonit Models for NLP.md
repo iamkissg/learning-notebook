@@ -1,0 +1,99 @@
+﻿Jonit Models for NLP
+
+- Motivation
+  - Related tasks in NLP
+    - Constituents and named entities
+    - NER, Chunking and POS Tagging
+  - Pipelines in NLP
+    - Segmentation => POS Tagging
+    - Entity and Relation
+    - Entity and Sentiment
+  - Pros
+    - Reduce error propagation
+    - Allow information exchange between tasks
+  - Challenges
+    - Joint learning
+    - Search #?
+  - Solutions
+    - 按两个维度: Search, Learning 可分成四个象限
+      - Joint Learning + Joint Search: Statistical, Neural
+      - Separate Learning + Joint Search: Statistical
+      - Jont Learning + Separate Search: Neural
+- Statistical Models
+  - Graph-based methods
+    - Traditional solution
+      - Score each candidate, select the highest-scored output
+      - Search-space typically exponential
+    - Joint Label Structure (Joint Learning + Joint Search)
+      - Joint Segmentation and POS tagging
+        - "Chinese part-of-speech tagging: One-at-a-time or all-at-once? word-based or character-based?"
+      - Joint Parsing and NER
+        - "Joint parsing and named entity recognition"
+    - Reranking (Separate Learning + Joint Search)
+      - Joint Segmentation and POS Tagging
+        - "A Dual-layer CRFs Based Joint Decoding Method for Cascaded Segmentation and Labeling Tasks"
+      - Joint Parsing and SRL
+        - "Joint parsing and semantic role labeling"
+    - Joint Modeling (Multi tasks) (Separate Learning + Joint Search)
+      - Joint Modeling
+        - "A comparison of loopy belief propagation and dual decomposition for integrated CCG supertagging and parsing"
+      - Joint Entity and Sentiment
+        - "Joint Inference for Fine-grained Opinion Extraction"
+      - Joint Supertagging and Parsing
+        - "A comparison of loopy belief propagation and dual decomposition for integrated CCG supertagging and parsing"
+    - Joint Modeling (Single task) (Joint Learning + Joint Search)
+      - Joint Segmentation and POS Tagging
+        - "Joint Word Segmentation and POS Tagging Using a Single Perceptron"
+      - Joint Entity Relation Extraction
+        - "Incremental Joint Extraction of Entity Mentions and Relations"
+  - Transition-based methods
+    - Automata (自动机)
+      - State
+        - Start state
+        - End state
+        - Intermediate states
+      - Actions: Change one state to another
+      - Transition-based Dependency Parsing
+        - Find the best sequence of actions, exponential (Beam-search decoding)
+        - Learning guided search
+          - Search not optional
+          - Learn to fix search errors
+        - Pros
+          - Low computation complexity
+          - Arbitrary linear features (Enabled by learning guided search)
+          - SOTA accuracies and speeds (for a wide range of tasks)
+          - Enable joint models
+        - "Syntactic Processing Using the Generalized Perceptron and Beam Search"
+      - Jonit Segmentation and Tagging
+        - "A Fast Decoder for Joint Word Segmentation and POS-tagging Using a Single Discriminative Model"
+      - Joint Segmentation, Tagging and Chunking
+        - "Joint Word Segmentation, POS-Tagging and Syntactic Chunking"
+      - Joint Segmentation, Tagging and Normalization
+        - "A Transition-based Model for Joint Segmentation, POS-tagging and Normalization"
+      - Joint Segmentation, POS-tagging and Constituent Parsing
+        - "Chinese Parsing Exploiting Characters"
+      - Transition-based Constituent Parsing
+        - "Syntactic Processing Using the Generalized Perceptron and Beam Search"
+      - Joint Entity and Relation Extraction
+        - "Joint Models for Extracting Adverse Drug Events from Biomedical Text"
+- Deep Learning Models
+  - Multi-tasks Learning
+    - Joint Tagging, Chunking and NER
+      - "Natural language processing (almost) from scratch"
+    - Joint Parsing and SRL
+      - "Exploiting Mutual Benefits between Syntax and Semantic Roles using Neural Network"
+      - "Joint Syntactic-Semantic Parsing with Stack LSTMs"
+    - Joint Event Detection and Reporting
+      - "A Neural Model for Joint Event Detection and Summarization"
+    - Opinion Recommendation
+      - ""Opinion Recommendation Using A Neural Model"
+    - Joint Entity and Sentiment Extraction
+      - "Neural Networks for Open Domain Targeted Sentiment"
+      - "End-to-end relation extraction using lstms on sequences and tree structures"
+      - "End-to-End Neural Relation Extraction with Global Optimization"
+    - Joint Word Segmentation, POS tagging and Dependency Parsing
+      - Neural Joint Model for Transition-based Chinese Syntactic Analysis"
+  - Cross-Lingual
+    - "Universal Dependencies Parsing for Colloquial Singaporean English"
+  - Cross-Standard
+    - "Neural Network for Heterogeneous Annotations"
